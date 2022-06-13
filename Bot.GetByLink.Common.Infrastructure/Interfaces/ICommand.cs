@@ -9,11 +9,13 @@ public interface ICommand
     ///     Run command.
     /// </summary>
     /// <param name="ctx">Context command.</param>
-    public void Execute(object? ctx = null);
+    /// <returns>Empty Task.</returns>
+    public Task Execute(object? ctx = null);
 
     /// <summary>
     ///     Rollback command.
     /// </summary>
     /// <param name="ctx">Context command.</param>
-    public void Undo(object? ctx = null);
+    /// <returns>Empty Task.</returns>
+    public Task Undo(object? ctx = null);
 }

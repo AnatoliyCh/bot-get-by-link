@@ -5,13 +5,14 @@ namespace Bot.GetByLink.Common.Infrastructure.Abstractions;
 /// <summary>
 ///     Base abstract command class.
 /// </summary>
-public abstract class Command : ICommand
+/// <typeparam name="TName">Command name type (enums).</typeparam>
+public abstract class Command<TName> : ICommand
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Command" /> class.
+    ///     Initializes a new instance of the <see cref="Command{TName}" /> class.
     /// </summary>
     /// <param name="name">Command name.</param>
-    protected Command(string name)
+    protected Command(TName name)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
     }
@@ -19,17 +20,22 @@ public abstract class Command : ICommand
     /// <summary>
     ///     Gets command name.
     /// </summary>
-    public string Name { get; }
+    public TName Name { get; }
 
     /// <summary>
     ///     Run command.
     /// </summary>
     /// <param name="ctx">Context command.</param>
-    public abstract void Execute(object? ctx = null);
+    /// <returns>Empty Task.</returns>
+    public abstract Task Execute(object? ctx = null);
 
     /// <summary>
     ///     Rollback command.
     /// </summary>
     /// <param name="ctx">Context command.</param>
-    public abstract void Undo(object? ctx = null);
+    /// <returns>Empty Task.</returns>
+    public virtual Task Undo(object? ctx = null)
+    {
+        throw new NotImplementedException();
+    }
 }
