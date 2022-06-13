@@ -33,7 +33,7 @@ while (looping)
     {
         case "exit polling":
             looping = false;
-            client.Stop();
+            await client.Stop();
             break;
         case "start polling":
             Console.WriteLine($"{projectName}: starting polling...");
@@ -41,7 +41,7 @@ while (looping)
             break;
         case "stop polling":
             Console.WriteLine($"{projectName}: stoping polling...");
-            client.Stop();
+            await client.Stop();
             break;
     }
 }
