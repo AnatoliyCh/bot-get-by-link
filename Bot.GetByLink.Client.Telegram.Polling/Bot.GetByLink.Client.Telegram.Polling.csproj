@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bot.GetByLink.Proxy.Reddit\Bot.GetByLink.Proxy.Reddit.csproj" />
+    <ProjectReference Include="..\Bot.GetByLink.Common.Infrastructure\Bot.GetByLink.Common.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
