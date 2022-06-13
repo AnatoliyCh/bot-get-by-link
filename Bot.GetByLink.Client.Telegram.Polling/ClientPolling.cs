@@ -1,5 +1,9 @@
-﻿using System.Text.RegularExpressions;
+﻿using Bot.GetByLink.Client.Telegram.Polling.Commands;
+using Bot.GetByLink.Client.Telegram.Polling.Enums;
+using Bot.GetByLink.Common.Infrastructure.Enums;
+using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Microsoft.Extensions.Configuration;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -9,31 +13,22 @@ using Telegram.Bot.Types.Enums;
 namespace Bot.GetByLink.Client.Telegram.Polling;
 
 /// <summary>
-///     Client state types.
-/// </summary>
-public enum Status
-{
-    /// <summary>
-    ///     Represents a running client.
-    /// </summary>
-    On,
-
-    /// <summary>
-    ///     Represents a stopped client.
-    /// </summary>
-    Off
-}
-
-/// <summary>
 ///     Telegram client.
 ///     Connection Type: polling.
 /// </summary>
-internal class ClientPolling
+internal class ClientPolling : Common.Infrastructure.Abstractions.Client
 {
     private readonly string? chatIdErrorHandling;
     private readonly ITelegramBotClient client;
+    private readonly IDictionary<CommandName, ICommand> commands;
+
     private readonly IConfiguration configuration;
+
     private readonly string patternCommand = "^\\/[a-zA-Z]+";
+
+    private readonly string patternURL =
+        @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
+
     private readonly ReceiverOptions receiverOptions;
 
     private CancellationTokenSource? cts;
@@ -54,20 +49,22 @@ internal class ClientPolling
         if (!string.IsNullOrWhiteSpace(chatId)) chatIdErrorHandling = chatId;
 
         receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message } };
-    }
 
-    /// <summary>
-    ///     Gets the current state of the client.
-    /// </summary>
-    public Status Status { get; private set; } = Status.Off;
+        // init commands
+        var chatInfoCommand = new ChatInfoCommand(CommandName.ChatInfo, client);
+        commands = new Dictionary<CommandName, ICommand>
+        {
+            { chatInfoCommand.Name, chatInfoCommand }
+        };
+    }
 
     /// <summary>
     ///     Client launch or reset.
     /// </summary>
     /// <returns>A <see cref="Task{TResult}" /> representing the result of the asynchronous operation.</returns>
-    public async Task<bool> Start()
+    public override async Task<bool> Start()
     {
-        if (Status == Status.On || cts is not null) Stop();
+        if (State == Status.On || cts is not null) await Stop();
         cts = new CancellationTokenSource();
         var validToken = await client.TestApiAsync(cts.Token);
         if (!validToken)
@@ -78,20 +75,25 @@ internal class ClientPolling
         }
 
         client.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, cts.Token);
-        Status = Status.On;
+        State = Status.On;
         return true;
     }
 
     /// <summary>
     ///     Client stop.
     /// </summary>
-    public void Stop()
+    /// <returns>Execution result.</returns>
+    public override Task<bool> Stop()
     {
-        Status = Status.Off;
-        if (cts is null) return;
-        cts.Cancel();
-        cts.Dispose();
-        cts = null;
+        if (cts is not null)
+        {
+            cts.Cancel();
+            cts.Dispose();
+            cts = null;
+        }
+
+        State = Status.Off;
+        return Task.FromResult(true);
     }
 
     /// <summary>
@@ -102,7 +104,7 @@ internal class ClientPolling
     public async Task SendTextMessageToLogChatAsync(string message)
     {
         if (string.IsNullOrWhiteSpace(message) || string.IsNullOrWhiteSpace(chatIdErrorHandling) || cts is null ||
-            Status == Status.Off) return;
+            State == Status.Off) return;
         try
         {
             await client.SendTextMessageAsync(chatIdErrorHandling, message, cancellationToken: cts.Token);
@@ -115,23 +117,28 @@ internal class ClientPolling
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken ct)
     {
-        // only text messages (/***)
-        if (!(update.Message!.Type == MessageType.Text &&
-              Regex.IsMatch(update.Message!.Text ?? string.Empty, patternCommand))) return;
+        var text = update.Message!.Text ?? string.Empty;
 
-        var chatId = update.Message.Chat.Id;
-        var words = update.Message.Text?.Split(" ");
+        // only command message (/**) and URL
+        if (!(update.Message!.Type == MessageType.Text &&
+              (Regex.IsMatch(text, patternCommand) || Regex.IsMatch(text, patternURL)))) return;
+
+        var words = text.Split(" ");
         if (words is null || words.Length == 0) return;
 
-        if (words[0] == "/chatInfo")
+        // commands
+        var commandNameText = Regex.Replace(words[0], "/", string.Empty);
+        commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
+        if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return;
+        var commandName = Enum.Parse<CommandName>(commandNameText, true);
+        commands.TryGetValue(commandName, out var command);
+        if (command == null) return;
+
+        switch (commandName)
         {
-            var chatInfo = await client.GetChatAsync(chatId, ct);
-            var from = update.Message.From;
-            var response =
-                $"Chat Id: {chatInfo.Id} \n" +
-                $"Chat Type: {chatInfo.Type} \n" +
-                $"From User: {from?.FirstName} {from?.LastName} @{from?.Username}";
-            await botClient.SendTextMessageAsync(chatId, response, cancellationToken: ct);
+            case CommandName.ChatInfo:
+                await command.Execute(update);
+                break;
         }
     }
 
@@ -139,12 +146,9 @@ internal class ClientPolling
     {
         if (exception is not ApiRequestException apiRequestException) return;
         var exceptionInString = apiRequestException.ToString();
-        if (string.IsNullOrWhiteSpace(chatIdErrorHandling) || apiRequestException.Message == "Unauthorized")
-        {
-            Console.WriteLine(exceptionInString);
-            return;
-        }
+        Console.WriteLine(exceptionInString);
 
+        if (string.IsNullOrWhiteSpace(chatIdErrorHandling) || apiRequestException.Message == "Unauthorized") return;
         await botClient.SendTextMessageAsync(chatIdErrorHandling, exceptionInString, cancellationToken: ct);
     }
 }
