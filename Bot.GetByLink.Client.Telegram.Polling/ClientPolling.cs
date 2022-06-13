@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Proxy.Reddit;
 using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -53,7 +54,7 @@ internal class ClientPolling
         var chatId = configuration.GetValue<string>("telegram:chat-id-log");
         if (!string.IsNullOrWhiteSpace(chatId)) chatIdErrorHandling = chatId;
 
-        receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message } };
+        receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
     }
 
     /// <summary>
@@ -115,8 +116,8 @@ internal class ClientPolling
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken ct)
     {
         // only text messages (/***)
-        if (!(update.Message!.Type == MessageType.Text &&
-              Regex.IsMatch(update.Message!.Text ?? string.Empty, patternCommand))) return;
+        //if (!(update.Message!.Type == MessageType.Text &&
+        //      Regex.IsMatch(update.Message!.Text ?? string.Empty, patternCommand))) return;
 
         var chatId = update.Message.Chat.Id;
         var words = update.Message.Text?.Split(" ");
@@ -131,6 +132,22 @@ internal class ClientPolling
                 $"Chat Type: {chatInfo.Type} \n" +
                 $"From User: {from?.FirstName} {from?.LastName} @{from?.Username}";
             await botClient.SendTextMessageAsync(chatId, response, cancellationToken: ct);
+        }
+
+        if (update.Message.Text != null && Regex.IsMatch(update.Message.Text, @"https?://www.reddit.com/r/\S+/comments/\S+"))
+        {
+            var proxyReddit = new ProxyReddit("", "");
+            var linkPost = Regex.Match(update.Message.Text, @"https?://www.reddit.com/r/\S+/comments/\S+").Value;
+            var cutUrlPost = linkPost.Substring(linkPost.IndexOf("comments/") + 9);
+            var idPost = cutUrlPost.Substring(0, cutUrlPost.IndexOf("/"));
+            var contentPost = proxyReddit.GetPostId(idPost);
+            var response = string.Empty;
+            if (!string.IsNullOrWhiteSpace(contentPost.UrlPicture)) response += contentPost.UrlPicture + " ";
+            if (!string.IsNullOrWhiteSpace(contentPost.UrlVideo)) response += contentPost.UrlVideo + " ";
+            response += contentPost.Text;
+            response = response.Replace(".", @"\.").Replace("_", @"\_").Replace("#", @"\#").Replace("=", @"\=").Replace("!", @"\!");
+            if (response.Length > 4096) response = response.Substring(0, 4096);
+            await botClient.SendTextMessageAsync(chatId, response, ParseMode.MarkdownV2, cancellationToken: ct);
         }
     }
 
