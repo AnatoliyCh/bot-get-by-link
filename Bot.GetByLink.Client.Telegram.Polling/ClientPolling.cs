@@ -1,9 +1,9 @@
-﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Polling.Commands;
+﻿using Bot.GetByLink.Client.Telegram.Polling.Commands;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Microsoft.Extensions.Configuration;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -80,7 +80,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
     }
 
     /// <summary>
-    ///     Client start.
+    ///     Client stop.
     /// </summary>
     /// <returns>Execution result.</returns>
     public override Task<bool> Stop()
