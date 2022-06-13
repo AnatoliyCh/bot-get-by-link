@@ -88,10 +88,11 @@ internal class ClientPolling
     /// </summary>
     public void Stop()
     {
-        if (cts is null) return;
         Status = Status.Off;
+        if (cts is null) return;
         cts.Cancel();
         cts.Dispose();
+        cts = null;
     }
 
     /// <summary>
