@@ -127,7 +127,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         if (words is null || words.Length == 0) return;
 
         // commands
-        var commandNameText = Regex.Replace(words[0], "/", string.Empty);
+        var commandNameText = Regex.Replace(words.First(), "/", string.Empty);
         commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
         if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return;
         var commandName = Enum.Parse<CommandName>(commandNameText, true);
