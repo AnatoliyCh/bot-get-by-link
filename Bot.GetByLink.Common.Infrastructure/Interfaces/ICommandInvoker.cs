@@ -12,5 +12,5 @@ public interface ICommandInvoker<in TCommandName>
     /// <param name="commandName">Command name.</param>
     /// <param name="ctx">Context command.</param>
     /// <returns>Empty Task.</returns>
-    Task Invoke(TCommandName commandName, object? ctx);
+    Task ExecuteCommand(TCommandName commandName, object? ctx);
 }
