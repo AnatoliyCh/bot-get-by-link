@@ -1,6 +1,4 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Interfaces;
-
-namespace Bot.GetByLink.Common.Infrastructure.Abstractions;
+﻿namespace Bot.GetByLink.Common.Infrastructure.Abstractions;
 
 /// <summary>
 ///     Base abstract command class.
