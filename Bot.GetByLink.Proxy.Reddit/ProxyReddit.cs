@@ -1,11 +1,12 @@
-﻿using Bot.GetByLink.Common.Infrastructure;
+﻿using System.Net.Http.Headers;
+using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using Bot.GetByLink.Common.Infrastructure;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Reddit;
-using System.Net.Http.Headers;
-using System.Text;
-using Telegram.Bot.Types;
-using System.Text.RegularExpressions;
 
 namespace Bot.GetByLink.Proxy.Reddit
 {
@@ -24,11 +25,15 @@ namespace Bot.GetByLink.Proxy.Reddit
         /// <param name="appId">Id application Reddit.</param>
         /// <param name="secretId">Secret Id application Reddit.</param>
         /// <param name="regexUrl">Regex url for proxy.</param>
-        public ProxyReddit(string[] regexUrl, string appId, string secretId)
+        public ProxyReddit(string[] regexUrl)
             : base(regexUrl)
         {
-            this.appId = appId;
-            this.secretId = secretId;
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true, true)
+                .AddEnvironmentVariables().Build();
+
+            appId = configuration.GetValue<string>("reddit:app-id") ?? string.Empty;
+            secretId = configuration.GetValue<string>("reddit:secret") ?? string.Empty;
         }
 
         /// <summary>
