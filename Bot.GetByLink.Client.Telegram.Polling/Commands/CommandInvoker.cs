@@ -1,6 +1,5 @@
 ﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Bot.GetByLink.Proxy.Reddit;
 using Telegram.Bot;
 
 namespace Bot.GetByLink.Client.Telegram.Polling.Commands;

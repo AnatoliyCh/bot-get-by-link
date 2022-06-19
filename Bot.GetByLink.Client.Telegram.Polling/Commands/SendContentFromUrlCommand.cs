@@ -31,7 +31,6 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands
         public SendContentFromUrlCommand(CommandName name, ITelegramBotClient client)
         : base(name)
         {
-
             var proxyReddit = new ProxyReddit(new string[] { @"https?:\/\/www.reddit.com\/r\/\S+/comments\/\S+" });
             ProxyServices = new List<IProxyService>() { proxyReddit };
             this.client = client;
