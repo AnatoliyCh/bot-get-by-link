@@ -33,10 +33,10 @@ namespace Bot.GetByLink.Common.Infrastructure.Abstractions
         }
 
         /// <summary>
-        /// Метод для получения контента поста по объекту апдейта из Telegram.
+        /// Метод для получения контента поста по url на пост.
         /// </summary>
-        /// <param name="ctx">Url на пост.</param>
+        /// <param name="url">Url на пост.</param>
         /// <returns>Объект с текстом и ссылками на картинки и видео присутствующие в посте.</returns>
-        public abstract Task<TelegramMessage> GetContentFromUpdateObject(object? ctx = null);
+        public abstract Task<TelegramMessage> GetContentUrl(string url);
     }
 }
