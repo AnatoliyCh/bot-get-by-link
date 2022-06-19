@@ -1,21 +1,13 @@
 ﻿namespace Bot.GetByLink.Common.Infrastructure.Interfaces;
 
 /// <summary>
-///     Command Interface.
+///     Basic Command Interface.
 /// </summary>
-public interface ICommand
+/// <typeparam name="TName">Command name type.</typeparam>
+public interface ICommand<out TName>
 {
     /// <summary>
-    ///     Run command.
+    ///     Gets command name.
     /// </summary>
-    /// <param name="ctx">Context command.</param>
-    /// <returns>Empty Task.</returns>
-    public Task Execute(object? ctx = null);
-
-    /// <summary>
-    ///     Rollback command.
-    /// </summary>
-    /// <param name="ctx">Context command.</param>
-    /// <returns>Empty Task.</returns>
-    public Task Undo(object? ctx = null);
+    public TName Name { get; }
 }

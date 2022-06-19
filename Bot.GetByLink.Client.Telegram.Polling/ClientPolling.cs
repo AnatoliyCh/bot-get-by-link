@@ -22,7 +22,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
 {
     private readonly string? chatIdErrorHandling;
     private readonly ITelegramBotClient client;
-    private readonly IDictionary<CommandName, ICommand> commands;
+    private readonly ICommandInvoker<CommandName> commandInvoker;
 
     private readonly IConfiguration configuration;
 
@@ -63,6 +63,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
             { chatInfoCommand.Name, chatInfoCommand },
             { sendContentFromUrl.Name, sendContentFromUrl }
         };
+        commandInvoker = new CommandInvoker(client);
     }
 
     /// <summary>
@@ -144,15 +145,8 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
         if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return;
         var commandName = Enum.Parse<CommandName>(commandNameText, true);
-        commands.TryGetValue(commandName, out var command);
-        if (command == null) return;
-        switch (commandName)
-        {
-            case CommandName.SendContentFromUrl:
-            case CommandName.ChatInfo:
-                await command.Execute(update);
-                break;
-        }
+
+        await commandInvoker.ExecuteCommand(commandName, update);
     }
 
     private async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken ct)
