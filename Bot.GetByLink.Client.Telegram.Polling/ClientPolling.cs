@@ -50,19 +50,6 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         var chatId = configuration.GetValue<string>("telegram:chat-id-log");
         if (!string.IsNullOrWhiteSpace(chatId)) chatIdErrorHandling = chatId;
         receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
-
-        // init commands
-        var chatInfoCommand = new ChatInfoCommand(CommandName.ChatInfo, client);
-        var redditAppId = configuration.GetValue<string>("reddit:app-id") ?? string.Empty;
-        var redditSecret = configuration.GetValue<string>("reddit:secret") ?? string.Empty;
-        var proxyReddit = new ProxyReddit(new string[] { @"https?:\/\/www.reddit.com\/r\/\S+/comments\/\S+" }, redditAppId, redditSecret);
-        var proxyServices = new List<IProxyService>() { proxyReddit };
-        var sendContentFromUrl = new SendContentFromUrlCommand(CommandName.SendContentFromUrl, client, proxyServices);
-        commands = new Dictionary<CommandName, ICommand>
-        {
-            { chatInfoCommand.Name, chatInfoCommand },
-            { sendContentFromUrl.Name, sendContentFromUrl }
-        };
         commandInvoker = new CommandInvoker(client);
     }
 
