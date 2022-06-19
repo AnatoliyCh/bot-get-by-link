@@ -29,7 +29,7 @@ namespace Bot.GetByLink.Common.Infrastructure.Abstractions
         /// <returns>Did pass url.</returns>
         public bool IsMatch(string url)
         {
-            return RegexUrl.Any(x => Regex.IsMatch(x, url));
+            return RegexUrl.Any(x => Regex.IsMatch(url, x));
         }
 
         /// <summary>
