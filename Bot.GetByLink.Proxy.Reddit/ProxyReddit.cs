@@ -10,10 +10,11 @@ using Reddit;
 namespace Bot.GetByLink.Proxy.Reddit;
 
 /// <summary>
-///     Апи реддита для получения контента поста по id или url.
+/// Reddit API for getting post content by id or url.
 /// </summary>
 public class ProxyReddit : ProxyService
 {
+    private readonly string userAgent = "bot-get-by-link-web";
     private readonly string uriString = "www.reddit.com";
     private readonly string appId;
     private readonly string secretId;
@@ -36,10 +37,10 @@ public class ProxyReddit : ProxyService
     }
 
     /// <summary>
-    ///     Метод для получения контента поста реддита по url поста.
+    /// Method for getting reddit post content by post url.
     /// </summary>
-    /// <param name="url">Url на пост реддита формата https?://www.reddit.com/r/S+/comments/S+.</param>
-    /// <returns>Объект с текстом и ссылками на картинки и видео присутствующие в посте.</returns>
+    /// <param name="url">Url to a reddit post in the format https://www.reddit.com/r/S+/comments/S+.</param>
+    /// <returns>An object with text and links to pictures and videos present in the post.</returns>
     public override async Task<ProxyResponseContent> GetContentUrl(string url)
     {
         var cutUrlPost = url[(url.IndexOf("comments/") + "comments/".Length)..];
@@ -48,18 +49,17 @@ public class ProxyReddit : ProxyService
     }
 
     /// <summary>
-    ///     Метод для получения контента поста реддита по ид поста.
+    /// Method for getting reddit post content by post id.
     /// </summary>
-    /// <param name="postId">Ид поста.</param>
-    /// <returns>Объект с текстом и ссылками на картинки и видео присутствующие в посте.</returns>
-    /// <exception cref="ArgumentNullException">Возвращается в случае если был передан пустой postId.</exception>
+    /// <param name="postId">Post ID.</param>
+    /// <returns>An object with text and links to pictures and videos present in the post.</returns>
+    /// <exception cref="ArgumentNullException">Returned if an empty postId was passed.</exception>
     public async Task<ProxyResponseContent> GetContentId(string postId)
     {
         if (string.IsNullOrWhiteSpace(postId)) throw new ArgumentNullException(nameof(postId), "Пустой id поста");
 
         var accsessToken = await GetAccessToken();
-        var redditAccess = new RedditClient(appId, appSecret: secretId, accessToken: accsessToken,
-            userAgent: "bot-get-by-link-web");
+        var redditAccess = new RedditClient(appId, appSecret: secretId, accessToken: accsessToken, userAgent: userAgent);
         var post = redditAccess.LinkPost($"t3_{postId}").Info();
         if (post.Listing.Media == null && !post.Listing.IsVideo && !post.Listing.IsRedditMediaDomain)
             return new ProxyResponseContent { Text = $"{post.Listing.URL}\n\n{post.Listing.SelfText}" };
@@ -69,17 +69,17 @@ public class ProxyReddit : ProxyService
     }
 
     /// <summary>
-    ///     Function for get accsess token from reddit.
+    /// Function for get accsess token from reddit.
     /// </summary>
     /// <returns>Accsess token reddit.</returns>
     /// <exception cref="HttpRequestException">
-    ///     Возвращается если не получилось авторизоваться в реддите или он вернул пустой
-    ///     ответ.
+    /// Returned if it was not possible to authorize in reddit or it returned empty
+    ///     answer.
     /// </exception>
     private async Task<string> GetAccessToken()
     {
         var client = new HttpClient();
-        client.BaseAddress = new Uri($"https://{UriString}");
+        client.BaseAddress = new Uri($"https://{uriString}");
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/access_token");
 
         var byteArray = new UTF8Encoding().GetBytes($"{appId}:{secretId}");

@@ -18,9 +18,9 @@ public interface IProxyService
     public bool IsMatch(string url);
 
     /// <summary>
-    ///     Метод для получения контента поста по url на пост.
+    /// Method for getting the content of the post by url to the post.
     /// </summary>
-    /// <param name="url">Url на пост.</param>
-    /// <returns>Объект с текстом и ссылками на картинки и видео присутствующие в посте.</returns>
+    /// <param name="url">Url to post.</param>
+    /// <returns>An object with text and links to pictures and videos present in the post.</returns>
     public Task<ProxyResponseContent> GetContentUrl(string url);
 }
