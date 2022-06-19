@@ -11,7 +11,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands
     /// <summary>
     ///     Returns content post Reddit.
     /// </summary>
-    internal class SendContentFromUrlCommand : Command<CommandName>
+    internal class SendContentFromUrlCommand : AsyncCommand<CommandName>
     {
         private readonly ITelegramBotClient client;
 
@@ -41,7 +41,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands
         /// </summary>
         /// <param name="ctx">Update client.</param>
         /// <returns>Empty Task.</returns>
-        public override async Task Execute(object? ctx = null)
+        public override async Task ExecuteAsync(object? ctx)
         {
             if (ctx is not Update) return;
             var update = ctx as Update;
@@ -62,7 +62,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands
             if (!string.IsNullOrWhiteSpace(postContent.Text))
                 await client.SendTextMessageAsync(chatId, postContent.Text, cancellationToken: cts.Token);
             if (!string.IsNullOrWhiteSpace(postContent.UrlVideo))
-                await client.SendTextMessageAsync(chatId, postContent.Text, cancellationToken: cts.Token);
+                await client.SendTextMessageAsync(chatId, postContent.UrlVideo, cancellationToken: cts.Token);
         }
     }
 }
