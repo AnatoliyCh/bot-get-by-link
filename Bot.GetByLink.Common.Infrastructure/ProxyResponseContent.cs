@@ -3,7 +3,7 @@
 /// <summary>
 ///     Временный класс для возвратного сообщения.
 /// </summary>
-public class TelegramMessage
+public class ProxyResponseContent
 {
     /// <summary>
     ///     Gets or sets текст поста.

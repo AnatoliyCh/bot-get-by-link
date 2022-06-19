@@ -37,5 +37,5 @@ public abstract class ProxyService : IProxyService
     /// </summary>
     /// <param name="url">Url на пост.</param>
     /// <returns>Объект с текстом и ссылками на картинки и видео присутствующие в посте.</returns>
-    public abstract Task<TelegramMessage> GetContentUrl(string url);
+    public abstract Task<ProxyResponseContent> GetContentUrl(string url);
 }

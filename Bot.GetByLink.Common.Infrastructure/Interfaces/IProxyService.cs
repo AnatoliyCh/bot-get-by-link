@@ -22,5 +22,5 @@ public interface IProxyService
     /// </summary>
     /// <param name="url">Url на пост.</param>
     /// <returns>Объект с текстом и ссылками на картинки и видео присутствующие в посте.</returns>
-    public Task<TelegramMessage> GetContentUrl(string url);
+    public Task<ProxyResponseContent> GetContentUrl(string url);
 }

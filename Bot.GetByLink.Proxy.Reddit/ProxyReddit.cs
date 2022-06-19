@@ -40,7 +40,7 @@ public class ProxyReddit : ProxyService
     /// </summary>
     /// <param name="url">Url на пост реддита формата https?://www.reddit.com/r/S+/comments/S+.</param>
     /// <returns>Объект с текстом и ссылками на картинки и видео присутствующие в посте.</returns>
-    public override async Task<TelegramMessage> GetContentUrl(string url)
+    public override async Task<ProxyResponseContent> GetContentUrl(string url)
     {
         var cutUrlPost = url[(url.IndexOf("comments/") + "comments/".Length)..];
         var postId = cutUrlPost[..cutUrlPost.IndexOf("/")];
@@ -53,7 +53,7 @@ public class ProxyReddit : ProxyService
     /// <param name="postId">Ид поста.</param>
     /// <returns>Объект с текстом и ссылками на картинки и видео присутствующие в посте.</returns>
     /// <exception cref="ArgumentNullException">Возвращается в случае если был передан пустой postId.</exception>
-    public async Task<TelegramMessage> GetContentId(string postId)
+    public async Task<ProxyResponseContent> GetContentId(string postId)
     {
         if (string.IsNullOrWhiteSpace(postId)) throw new ArgumentNullException(nameof(postId), "Пустой id поста");
 
@@ -62,10 +62,10 @@ public class ProxyReddit : ProxyService
             userAgent: "bot-get-by-link-web");
         var post = redditAccess.LinkPost($"t3_{postId}").Info();
         if (post.Listing.Media == null && !post.Listing.IsVideo && !post.Listing.IsRedditMediaDomain)
-            return new TelegramMessage { Text = $"{post.Listing.URL}\n\n{post.Listing.SelfText}" };
+            return new ProxyResponseContent { Text = $"{post.Listing.URL}\n\n{post.Listing.SelfText}" };
         if (Regex.IsMatch(post.Listing.URL, @"https?://\S+(?:jpg|jpeg|png)", RegexOptions.IgnoreCase))
-            return new TelegramMessage { Text = post.Listing.SelfText, UrlPicture = post.Listing.URL };
-        return new TelegramMessage { Text = post.Listing.SelfText, UrlVideo = post.Listing.URL };
+            return new ProxyResponseContent { Text = post.Listing.SelfText, UrlPicture = post.Listing.URL };
+        return new ProxyResponseContent { Text = post.Listing.SelfText, UrlVideo = post.Listing.URL };
     }
 
     /// <summary>
