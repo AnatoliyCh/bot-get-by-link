@@ -1,5 +1,6 @@
 ﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Proxy.Reddit;
 using Telegram.Bot;
 
 namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
@@ -18,7 +19,10 @@ internal class CommandInvoker : ICommandInvoker<CommandName>
     public CommandInvoker(ITelegramBotClient client)
     {
         var chatInfoCommand = new ChatInfoCommand(CommandName.ChatInfo, client);
-        commands = new Dictionary<CommandName, ICommand<CommandName>> { { chatInfoCommand.Name, chatInfoCommand } };
+        var proxyReddit = new ProxyReddit(new string[] { @"https?:\/\/www.reddit.com\/r\/\S+/comments\/\S+" });
+        var proxyServices = new List<IProxyService>() { proxyReddit };
+        var sendContentFromUrl = new SendContentFromUrlCommand(CommandName.SendContentFromUrl, client, proxyServices);
+        commands = new Dictionary<CommandName, ICommand<CommandName>> { { chatInfoCommand.Name, chatInfoCommand }, { sendContentFromUrl.Name, sendContentFromUrl } };
     }
 
     /// <summary>
