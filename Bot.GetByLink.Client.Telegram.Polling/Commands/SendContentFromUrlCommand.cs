@@ -56,10 +56,13 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands
 
             if (matchProxy == null) return;
             var postContent = await matchProxy.GetContentUrl(url);
-
-            if (postContent is null || string.IsNullOrWhiteSpace(postContent.Text)) return;
+            if (postContent is null) return;
             var cts = new CancellationTokenSource();
-            await client.SendTextMessageAsync(chatId, postContent.Text, cancellationToken: cts.Token);
+            if (!string.IsNullOrWhiteSpace(postContent.UrlPicture)) await client.SendTextMessageAsync(chatId, postContent.UrlPicture, cancellationToken: cts.Token);
+            if (!string.IsNullOrWhiteSpace(postContent.Text))
+                await client.SendTextMessageAsync(chatId, postContent.Text, cancellationToken: cts.Token);
+            if (!string.IsNullOrWhiteSpace(postContent.UrlVideo))
+                await client.SendTextMessageAsync(chatId, postContent.Text, cancellationToken: cts.Token);
         }
     }
 }
