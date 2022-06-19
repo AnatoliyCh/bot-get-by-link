@@ -3,18 +3,18 @@
 namespace Bot.GetByLink.Common.Infrastructure.Abstractions;
 
 /// <summary>
-///     Base abstract command class.
+///     The base class for an asynchronous command.
 /// </summary>
-/// <typeparam name="TName">Command name type (enums).</typeparam>
-public abstract class Command<TName> : ICommand
+/// <typeparam name="TName">Command name type.</typeparam>
+public abstract class AsyncCommand<TName> : IAsyncCommand<TName>
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Command{TName}" /> class.
+    ///     Initializes a new instance of the <see cref="AsyncCommand{TName}" /> class.
     /// </summary>
     /// <param name="name">Command name.</param>
-    protected Command(TName name)
+    protected AsyncCommand(TName name)
     {
-        Name = name ?? throw new ArgumentNullException(nameof(name));
+        Name = name;
     }
 
     /// <summary>
@@ -23,18 +23,19 @@ public abstract class Command<TName> : ICommand
     public TName Name { get; }
 
     /// <summary>
-    ///     Run command.
+    ///     Execute an asynchronous command.
     /// </summary>
     /// <param name="ctx">Context command.</param>
     /// <returns>Empty Task.</returns>
-    public abstract Task Execute(object? ctx = null);
+    public abstract Task ExecuteAsync(object? ctx);
 
     /// <summary>
-    ///     Rollback command.
+    ///     Rollback an asynchronous command.
     /// </summary>
     /// <param name="ctx">Context command.</param>
     /// <returns>Empty Task.</returns>
-    public virtual Task Undo(object? ctx = null)
+    /// <exception cref="NotImplementedException">Method is not implemented.</exception>
+    public virtual Task UndoAsync(object? ctx)
     {
         throw new NotImplementedException();
     }

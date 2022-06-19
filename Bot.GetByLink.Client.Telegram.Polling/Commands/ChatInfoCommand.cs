@@ -9,7 +9,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// <summary>
 ///     Returns information about the current chat and the sender.
 /// </summary>
-internal class ChatInfoCommand : Command<CommandName>
+internal class ChatInfoCommand : AsyncCommand<CommandName>
 {
     private readonly ITelegramBotClient client;
 
@@ -29,7 +29,7 @@ internal class ChatInfoCommand : Command<CommandName>
     /// </summary>
     /// <param name="ctx">Update client.</param>
     /// <returns>Empty Task.</returns>
-    public override async Task Execute(object? ctx = null)
+    public override async Task ExecuteAsync(object? ctx)
     {
         if (ctx is not Update) return;
         var update = ctx as Update;
