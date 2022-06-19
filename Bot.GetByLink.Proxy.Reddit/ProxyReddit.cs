@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Headers;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Bot.GetByLink.Common.Infrastructure;
