@@ -10,14 +10,14 @@ using Reddit;
 namespace Bot.GetByLink.Proxy.Reddit;
 
 /// <summary>
-/// Reddit API for getting post content by id or url.
+///     Reddit API for getting post content by id or url.
 /// </summary>
 public class ProxyReddit : ProxyService
 {
-    private readonly string userAgent = "bot-get-by-link-web";
-    private readonly string uriString = "www.reddit.com";
     private readonly string appId;
     private readonly string secretId;
+    private readonly string uriString = "www.reddit.com";
+    private readonly string userAgent = "bot-get-by-link-web";
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyReddit" /> class.
@@ -37,7 +37,7 @@ public class ProxyReddit : ProxyService
     }
 
     /// <summary>
-    /// Method for getting reddit post content by post url.
+    ///     Method for getting reddit post content by post url.
     /// </summary>
     /// <param name="url">Url to a reddit post in the format https://www.reddit.com/r/S+/comments/S+.</param>
     /// <returns>An object with text and links to pictures and videos present in the post.</returns>
@@ -49,7 +49,7 @@ public class ProxyReddit : ProxyService
     }
 
     /// <summary>
-    /// Method for getting reddit post content by post id.
+    ///     Method for getting reddit post content by post id.
     /// </summary>
     /// <param name="postId">Post ID.</param>
     /// <returns>An object with text and links to pictures and videos present in the post.</returns>
@@ -59,7 +59,8 @@ public class ProxyReddit : ProxyService
         if (string.IsNullOrWhiteSpace(postId)) throw new ArgumentNullException(nameof(postId), "Пустой id поста");
 
         var accsessToken = await GetAccessToken();
-        var redditAccess = new RedditClient(appId, appSecret: secretId, accessToken: accsessToken, userAgent: userAgent);
+        var redditAccess =
+            new RedditClient(appId, appSecret: secretId, accessToken: accsessToken, userAgent: userAgent);
         var post = redditAccess.LinkPost($"t3_{postId}").Info();
         if (post.Listing.Media == null && !post.Listing.IsVideo && !post.Listing.IsRedditMediaDomain)
             return new ProxyResponseContent { Text = $"{post.Listing.URL}\n\n{post.Listing.SelfText}" };
@@ -69,11 +70,11 @@ public class ProxyReddit : ProxyService
     }
 
     /// <summary>
-    /// Function for get accsess token from reddit.
+    ///     Function for get accsess token from reddit.
     /// </summary>
     /// <returns>Accsess token reddit.</returns>
     /// <exception cref="HttpRequestException">
-    /// Returned if it was not possible to authorize in reddit or it returned empty
+    ///     Returned if it was not possible to authorize in reddit or it returned empty
     ///     answer.
     /// </exception>
     private async Task<string> GetAccessToken()

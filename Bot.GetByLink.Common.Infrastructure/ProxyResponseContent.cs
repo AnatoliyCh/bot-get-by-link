@@ -1,7 +1,7 @@
 ﻿namespace Bot.GetByLink.Common.Infrastructure;
 
 /// <summary>
-///     Временный класс для возвратного сообщения.
+///     Сlass for returned object from proxy.
 /// </summary>
 public class ProxyResponseContent
 {
