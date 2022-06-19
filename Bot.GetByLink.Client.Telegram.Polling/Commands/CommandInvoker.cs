@@ -19,9 +19,7 @@ internal class CommandInvoker : ICommandInvoker<CommandName>
     public CommandInvoker(ITelegramBotClient client)
     {
         var chatInfoCommand = new ChatInfoCommand(CommandName.ChatInfo, client);
-        var proxyReddit = new ProxyReddit(new string[] { @"https?:\/\/www.reddit.com\/r\/\S+/comments\/\S+" });
-        var proxyServices = new List<IProxyService>() { proxyReddit };
-        var sendContentFromUrl = new SendContentFromUrlCommand(CommandName.SendContentFromUrl, client, proxyServices);
+        var sendContentFromUrl = new SendContentFromUrlCommand(CommandName.SendContentFromUrl, client);
         commands = new Dictionary<CommandName, ICommand<CommandName>> { { chatInfoCommand.Name, chatInfoCommand }, { sendContentFromUrl.Name, sendContentFromUrl } };
     }
 

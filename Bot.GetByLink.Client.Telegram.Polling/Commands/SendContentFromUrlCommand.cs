@@ -1,6 +1,7 @@
 ﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Proxy.Reddit;
 using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -27,12 +28,13 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands
         /// </summary>
         /// <param name="name">Command name.</param>
         /// <param name="client">Telegram Client.</param>
-        /// <param name="proxyServices">Proxy services.</param>
-        public SendContentFromUrlCommand(CommandName name, ITelegramBotClient client, List<IProxyService> proxyServices)
+        public SendContentFromUrlCommand(CommandName name, ITelegramBotClient client)
         : base(name)
         {
+
+            var proxyReddit = new ProxyReddit(new string[] { @"https?:\/\/www.reddit.com\/r\/\S+/comments\/\S+" });
+            ProxyServices = new List<IProxyService>() { proxyReddit };
             this.client = client;
-            ProxyServices = proxyServices;
         }
 
         /// <summary>
