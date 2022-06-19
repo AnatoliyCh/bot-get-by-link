@@ -55,7 +55,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         var chatInfoCommand = new ChatInfoCommand(CommandName.ChatInfo, client);
         var redditAppId = configuration.GetValue<string>("reddit:app-id") ?? string.Empty;
         var redditSecret = configuration.GetValue<string>("reddit:secret") ?? string.Empty;
-        var proxyReddit = new ProxyReddit(new string[] { "https?://www.reddit.com/r/S+/comments/S+" }, redditAppId, redditSecret);
+        var proxyReddit = new ProxyReddit(new string[] { @"https?:\/\/www.reddit.com\/r\/\S+/comments\/\S+" }, redditAppId, redditSecret);
         var proxyServices = new List<IProxyService>() { proxyReddit };
         var sendContentFromUrl = new SendContentFromUrlCommand(CommandName.SendContentFromUrl, client, proxyServices);
         commands = new Dictionary<CommandName, ICommand>
@@ -138,8 +138,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         var commandNameText = Regex.Replace(firstWord, "/", string.Empty);
         if (Regex.IsMatch(firstWord, patternURL))
         {
-            var cutUrl = new Uri(firstWord).DnsSafeHost.Replace("www.", string.Empty);
-            commandNameText = cutUrl[..cutUrl.IndexOf('.')];
+            commandNameText = CommandName.SendContentFromUrl.ToString();
         }
 
         commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
