@@ -1,11 +1,11 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-using System.Text.RegularExpressions;
-using Bot.GetByLink.Common.Infrastructure;
+﻿using Bot.GetByLink.Common.Infrastructure;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Reddit;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Bot.GetByLink.Proxy.Reddit;
 

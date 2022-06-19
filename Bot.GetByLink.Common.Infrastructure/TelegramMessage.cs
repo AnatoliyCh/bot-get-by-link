@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Bot.GetByLink.Common.Infrastructure;
+﻿namespace Bot.GetByLink.Common.Infrastructure;
 
 /// <summary>
 /// Временный класс для возвратного сообщения.
