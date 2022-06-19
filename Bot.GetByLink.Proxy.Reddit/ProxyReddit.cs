@@ -14,7 +14,7 @@ namespace Bot.GetByLink.Proxy.Reddit;
 /// </summary>
 public class ProxyReddit : ProxyService
 {
-    private const string UriString = "www.reddit.com";
+    private readonly string uriString = "www.reddit.com";
     private readonly string appId;
     private readonly string secretId;
 
