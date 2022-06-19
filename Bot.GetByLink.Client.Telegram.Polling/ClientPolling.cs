@@ -1,11 +1,11 @@
 ﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Proxy.Reddit;
-﻿using Bot.GetByLink.Client.Telegram.Polling.Commands;
+using Bot.GetByLink.Client.Telegram.Polling.Commands;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
+using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Proxy.Reddit;
 using Microsoft.Extensions.Configuration;
-using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -53,9 +53,15 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
 
         // init commands
         var chatInfoCommand = new ChatInfoCommand(CommandName.ChatInfo, client);
+        var redditAppId = configuration.GetValue<string>("reddit:app-id") ?? string.Empty;
+        var redditSecret = configuration.GetValue<string>("reddit:secret") ?? string.Empty;
+        var proxyReddit = new ProxyReddit(new string[] { "https?://www.reddit.com/r/S+/comments/S+" }, redditAppId, redditSecret);
+        var proxyServices = new List<IProxyService>() { proxyReddit };
+        var sendContentFromUrl = new SendContentFromUrlCommand(CommandName.SendContentFromUrl, client, proxyServices);
         commands = new Dictionary<CommandName, ICommand>
         {
-            { chatInfoCommand.Name, chatInfoCommand }
+            { chatInfoCommand.Name, chatInfoCommand },
+            { sendContentFromUrl.Name, sendContentFromUrl }
         };
     }
 
@@ -128,34 +134,25 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         if (words is null || words.Length == 0) return;
 
         // commands
-        var commandNameText = Regex.Replace(words.First(), "/", string.Empty);
+        var firstWord = words.First();
+        var commandNameText = Regex.Replace(firstWord, "/", string.Empty);
+        if (Regex.IsMatch(firstWord, patternURL))
+        {
+            var cutUrl = new Uri(firstWord).DnsSafeHost.Replace("www.", string.Empty);
+            commandNameText = cutUrl[..cutUrl.IndexOf('.')];
+        }
+
         commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
         if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return;
         var commandName = Enum.Parse<CommandName>(commandNameText, true);
         commands.TryGetValue(commandName, out var command);
         if (command == null) return;
-
         switch (commandName)
         {
+            case CommandName.SendContentFromUrl:
             case CommandName.ChatInfo:
                 await command.Execute(update);
                 break;
-        }
-
-        if (update.Message.Text != null && Regex.IsMatch(update.Message.Text, @"https?://www.reddit.com/r/\S+/comments/\S+"))
-        {
-            var proxyReddit = new ProxyReddit("", "");
-            var linkPost = Regex.Match(update.Message.Text, @"https?://www.reddit.com/r/\S+/comments/\S+").Value;
-            var cutUrlPost = linkPost.Substring(linkPost.IndexOf("comments/") + 9);
-            var idPost = cutUrlPost.Substring(0, cutUrlPost.IndexOf("/"));
-            var contentPost = proxyReddit.GetPostId(idPost);
-            var response = string.Empty;
-            if (!string.IsNullOrWhiteSpace(contentPost.UrlPicture)) response += contentPost.UrlPicture + " ";
-            if (!string.IsNullOrWhiteSpace(contentPost.UrlVideo)) response += contentPost.UrlVideo + " ";
-            response += contentPost.Text;
-            response = response.Replace(".", @"\.").Replace("_", @"\_").Replace("#", @"\#").Replace("=", @"\=").Replace("!", @"\!");
-            if (response.Length > 4096) response = response.Substring(0, 4096);
-            await botClient.SendTextMessageAsync(chatId, response, ParseMode.MarkdownV2, cancellationToken: ct);
         }
     }
 
