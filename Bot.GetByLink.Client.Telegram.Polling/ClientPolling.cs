@@ -47,9 +47,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
 
         var chatId = configuration.GetValue<string>("telegram:chat-id-log");
         if (!string.IsNullOrWhiteSpace(chatId)) chatIdErrorHandling = chatId;
-
-        receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message } };
-
+        receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
         commandInvoker = new CommandInvoker(client);
     }
 
@@ -122,7 +120,10 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         if (words is null || words.Length == 0) return;
 
         // commands
-        var commandNameText = Regex.Replace(words.First(), "/", string.Empty);
+        var firstWord = words.First();
+        var commandNameText = Regex.Replace(firstWord, "/", string.Empty);
+        if (Regex.IsMatch(firstWord, patternURL)) commandNameText = CommandName.SendContentFromUrl.ToString();
+
         commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
         if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return;
         var commandName = Enum.Parse<CommandName>(commandNameText, true);
