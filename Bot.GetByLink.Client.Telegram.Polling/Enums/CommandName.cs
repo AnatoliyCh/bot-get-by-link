@@ -8,5 +8,10 @@ public enum CommandName
     /// <summary>
     ///     Information about the current chat.
     /// </summary>
-    ChatInfo
+    ChatInfo,
+
+    /// <summary>
+    ///     Send content post from url in tg.
+    /// </summary>
+    SendContentFromUrl
 }
