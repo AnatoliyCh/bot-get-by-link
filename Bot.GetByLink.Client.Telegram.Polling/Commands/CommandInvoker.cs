@@ -19,7 +19,8 @@ internal class CommandInvoker : ICommandInvoker<CommandName>
     {
         var chatInfoCommand = new ChatInfoCommand(CommandName.ChatInfo, client);
         var sendContentFromUrl = new SendContentFromUrlCommand(CommandName.SendContentFromUrl, client);
-        commands = new Dictionary<CommandName, ICommand<CommandName>> { { chatInfoCommand.Name, chatInfoCommand }, { sendContentFromUrl.Name, sendContentFromUrl } };
+        commands = new Dictionary<CommandName, ICommand<CommandName>>
+            { { chatInfoCommand.Name, chatInfoCommand }, { sendContentFromUrl.Name, sendContentFromUrl } };
     }
 
     /// <summary>

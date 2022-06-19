@@ -1,9 +1,9 @@
-﻿using Bot.GetByLink.Client.Telegram.Polling.Commands;
+﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Client.Telegram.Polling.Commands;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Microsoft.Extensions.Configuration;
-using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -122,10 +122,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         // commands
         var firstWord = words.First();
         var commandNameText = Regex.Replace(firstWord, "/", string.Empty);
-        if (Regex.IsMatch(firstWord, patternURL))
-        {
-            commandNameText = CommandName.SendContentFromUrl.ToString();
-        }
+        if (Regex.IsMatch(firstWord, patternURL)) commandNameText = CommandName.SendContentFromUrl.ToString();
 
         commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
         if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return;

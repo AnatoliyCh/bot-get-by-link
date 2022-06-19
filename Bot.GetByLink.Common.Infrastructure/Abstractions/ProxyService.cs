@@ -1,20 +1,15 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Common.Infrastructure.Interfaces;
 
 namespace Bot.GetByLink.Common.Infrastructure.Abstractions;
 
 /// <summary>
-/// Base abstract proxy class.
+///     Base abstract proxy class.
 /// </summary>
 public abstract class ProxyService : IProxyService
 {
     /// <summary>
-    /// Gets regex url for proxy.
-    /// </summary>
-    public string[] RegexUrl { get; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ProxyService"/> class.
+    ///     Initializes a new instance of the <see cref="ProxyService" /> class.
     /// </summary>
     /// <param name="regexUrl">Regex url for proxy.</param>
     protected ProxyService(string[] regexUrl)
@@ -23,7 +18,12 @@ public abstract class ProxyService : IProxyService
     }
 
     /// <summary>
-    /// Get match url with regex for this proxy.
+    ///     Gets regex url for proxy.
+    /// </summary>
+    public string[] RegexUrl { get; }
+
+    /// <summary>
+    ///     Get match url with regex for this proxy.
     /// </summary>
     /// <param name="url">Url for check.</param>
     /// <returns>Did pass url.</returns>
@@ -33,7 +33,7 @@ public abstract class ProxyService : IProxyService
     }
 
     /// <summary>
-    /// Метод для получения контента поста по url на пост.
+    ///     Метод для получения контента поста по url на пост.
     /// </summary>
     /// <param name="url">Url на пост.</param>
     /// <returns>Объект с текстом и ссылками на картинки и видео присутствующие в посте.</returns>

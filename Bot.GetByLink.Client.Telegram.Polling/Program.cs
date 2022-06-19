@@ -1,6 +1,6 @@
-﻿using Bot.GetByLink.Client.Telegram.Polling;
+﻿using System.Reflection;
+using Bot.GetByLink.Client.Telegram.Polling;
 using Microsoft.Extensions.Configuration;
-using System.Reflection;
 
 // get project name
 var projectName = Assembly.GetExecutingAssembly().GetName().Name;
