@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Polling.Commands;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
@@ -36,19 +35,19 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
     /// <summary>
     ///     Initializes a new instance of the <see cref="ClientPolling" /> class.
     /// </summary>
-    /// <param name="configuration">Client configuration.</param>
-    public ClientPolling(IConfiguration configuration)
+    /// <param name="config">Client configuration.</param>
+    /// <param name="client">Telegram Client.</param>
+    /// <param name="invoker">Command Executor.</param>
+    public ClientPolling(IConfiguration config, ITelegramBotClient client, ICommandInvoker<CommandName> invoker)
     {
-        this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        configuration = config ?? throw new ArgumentNullException(nameof(config));
+        this.client = client ?? throw new ArgumentNullException(nameof(client));
+        commandInvoker = invoker ?? throw new ArgumentNullException(nameof(invoker));
 
-        var tokenClientTelegram = configuration.GetValue<string>("telegram:token-client");
-        if (!string.IsNullOrWhiteSpace(tokenClientTelegram)) client = new TelegramBotClient(tokenClientTelegram);
-        else throw new ArgumentException("telegram:token-client");
-
-        var chatId = configuration.GetValue<string>("telegram:chat-id-log");
+        var chatId = configuration.GetValue<string>("Telegram:ChatIdLog");
         if (!string.IsNullOrWhiteSpace(chatId)) chatIdErrorHandling = chatId;
         receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
-        commandInvoker = new CommandInvoker(client);
+        Console.WriteLine("Initializes a new ClientPolling");
     }
 
     /// <summary>
@@ -63,7 +62,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         if (!validToken)
         {
             cts = null;
-            Console.WriteLine($"{configuration["project-name"]}: token is not valid");
+            Console.WriteLine($"{configuration["ProjectName"]}: token is not valid");
             return false;
         }
 
@@ -96,8 +95,11 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
     /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
     public async Task SendTextMessageToLogChatAsync(string message)
     {
-        if (string.IsNullOrWhiteSpace(message) || string.IsNullOrWhiteSpace(chatIdErrorHandling) || cts is null ||
-            State == Status.Off) return;
+        if (string.IsNullOrWhiteSpace(message) ||
+            string.IsNullOrWhiteSpace(chatIdErrorHandling) ||
+            cts is null || State == Status.Off)
+            return;
+
         try
         {
             await client.SendTextMessageAsync(chatIdErrorHandling, message, cancellationToken: cts.Token);

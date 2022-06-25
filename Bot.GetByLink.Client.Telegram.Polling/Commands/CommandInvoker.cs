@@ -17,6 +17,7 @@ internal class CommandInvoker : ICommandInvoker<CommandName>
     /// <param name="client">Telegram Client.</param>
     public CommandInvoker(ITelegramBotClient client)
     {
+        if (client == null) throw new ArgumentNullException("client");
         var chatInfoCommand = new ChatInfoCommand(CommandName.ChatInfo, client);
         var sendContentFromUrl = new SendContentFromUrlCommand(CommandName.SendContentFromUrl, client);
         commands = new Dictionary<CommandName, ICommand<CommandName>>
