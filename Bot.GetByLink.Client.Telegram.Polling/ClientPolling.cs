@@ -47,7 +47,6 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         var chatId = configuration.GetValue<string>("Telegram:ChatIdLog");
         if (!string.IsNullOrWhiteSpace(chatId)) chatIdErrorHandling = chatId;
         receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
-        Console.WriteLine("Initializes a new ClientPolling");
     }
 
     /// <summary>
