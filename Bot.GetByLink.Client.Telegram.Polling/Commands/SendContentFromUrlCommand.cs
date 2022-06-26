@@ -2,7 +2,6 @@
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Bot.GetByLink.Proxy.Reddit;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -23,11 +22,14 @@ internal class SendContentFromUrlCommand : AsyncCommand<CommandName>
     /// </summary>
     /// <param name="name">Command name.</param>
     /// <param name="client">Telegram Client.</param>
-    public SendContentFromUrlCommand(CommandName name, ITelegramBotClient client)
+    /// <param name="proxyServices">Proxy collection.</param>
+    public SendContentFromUrlCommand(CommandName name, ITelegramBotClient client,
+        IEnumerable<IProxyService> proxyServices)
         : base(name)
     {
-        var proxyReddit = new ProxyReddit(new[] { @"https?:\/\/www.reddit.com\/r\/\S+/comments\/\S+" });
-        ProxyServices = new List<IProxyService> { proxyReddit };
+        if (proxyServices is null) throw new ArgumentNullException(nameof(proxyServices));
+
+        ProxyServices = proxyServices.ToList(); // TODO: сделать коллекцию IEnumerable<IProxyService>
         this.client = client;
     }
 
