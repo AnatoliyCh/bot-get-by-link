@@ -1,9 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Polling.Commands;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -22,7 +20,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
     private readonly ITelegramBotClient client;
     private readonly ICommandInvoker<CommandName> commandInvoker;
 
-    private readonly IConfiguration configuration;
+    private readonly IBotConfiguration configuration;
 
     private readonly string patternCommand = "^\\/[a-zA-Z]+";
 
@@ -36,21 +34,18 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
     /// <summary>
     ///     Initializes a new instance of the <see cref="ClientPolling" /> class.
     /// </summary>
-    /// <param name="configuration">Client configuration.</param>
-    public ClientPolling(IConfiguration configuration)
+    /// <param name="config">Bot configuration.</param>
+    /// <param name="client">Telegram Client.</param>
+    /// <param name="invoker">Command Executor.</param>
+    public ClientPolling(IBotConfiguration config, ITelegramBotClient client, ICommandInvoker<CommandName> invoker)
     {
-        this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        configuration = config ?? throw new ArgumentNullException(nameof(config));
+        this.client = client ?? throw new ArgumentNullException(nameof(client));
+        commandInvoker = invoker ?? throw new ArgumentNullException(nameof(invoker));
 
-        var tokenClientTelegram = configuration.GetValue<string>("telegram:token-client");
-        if (!string.IsNullOrWhiteSpace(tokenClientTelegram)) client = new TelegramBotClient(tokenClientTelegram);
-        else throw new ArgumentException("telegram:token-client");
-
-        var chatId = configuration.GetValue<string>("telegram:chat-id-log");
+        var chatId = configuration.Clients.Telegram.ChatIdLog;
         if (!string.IsNullOrWhiteSpace(chatId)) chatIdErrorHandling = chatId;
-
-        receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message } };
-
-        commandInvoker = new CommandInvoker(client);
+        receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
     }
 
     /// <summary>
@@ -65,7 +60,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         if (!validToken)
         {
             cts = null;
-            Console.WriteLine($"{configuration["project-name"]}: token is not valid");
+            Console.WriteLine($"{configuration.ProjectName}: token is not valid");
             return false;
         }
 
@@ -98,8 +93,11 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
     /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
     public async Task SendTextMessageToLogChatAsync(string message)
     {
-        if (string.IsNullOrWhiteSpace(message) || string.IsNullOrWhiteSpace(chatIdErrorHandling) || cts is null ||
-            State == Status.Off) return;
+        if (string.IsNullOrWhiteSpace(message) ||
+            string.IsNullOrWhiteSpace(chatIdErrorHandling) ||
+            cts is null || State == Status.Off)
+            return;
+
         try
         {
             await client.SendTextMessageAsync(chatIdErrorHandling, message, cancellationToken: cts.Token);
@@ -122,7 +120,10 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         if (words is null || words.Length == 0) return;
 
         // commands
-        var commandNameText = Regex.Replace(words.First(), "/", string.Empty);
+        var firstWord = words.First();
+        var commandNameText = Regex.Replace(firstWord, "/", string.Empty);
+        if (Regex.IsMatch(firstWord, patternURL)) commandNameText = CommandName.SendContentFromUrl.ToString();
+
         commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
         if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return;
         var commandName = Enum.Parse<CommandName>(commandNameText, true);
