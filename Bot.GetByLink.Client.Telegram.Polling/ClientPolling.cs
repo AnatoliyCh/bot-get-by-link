@@ -2,7 +2,6 @@
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -21,7 +20,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
     private readonly ITelegramBotClient client;
     private readonly ICommandInvoker<CommandName> commandInvoker;
 
-    private readonly IConfiguration configuration;
+    private readonly IBotConfiguration configuration;
 
     private readonly string patternCommand = "^\\/[a-zA-Z]+";
 
@@ -35,16 +34,16 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
     /// <summary>
     ///     Initializes a new instance of the <see cref="ClientPolling" /> class.
     /// </summary>
-    /// <param name="config">Client configuration.</param>
+    /// <param name="config">Bot configuration.</param>
     /// <param name="client">Telegram Client.</param>
     /// <param name="invoker">Command Executor.</param>
-    public ClientPolling(IConfiguration config, ITelegramBotClient client, ICommandInvoker<CommandName> invoker)
+    public ClientPolling(IBotConfiguration config, ITelegramBotClient client, ICommandInvoker<CommandName> invoker)
     {
         configuration = config ?? throw new ArgumentNullException(nameof(config));
         this.client = client ?? throw new ArgumentNullException(nameof(client));
         commandInvoker = invoker ?? throw new ArgumentNullException(nameof(invoker));
 
-        var chatId = configuration.GetValue<string>("Telegram:ChatIdLog");
+        var chatId = configuration.Clients.Telegram.ChatIdLog;
         if (!string.IsNullOrWhiteSpace(chatId)) chatIdErrorHandling = chatId;
         receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
     }
@@ -61,7 +60,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         if (!validToken)
         {
             cts = null;
-            Console.WriteLine($"{configuration["ProjectName"]}: token is not valid");
+            Console.WriteLine($"{configuration.ProjectName}: token is not valid");
             return false;
         }
 

@@ -15,11 +15,14 @@ internal class CommandInvoker : ICommandInvoker<CommandName>
     ///     Initializes a new instance of the <see cref="CommandInvoker" /> class.
     /// </summary>
     /// <param name="client">Telegram Client.</param>
-    public CommandInvoker(ITelegramBotClient client)
+    /// <param name="proxyServices">Proxy collection.</param>
+    public CommandInvoker(ITelegramBotClient client, IEnumerable<IProxyService> proxyServices)
     {
-        if (client == null) throw new ArgumentNullException("client");
+        if (client is null) throw new ArgumentNullException(nameof(client));
+        if (proxyServices is null) throw new ArgumentNullException(nameof(proxyServices));
+
         var chatInfoCommand = new ChatInfoCommand(CommandName.ChatInfo, client);
-        var sendContentFromUrl = new SendContentFromUrlCommand(CommandName.SendContentFromUrl, client);
+        var sendContentFromUrl = new SendContentFromUrlCommand(CommandName.SendContentFromUrl, client, proxyServices);
         commands = new Dictionary<CommandName, ICommand<CommandName>>
             { { chatInfoCommand.Name, chatInfoCommand }, { sendContentFromUrl.Name, sendContentFromUrl } };
     }

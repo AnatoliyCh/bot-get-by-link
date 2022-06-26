@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Bot.GetByLink.Common.Infrastructure;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
-using Microsoft.Extensions.Configuration;
+using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Newtonsoft.Json;
 using Reddit;
 
@@ -22,18 +22,17 @@ public class ProxyReddit : ProxyService
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyReddit" /> class.
     /// </summary>
-    /// <param name="appId">Id application Reddit.</param>
-    /// <param name="secretId">Secret Id application Reddit.</param>
-    /// <param name="regexUrl">Regex url for proxy.</param>
-    public ProxyReddit(string[] regexUrl)
-        : base(regexUrl)
+    /// <param name="configuration">Bot configuration.</param>
+    public ProxyReddit(IBotConfiguration configuration)
+        : base(new[]
+        {
+            @"https?:\/\/www.reddit.com\/r\/\S+/comments\/\S+"
+        }) // TODO: переделать на фабрику / найти подходящее место.
     {
-        IConfiguration configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", true, true)
-            .AddEnvironmentVariables().Build();
+        if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 
-        appId = configuration.GetValue<string>("reddit:app-id") ?? string.Empty;
-        secretId = configuration.GetValue<string>("reddit:secret") ?? string.Empty;
+        appId = configuration.Proxy.Reddit.AppId ?? string.Empty;
+        secretId = configuration.Proxy.Reddit.Secret ?? string.Empty;
     }
 
     /// <summary>
