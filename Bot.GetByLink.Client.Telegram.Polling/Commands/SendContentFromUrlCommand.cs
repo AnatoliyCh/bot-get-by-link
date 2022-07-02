@@ -1,7 +1,7 @@
-﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -23,20 +23,19 @@ internal class SendContentFromUrlCommand : AsyncCommand<CommandName>
     /// <param name="name">Command name.</param>
     /// <param name="client">Telegram Client.</param>
     /// <param name="proxyServices">Proxy collection.</param>
-    public SendContentFromUrlCommand(CommandName name, ITelegramBotClient client,
-        IEnumerable<IProxyService> proxyServices)
+    public SendContentFromUrlCommand(CommandName name, ITelegramBotClient client, IEnumerable<IProxyService> proxyServices)
         : base(name)
     {
         if (proxyServices is null) throw new ArgumentNullException(nameof(proxyServices));
 
-        ProxyServices = proxyServices.ToList(); // TODO: сделать коллекцию IEnumerable<IProxyService>
+        ProxyServices = proxyServices;
         this.client = client;
     }
 
     /// <summary>
-    ///     Gets list proxy api.
+    ///     Gets a collection of proxy services.
     /// </summary>
-    public List<IProxyService> ProxyServices { get; }
+    public IEnumerable<IProxyService> ProxyServices { get; }
 
     /// <summary>
     ///     Collect and send content post reddit.
