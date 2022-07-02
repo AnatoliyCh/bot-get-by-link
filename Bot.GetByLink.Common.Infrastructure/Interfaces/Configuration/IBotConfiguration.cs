@@ -1,4 +1,4 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Configuration;
+﻿using Bot.GetByLink.Common.Infrastructure.Interfaces.Configuration;
 
 namespace Bot.GetByLink.Common.Infrastructure.Interfaces;
 
@@ -15,10 +15,10 @@ public interface IBotConfiguration
     /// <summary>
     ///     Gets сollection of client configurations.
     /// </summary>
-    public ClientsConfiguration Clients { get; init; }
+    public IClientConfiguration Clients { get; init; }
 
     /// <summary>
     ///     Gets сollection of proxy configurations.
     /// </summary>
-    public ProxyConfiguration Proxy { get; init; }
+    public IProxyConfiguration Proxy { get; init; }
 }

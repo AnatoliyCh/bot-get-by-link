@@ -1,12 +1,13 @@
-﻿using System.Text.Json.Serialization;
-using Bot.GetByLink.Common.Infrastructure.Configuration.Clients;
+﻿using Bot.GetByLink.Common.Infrastructure.Configuration.Clients;
+using Bot.GetByLink.Common.Infrastructure.Interfaces.Configuration;
+using System.Text.Json.Serialization;
 
 namespace Bot.GetByLink.Common.Infrastructure.Configuration;
 
 /// <summary>
 ///     Collection of client configurations.
 /// </summary>
-public sealed class ClientsConfiguration
+public sealed class ClientsConfiguration : IClientConfiguration
 {
     /// <summary>
     ///     Gets Telegram client configuration.
