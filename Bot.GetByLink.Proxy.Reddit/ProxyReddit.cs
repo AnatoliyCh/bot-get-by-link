@@ -1,18 +1,18 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-using System.Text.RegularExpressions;
-using Bot.GetByLink.Common.Infrastructure;
+﻿using Bot.GetByLink.Common.Infrastructure;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Newtonsoft.Json;
 using Reddit;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Bot.GetByLink.Proxy.Reddit;
 
 /// <summary>
 ///     Reddit API for getting post content by id or url.
 /// </summary>
-public class ProxyReddit : ProxyService
+public sealed class ProxyReddit : ProxyService
 {
     private readonly string appId;
     private readonly string secretId;
@@ -78,17 +78,21 @@ public class ProxyReddit : ProxyService
     /// </exception>
     private async Task<string> GetAccessToken()
     {
-        var client = new HttpClient();
-        client.BaseAddress = new Uri($"https://{uriString}");
+        var client = new HttpClient
+        {
+            BaseAddress = new Uri($"https://{uriString}")
+        };
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/access_token");
 
         var byteArray = new UTF8Encoding().GetBytes($"{appId}:{secretId}");
         client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-        var formData = new List<KeyValuePair<string, string>>();
-        formData.Add(new KeyValuePair<string, string>("grant_type", "client_credentials"));
-        formData.Add(new KeyValuePair<string, string>("device_id", appId));
+        var formData = new List<KeyValuePair<string, string>>
+        {
+            new KeyValuePair<string, string>("grant_type", "client_credentials"),
+            new KeyValuePair<string, string>("device_id", appId)
+        };
 
         request.Content = new FormUrlEncodedContent(formData);
         var response = await client.SendAsync(request);

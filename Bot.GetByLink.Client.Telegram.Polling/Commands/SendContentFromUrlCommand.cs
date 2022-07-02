@@ -10,7 +10,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// <summary>
 ///     Returns content post Reddit.
 /// </summary>
-internal class SendContentFromUrlCommand : AsyncCommand<CommandName>
+internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
 {
     private readonly ITelegramBotClient client;
 

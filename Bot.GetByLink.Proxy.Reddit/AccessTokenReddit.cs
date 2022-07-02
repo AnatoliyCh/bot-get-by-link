@@ -5,7 +5,7 @@ namespace Bot.GetByLink.Proxy.Reddit;
 /// <summary>
 ///     Reddit access token class.
 /// </summary>
-public class AccessTokenReddit
+public sealed class AccessTokenReddit
 {
     /// <summary>
     ///     Gets or sets Access token.
