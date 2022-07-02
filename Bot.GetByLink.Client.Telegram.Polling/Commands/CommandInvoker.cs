@@ -7,7 +7,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// <summary>
 ///     Executes the specified command.
 /// </summary>
-internal class CommandInvoker : ICommandInvoker<CommandName>
+internal sealed class CommandInvoker : ICommandInvoker<CommandName>
 {
     private readonly IDictionary<CommandName, ICommand<CommandName>> commands;
 
@@ -28,23 +28,58 @@ internal class CommandInvoker : ICommandInvoker<CommandName>
     }
 
     /// <summary>
-    ///     Execute the specified command.
+    ///     Calls the given command.
     /// </summary>
-    /// <param name="commandName">Command names for telegram client.</param>
+    /// <param name="command">Given command.</param>
     /// <param name="ctx">Context command.</param>
     /// <returns>Empty Task.</returns>
-    public async Task ExecuteCommand(CommandName commandName, object? ctx)
+    public async Task TryExecuteCommand(ICommand<CommandName>? command, object? ctx)
+    {
+        try
+        {
+            switch (command)
+            {
+                case IAsyncCommand<CommandName> asyncCommand:
+                    await asyncCommand.ExecuteAsync(ctx);
+                    break;
+                case ISyncCommand<CommandName> syncCommand:
+                    syncCommand.Execute(ctx);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+
+            // TODO: команда отправки сообщений в чат лога
+        }
+    }
+
+    /// <summary>
+    ///     Calls the given command.
+    /// </summary>
+    /// <param name="commandName">Command name.</param>
+    /// <param name="ctx">Context command.</param>
+    /// <returns>Empty Task.</returns>
+    public async Task TryExecuteCommand(CommandName commandName, object? ctx)
     {
         commands.TryGetValue(commandName, out var command);
+        await TryExecuteCommand(command, ctx);
+    }
 
-        switch (command)
+    /// <summary>
+    ///     Returns a command of the given type.
+    /// </summary>
+    /// <typeparam name="T">Command type.</typeparam>
+    /// <returns>Command of the specified type or null.</returns>
+    public T? GetCommand<T>()
+        where T : class, ICommand<CommandName>
+    {
+        foreach (var (_, value) in commands)
         {
-            case IAsyncCommand<CommandName> asyncCommand:
-                await asyncCommand.ExecuteAsync(ctx);
-                break;
-            case ISyncCommand<CommandName> syncCommand:
-                syncCommand.Execute(ctx);
-                break;
+            if (value is T command) return command;
         }
+
+        return null;
     }
 }

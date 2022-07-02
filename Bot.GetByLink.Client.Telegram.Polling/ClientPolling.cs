@@ -1,7 +1,7 @@
-﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -128,7 +128,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return;
         var commandName = Enum.Parse<CommandName>(commandNameText, true);
 
-        await commandInvoker.ExecuteCommand(commandName, update);
+        await commandInvoker.TryExecuteCommand(commandName, update);
     }
 
     private async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken ct)
