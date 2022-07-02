@@ -1,6 +1,6 @@
-﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -18,8 +18,8 @@ internal class ChatInfoCommand : AsyncCommand<CommandName>
     /// </summary>
     /// <param name="name">Command name.</param>
     /// <param name="client">Telegram Client.</param>
-    public ChatInfoCommand(CommandName name, ITelegramBotClient client)
-        : base(name)
+    public ChatInfoCommand(ITelegramBotClient client)
+        : base(CommandName.ChatInfo)
     {
         this.client = client;
     }

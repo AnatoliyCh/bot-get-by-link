@@ -21,8 +21,8 @@ internal class CommandInvoker : ICommandInvoker<CommandName>
         if (client is null) throw new ArgumentNullException(nameof(client));
         if (proxyServices is null) throw new ArgumentNullException(nameof(proxyServices));
 
-        var chatInfoCommand = new ChatInfoCommand(CommandName.ChatInfo, client);
-        var sendContentFromUrl = new SendContentFromUrlCommand(CommandName.SendContentFromUrl, client, proxyServices);
+        var chatInfoCommand = new ChatInfoCommand(client);
+        var sendContentFromUrl = new SendContentFromUrlCommand(client, proxyServices);
         commands = new Dictionary<CommandName, ICommand<CommandName>>
             { { chatInfoCommand.Name, chatInfoCommand }, { sendContentFromUrl.Name, sendContentFromUrl } };
     }
