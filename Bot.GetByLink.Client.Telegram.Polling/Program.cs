@@ -1,4 +1,5 @@
-﻿using Bot.GetByLink.Client.Telegram.Polling;
+﻿using System.Reflection;
+using Bot.GetByLink.Client.Telegram.Polling;
 using Bot.GetByLink.Client.Telegram.Polling.Commands;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Configuration;
@@ -6,7 +7,6 @@ using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Bot.GetByLink.Proxy.Reddit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 using Telegram.Bot;
 
 var serviceProvider = ConfigureServices();

@@ -1,7 +1,7 @@
-﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -16,14 +16,15 @@ namespace Bot.GetByLink.Client.Telegram.Polling;
 /// </summary>
 internal sealed class ClientPolling : Common.Infrastructure.Abstractions.Client
 {
+    private readonly string? chatIdErrorHandling;
     private readonly ITelegramBotClient client;
     private readonly ICommandInvoker<CommandName> commandInvoker;
-
-    private readonly string projectName;
-    private readonly string? chatIdErrorHandling;
     private readonly string patternCommand = "^\\/[a-zA-Z]+";
+
     private readonly string patternURL =
         @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
+
+    private readonly string projectName;
 
     private readonly ReceiverOptions receiverOptions;
 

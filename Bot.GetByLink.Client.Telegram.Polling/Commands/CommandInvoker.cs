@@ -76,9 +76,8 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
         where T : class, ICommand<CommandName>
     {
         foreach (var (_, value) in commands)
-        {
-            if (value is T command) return command;
-        }
+            if (value is T command)
+                return command;
 
         return null;
     }
