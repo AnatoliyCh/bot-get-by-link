@@ -10,7 +10,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// <summary>
 ///     Returns content post Reddit.
 /// </summary>
-internal class SendContentFromUrlCommand : AsyncCommand<CommandName>
+internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
 {
     private readonly ITelegramBotClient client;
 
@@ -23,20 +23,19 @@ internal class SendContentFromUrlCommand : AsyncCommand<CommandName>
     /// <param name="name">Command name.</param>
     /// <param name="client">Telegram Client.</param>
     /// <param name="proxyServices">Proxy collection.</param>
-    public SendContentFromUrlCommand(CommandName name, ITelegramBotClient client,
-        IEnumerable<IProxyService> proxyServices)
-        : base(name)
+    public SendContentFromUrlCommand(ITelegramBotClient client, IEnumerable<IProxyService> proxyServices)
+        : base(CommandName.SendContentFromUrl)
     {
         if (proxyServices is null) throw new ArgumentNullException(nameof(proxyServices));
 
-        ProxyServices = proxyServices.ToList(); // TODO: сделать коллекцию IEnumerable<IProxyService>
+        ProxyServices = proxyServices;
         this.client = client;
     }
 
     /// <summary>
-    ///     Gets list proxy api.
+    ///     Gets a collection of proxy services.
     /// </summary>
-    public List<IProxyService> ProxyServices { get; }
+    public IEnumerable<IProxyService> ProxyServices { get; }
 
     /// <summary>
     ///     Collect and send content post reddit.

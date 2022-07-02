@@ -9,7 +9,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// <summary>
 ///     Returns information about the current chat and the sender.
 /// </summary>
-internal class ChatInfoCommand : AsyncCommand<CommandName>
+internal sealed class ChatInfoCommand : AsyncCommand<CommandName>
 {
     private readonly ITelegramBotClient client;
 
@@ -18,8 +18,8 @@ internal class ChatInfoCommand : AsyncCommand<CommandName>
     /// </summary>
     /// <param name="name">Command name.</param>
     /// <param name="client">Telegram Client.</param>
-    public ChatInfoCommand(CommandName name, ITelegramBotClient client)
-        : base(name)
+    public ChatInfoCommand(ITelegramBotClient client)
+        : base(CommandName.ChatInfo)
     {
         this.client = client;
     }
@@ -42,7 +42,7 @@ internal class ChatInfoCommand : AsyncCommand<CommandName>
         await client.SendTextMessageAsync(chatId, info, cancellationToken: cts.Token);
     }
 
-    private string GetInfoByUpdate(Chat chat, Update update)
+    private static string GetInfoByUpdate(Chat chat, Update update)
     {
         var from = update.Message?.From;
         var chatId = $"Chat Id: {chat.Id}";

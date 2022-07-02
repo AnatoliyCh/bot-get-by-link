@@ -21,7 +21,7 @@ if (launched)
 {
     var startMessage = $"{configuration.ProjectName}: start";
     Console.WriteLine(startMessage);
-    await client.SendTextMessageToLogChatAsync(startMessage);
+    await client.TrySendTextMessageToLogChatAsync(startMessage);
 }
 
 var looping = true;
