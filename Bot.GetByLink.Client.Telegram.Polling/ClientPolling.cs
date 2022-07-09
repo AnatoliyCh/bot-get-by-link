@@ -1,9 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Polling.Commands;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -16,18 +14,17 @@ namespace Bot.GetByLink.Client.Telegram.Polling;
 ///     Telegram client.
 ///     Connection Type: polling.
 /// </summary>
-internal class ClientPolling : Common.Infrastructure.Abstractions.Client
+internal sealed class ClientPolling : Common.Infrastructure.Abstractions.Client
 {
     private readonly string? chatIdErrorHandling;
     private readonly ITelegramBotClient client;
     private readonly ICommandInvoker<CommandName> commandInvoker;
-
-    private readonly IConfiguration configuration;
-
     private readonly string patternCommand = "^\\/[a-zA-Z]+";
 
     private readonly string patternURL =
         @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
+
+    private readonly string projectName;
 
     private readonly ReceiverOptions receiverOptions;
 
@@ -36,19 +33,20 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
     /// <summary>
     ///     Initializes a new instance of the <see cref="ClientPolling" /> class.
     /// </summary>
-    /// <param name="configuration">Client configuration.</param>
-    public ClientPolling(IConfiguration configuration)
+    /// <param name="config">Bot configuration.</param>
+    /// <param name="client">Telegram Client.</param>
+    /// <param name="invoker">Command Executor.</param>
+    public ClientPolling(IBotConfiguration config, ITelegramBotClient client, ICommandInvoker<CommandName> invoker)
     {
-        this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        if (config is null) throw new ArgumentNullException(nameof(config));
+        this.client = client ?? throw new ArgumentNullException(nameof(client));
+        commandInvoker = invoker ?? throw new ArgumentNullException(nameof(invoker));
 
-        var tokenClientTelegram = configuration.GetValue<string>("telegram:token-client");
-        if (!string.IsNullOrWhiteSpace(tokenClientTelegram)) client = new TelegramBotClient(tokenClientTelegram);
-        else throw new ArgumentException("telegram:token-client");
+        projectName = config.ProjectName ?? throw new NullReferenceException(nameof(projectName));
+        var chatId = config.Clients.Telegram.ChatIdLog;
 
-        var chatId = configuration.GetValue<string>("telegram:chat-id-log");
         if (!string.IsNullOrWhiteSpace(chatId)) chatIdErrorHandling = chatId;
         receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
-        commandInvoker = new CommandInvoker(client);
     }
 
     /// <summary>
@@ -62,8 +60,8 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         var validToken = await client.TestApiAsync(cts.Token);
         if (!validToken)
         {
-            cts = null;
-            Console.WriteLine($"{configuration["project-name"]}: token is not valid");
+            RemoveToken();
+            Console.WriteLine($"{projectName}: token is not valid");
             return false;
         }
 
@@ -78,13 +76,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
     /// <returns>Execution result.</returns>
     public override Task<bool> Stop()
     {
-        if (cts is not null)
-        {
-            cts.Cancel();
-            cts.Dispose();
-            cts = null;
-        }
-
+        RemoveToken();
         State = Status.Off;
         return Task.FromResult(true);
     }
@@ -94,10 +86,13 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
     /// </summary>
     /// <param name="message">Message content.</param>
     /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-    public async Task SendTextMessageToLogChatAsync(string message)
+    public async Task TrySendTextMessageToLogChatAsync(string message)
     {
-        if (string.IsNullOrWhiteSpace(message) || string.IsNullOrWhiteSpace(chatIdErrorHandling) || cts is null ||
-            State == Status.Off) return;
+        if (string.IsNullOrWhiteSpace(message) ||
+            string.IsNullOrWhiteSpace(chatIdErrorHandling) ||
+            cts is null || State == Status.Off)
+            return;
+
         try
         {
             await client.SendTextMessageAsync(chatIdErrorHandling, message, cancellationToken: cts.Token);
@@ -128,7 +123,7 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
         if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return;
         var commandName = Enum.Parse<CommandName>(commandNameText, true);
 
-        await commandInvoker.ExecuteCommand(commandName, update);
+        await commandInvoker.TryExecuteCommand(commandName, update);
     }
 
     private async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken ct)
@@ -139,5 +134,13 @@ internal class ClientPolling : Common.Infrastructure.Abstractions.Client
 
         if (string.IsNullOrWhiteSpace(chatIdErrorHandling) || apiRequestException.Message == "Unauthorized") return;
         await botClient.SendTextMessageAsync(chatIdErrorHandling, exceptionInString, cancellationToken: ct);
+    }
+
+    private void RemoveToken()
+    {
+        if (cts is null) return;
+        cts.Cancel();
+        cts.Dispose();
+        cts = null;
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace Bot.GetByLink.Common.Infrastructure;
 
 /// <summary>
-/// TODO: temporary implementation. Сlass for returned object from proxy.
+///     TODO: temporary implementation. Сlass for returned object from proxy.
 /// </summary>
 public class ProxyResponseContent
 {

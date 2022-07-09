@@ -1,26 +1,27 @@
 ﻿using System.Reflection;
 using Bot.GetByLink.Client.Telegram.Polling;
+using Bot.GetByLink.Client.Telegram.Polling.Commands;
+using Bot.GetByLink.Client.Telegram.Polling.Enums;
+using Bot.GetByLink.Common.Infrastructure.Configuration;
+using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Proxy.Reddit;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Telegram.Bot;
 
-// get project name
-var projectName = Assembly.GetExecutingAssembly().GetName().Name;
+var serviceProvider = ConfigureServices();
 
-IConfiguration configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json", true, true)
-    .AddEnvironmentVariables().Build();
+var configuration = serviceProvider.GetService<IBotConfiguration>()!;
 
-configuration["project-name"] = projectName;
-
-var client = new ClientPolling(configuration);
-
-var startMessage = $"{projectName}: start";
+var client = serviceProvider.GetService<ClientPolling>()!;
 
 var launched = await client.Start();
 
 if (launched)
 {
+    var startMessage = $"{configuration.ProjectName}: start";
     Console.WriteLine(startMessage);
-    await client.SendTextMessageToLogChatAsync(startMessage);
+    await client.TrySendTextMessageToLogChatAsync(startMessage);
 }
 
 var looping = true;
@@ -36,12 +37,49 @@ while (looping)
             await client.Stop();
             break;
         case "start polling":
-            Console.WriteLine($"{projectName}: starting polling...");
+            Console.WriteLine($"{configuration.ProjectName}: starting polling...");
             await client.Start();
             break;
         case "stop polling":
-            Console.WriteLine($"{projectName}: stoping polling...");
+            Console.WriteLine($"{configuration.ProjectName}: stoping polling...");
             await client.Stop();
             break;
     }
+}
+
+static IBotConfiguration GetConfiguration()
+{
+    var botConfiguration = new BotConfiguration();
+    var configuration = new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json", true, true)
+        .AddEnvironmentVariables().Build();
+
+    // get project name
+    var projectName = Assembly.GetExecutingAssembly().GetName().Name;
+    configuration["ProjectName"] = projectName;
+
+    configuration.Bind(botConfiguration);
+    return botConfiguration;
+}
+
+static ITelegramBotClient GetTelegramClient(IBotConfiguration configuration)
+{
+    var token = configuration?.Clients?.Telegram?.Token;
+    if (!string.IsNullOrWhiteSpace(token)) return new TelegramBotClient(token);
+    throw new ArgumentException("Telegram:Token");
+}
+
+static IServiceProvider ConfigureServices()
+{
+    var configuration = GetConfiguration();
+    var client = GetTelegramClient(configuration);
+
+    IServiceCollection services = new ServiceCollection();
+    services.AddSingleton(configuration);
+    services.AddSingleton(client);
+    services.AddScoped<IProxyService, ProxyReddit>();
+    services.AddScoped<ICommandInvoker<CommandName>, CommandInvoker>();
+    services.AddScoped<ClientPolling>();
+
+    return services.BuildServiceProvider();
 }

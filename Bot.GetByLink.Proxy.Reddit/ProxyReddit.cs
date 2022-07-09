@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Bot.GetByLink.Common.Infrastructure;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
-using Microsoft.Extensions.Configuration;
+using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Reddit;
@@ -13,7 +13,7 @@ namespace Bot.GetByLink.Proxy.Reddit;
 /// <summary>
 ///     Reddit API for getting post content by id or url.
 /// </summary>
-public class ProxyReddit : ProxyService
+public sealed class ProxyReddit : ProxyService
 {
     private readonly string appId;
     private readonly string secretId;
@@ -34,18 +34,17 @@ public class ProxyReddit : ProxyService
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyReddit" /> class.
     /// </summary>
-    /// <param name="appId">Id application Reddit.</param>
-    /// <param name="secretId">Secret Id application Reddit.</param>
-    /// <param name="regexUrl">Regex url for proxy.</param>
-    public ProxyReddit(string[] regexUrl)
-        : base(regexUrl)
+    /// <param name="configuration">Bot configuration.</param>
+    public ProxyReddit(IBotConfiguration configuration)
+        : base(new[]
+        {
+            @"https?:\/\/www.reddit.com\/r\/\S+/comments\/\S+"
+        }) // TODO: переделать на фабрику / найти подходящее место.
     {
-        IConfiguration configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", true, true)
-            .AddEnvironmentVariables().Build();
+        if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 
-        appId = configuration.GetValue<string>("reddit:app-id") ?? string.Empty;
-        secretId = configuration.GetValue<string>("reddit:secret") ?? string.Empty;
+        appId = configuration.Proxy.Reddit.AppId ?? string.Empty;
+        secretId = configuration.Proxy.Reddit.Secret ?? string.Empty;
     }
 
     /// <summary>
@@ -104,17 +103,21 @@ public class ProxyReddit : ProxyService
     /// </exception>
     private async Task<string> GetAccessTokenAsync()
     {
-        var client = new HttpClient();
-        client.BaseAddress = new Uri($"https://{uriString}");
+        var client = new HttpClient
+        {
+            BaseAddress = new Uri($"https://{uriString}")
+        };
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/access_token");
 
         var byteArray = new UTF8Encoding().GetBytes($"{appId}:{secretId}");
         client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-        var formData = new List<KeyValuePair<string, string>>();
-        formData.Add(new KeyValuePair<string, string>("grant_type", "client_credentials"));
-        formData.Add(new KeyValuePair<string, string>("device_id", appId));
+        var formData = new List<KeyValuePair<string, string>>
+        {
+            new("grant_type", "client_credentials"),
+            new("device_id", appId)
+        };
 
         request.Content = new FormUrlEncodedContent(formData);
         var response = await client.SendAsync(request);
