@@ -63,16 +63,10 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
         var content = new FormaterMessage(postContent);
 
         if (content.AlbumInputMedias.Count > 0)
-        {
             await client.SendMediaGroupAsync(chatId, content.AlbumInputMedias, cancellationToken: cts.Token);
-        }
 
         if (content.Messages.Count > 0)
-        {
             foreach (var message in content.Messages)
-            {
                 await client.SendTextMessageAsync(chatId, message, cancellationToken: cts.Token);
-            }
-        }
     }
 }

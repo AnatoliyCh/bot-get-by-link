@@ -21,17 +21,6 @@ public sealed class ProxyReddit : ProxyService
     private readonly string userAgent = "bot-get-by-link-web";
 
     /// <summary>
-    ///    Function for get url reddit video.
-    /// </summary>
-    /// <param name="media">Object media.</param>
-    /// <returns>Url reddit video.</returns>
-    private static string? GetVideoLink(object media)
-    {
-        if (media is not JObject mediaJsonObject) return string.Empty;
-        return mediaJsonObject?.SelectToken("reddit_video")?.SelectToken("fallback_url")?.Value<string>();
-    }
-
-    /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyReddit" /> class.
     /// </summary>
     /// <param name="configuration">Bot configuration.</param>
@@ -45,6 +34,17 @@ public sealed class ProxyReddit : ProxyService
 
         appId = configuration.Proxy.Reddit.AppId ?? string.Empty;
         secretId = configuration.Proxy.Reddit.Secret ?? string.Empty;
+    }
+
+    /// <summary>
+    ///     Function for get url reddit video.
+    /// </summary>
+    /// <param name="media">Object media.</param>
+    /// <returns>Url reddit video.</returns>
+    private static string? GetVideoLink(object media)
+    {
+        if (media is not JObject mediaJsonObject) return string.Empty;
+        return mediaJsonObject?.SelectToken("reddit_video")?.SelectToken("fallback_url")?.Value<string>();
     }
 
     /// <summary>
@@ -77,20 +77,20 @@ public sealed class ProxyReddit : ProxyService
         if (!string.IsNullOrWhiteSpace(crossPostId)) post = redditClient.LinkPost($"{crossPostId}").Info();
         var startText = $"https://www.reddit.com{post.Permalink}\n\n{post.Title}\n";
         if (post.Listing.Media == null && !post.Listing.IsVideo && !post.Listing.IsRedditMediaDomain)
-        {
-            return new ProxyResponseContent($"{startText}{post.Listing.SelfText}", Array.Empty<string>(), Array.Empty<string>());
-        }
+            return new ProxyResponseContent($"{startText}{post.Listing.SelfText}", Array.Empty<string>(),
+                Array.Empty<string>());
 
         if (Regex.IsMatch(post.Listing.URL, @"https?://\S+(?:jpg|jpeg|png)", RegexOptions.IgnoreCase))
-            return new ProxyResponseContent(startText, new string[] { post.Listing.URL }, Array.Empty<string>());
+            return new ProxyResponseContent(startText, new[] { post.Listing.URL }, Array.Empty<string>());
         if (post.Listing.Media != null && post.Listing.IsVideo)
         {
             var videoLink = GetVideoLink(post.Listing.Media);
-            if (!string.IsNullOrWhiteSpace(videoLink)) return new ProxyResponseContent(startText, Array.Empty<string>(), new string[] { videoLink });
+            if (!string.IsNullOrWhiteSpace(videoLink))
+                return new ProxyResponseContent(startText, Array.Empty<string>(), new[] { videoLink });
             return new ProxyResponseContent(startText, Array.Empty<string>(), Array.Empty<string>());
         }
 
-        return new ProxyResponseContent(startText, Array.Empty<string>(), new string[] { post.Listing.URL });
+        return new ProxyResponseContent(startText, Array.Empty<string>(), new[] { post.Listing.URL });
     }
 
     /// <summary>
@@ -147,7 +147,8 @@ public sealed class ProxyReddit : ProxyService
         response.EnsureSuccessStatusCode();
         var text = await response.Content.ReadAsStringAsync();
         var data = (JObject)JsonConvert.DeserializeObject(text);
-        string? prarentPostId = data?.SelectToken("data")?.SelectToken("children")?.First["data"]?.SelectToken("crosspost_parent")?.Value<string>();
+        var prarentPostId = data?.SelectToken("data")?.SelectToken("children")?.First["data"]
+            ?.SelectToken("crosspost_parent")?.Value<string>();
         return prarentPostId;
     }
 }
