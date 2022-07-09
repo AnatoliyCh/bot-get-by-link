@@ -55,14 +55,23 @@ internal class SendContentFromUrlCommand : AsyncCommand<CommandName>
         var matchProxy = ProxyServices.FirstOrDefault(x => x.IsMatch(url));
 
         if (matchProxy == null) return;
-        var postContent = await matchProxy.GetContentUrl(url);
+        var postContent = await matchProxy.GetContentUrlAsync(url);
         if (postContent is null) return;
         var cts = new CancellationTokenSource();
-        if (!string.IsNullOrWhiteSpace(postContent.UrlPicture))
-            await client.SendTextMessageAsync(chatId, postContent.UrlPicture, cancellationToken: cts.Token);
-        if (!string.IsNullOrWhiteSpace(postContent.Text))
-            await client.SendTextMessageAsync(chatId, postContent.Text, cancellationToken: cts.Token);
-        if (!string.IsNullOrWhiteSpace(postContent.UrlVideo))
-            await client.SendTextMessageAsync(chatId, postContent.UrlVideo, cancellationToken: cts.Token);
+
+        var content = new FormaterMessage(postContent);
+
+        if (content.AlbumInputMedias.Count > 0)
+        {
+            await client.SendMediaGroupAsync(chatId, content.AlbumInputMedias, cancellationToken: cts.Token);
+        }
+
+        if (content.Messages.Count > 0)
+        {
+            foreach (var message in content.Messages)
+            {
+                await client.SendTextMessageAsync(chatId, message, cancellationToken: cts.Token);
+            }
+        }
     }
 }
