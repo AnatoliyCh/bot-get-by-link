@@ -13,7 +13,7 @@ public interface IMediaInfo
     /// <summary>
     ///     Gets or sets for size in mb on url media.
     /// </summary>
-    public long SizeMedia { get; set; }
+    public double SizeMedia { get; set; }
 
     /// <summary>
     ///     Function for set imfo media on url media.

@@ -37,12 +37,12 @@ public class FormaterContentTelegram : IFormaterContentTelegram
     /// <summary>
     ///     Gets max size in mb photo for telegram bot.
     /// </summary>
-    public long MaxSizeMbPhoto { get; }
+    public double MaxSizeMbPhoto { get; }
 
     /// <summary>
     ///     Gets max size in mb vide telegram bot.
     /// </summary>
-    public long MaxSizeMbVideo { get; }
+    public double MaxSizeMbVideo { get; }
 
     /// <summary>
     ///     Gets max text length first media.
