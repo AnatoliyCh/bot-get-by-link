@@ -61,7 +61,7 @@ public class FormaterContentTelegram : IFormaterContentTelegram
     public void SetFormaterContent(ProxyResponseContent responseContent)
     {
         var (textUrl, urlPictures, urlVideo) =
-            GetTextUrlAndValidUrl(responseContent.UrlPicture.ToList(), responseContent.UrlPicture.ToList());
+            GetTextUrlAndValidUrl(responseContent.UrlPicture.ToList(), responseContent.UrlVideo.ToList());
         var hasMedia = urlPictures.Count > 0 || urlVideo.Count > 0;
         var textMessage = $"{textUrl}{responseContent.Text}";
         var captionLength = hasMedia ? Math.Min(MaxTextLenghtFirstMedia, textMessage.Length) : 0;
