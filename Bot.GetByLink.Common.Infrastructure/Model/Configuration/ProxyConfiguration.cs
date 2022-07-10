@@ -1,8 +1,8 @@
-﻿using System.Text.Json.Serialization;
-using Bot.GetByLink.Common.Infrastructure.Configuration.Proxy;
-using Bot.GetByLink.Common.Infrastructure.Interfaces.Configuration;
+﻿using Bot.GetByLink.Common.Infrastructure.Interfaces.Configuration;
+using Bot.GetByLink.Common.Infrastructure.Model.Configuration.Proxy;
+using System.Text.Json.Serialization;
 
-namespace Bot.GetByLink.Common.Infrastructure.Configuration;
+namespace Bot.GetByLink.Common.Infrastructure.Model.Configuration;
 
 /// <summary>
 ///     Collection of proxy configurations.

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Bot.GetByLink.Common.Infrastructure.Configuration.Proxy;
+namespace Bot.GetByLink.Common.Infrastructure.Model.Configuration.Proxy;
 
 /// <summary>
 ///     Reddit proxy configuration.
