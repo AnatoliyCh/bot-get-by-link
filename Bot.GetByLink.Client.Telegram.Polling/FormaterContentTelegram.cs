@@ -13,7 +13,7 @@ public class FormaterContentTelegram : IFormaterContentTelegram
     ///     Initializes a new instance of the <see cref="FormaterContentTelegram" /> class.
     /// </summary>
     /// <param name="responseContent">Proxy content.</param>
-    public FormaterContentTelegram(ProxyResponseContent responseContent)
+    public FormaterContentTelegram()
     {
         // TODO Потестить отдельно гифки
         AlbumInputMedias = new List<IAlbumInputMedia>();

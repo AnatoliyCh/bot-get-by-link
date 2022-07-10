@@ -14,6 +14,8 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
 {
     private readonly ITelegramBotClient client;
 
+    private readonly FormaterContentTelegram formaterContent;
+
     private readonly string patternURL =
         @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
 
@@ -27,7 +29,7 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
         : base(CommandName.SendContentFromUrl)
     {
         if (proxyServices is null) throw new ArgumentNullException(nameof(proxyServices));
-
+        formaterContent = new FormaterContentTelegram();
         ProxyServices = proxyServices;
         this.client = client;
     }
@@ -60,13 +62,13 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
         if (postContent is null) return;
         var cts = new CancellationTokenSource();
 
-        var content = new FormaterContentTelegram(postContent);
+        formaterContent.SetFormaterContent(postContent);
 
-        if (content.AlbumInputMedias.Count() > 0)
-            await client.SendMediaGroupAsync(chatId, content.AlbumInputMedias, cancellationToken: cts.Token);
+        if (formaterContent.AlbumInputMedias.Count() > 0)
+            await client.SendMediaGroupAsync(chatId, formaterContent.AlbumInputMedias, cancellationToken: cts.Token);
 
-        if (content.Messages.Count() > 0)
-            foreach (var message in content.Messages)
+        if (formaterContent.Messages.Count() > 0)
+            foreach (var message in formaterContent.Messages)
                 await client.SendTextMessageAsync(chatId, message, cancellationToken: cts.Token);
     }
 }
