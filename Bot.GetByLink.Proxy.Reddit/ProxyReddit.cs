@@ -72,25 +72,35 @@ public sealed class ProxyReddit : ProxyService
         var accsessToken = await GetAccessTokenAsync();
         var redditClient =
             new RedditClient(appId, appSecret: secretId, accessToken: accsessToken, userAgent: userAgent);
+        var mediaObject = new MediaInfo();
         var post = redditClient.LinkPost($"t3_{postId}").Info();
         var crossPostId = await GetParentPostIdAsync($"t3_{postId}");
         if (!string.IsNullOrWhiteSpace(crossPostId)) post = redditClient.LinkPost($"{crossPostId}").Info();
         var startText = $"https://www.reddit.com{post.Permalink}\n\n{post.Title}\n";
         if (post.Listing.Media == null && !post.Listing.IsVideo && !post.Listing.IsRedditMediaDomain)
-            return new ProxyResponseContent($"{startText}{post.Listing.SelfText}", Array.Empty<string>(),
-                Array.Empty<string>());
+            return new ProxyResponseContent($"{startText}{post.Listing.SelfText}", Array.Empty<MediaInfo>(),
+                Array.Empty<MediaInfo>());
 
         if (Regex.IsMatch(post.Listing.URL, @"https?://\S+(?:jpg|jpeg|png)", RegexOptions.IgnoreCase))
-            return new ProxyResponseContent(startText, new[] { post.Listing.URL }, Array.Empty<string>());
+        {
+            await mediaObject.SetMediaInfoAsync(post.Listing.URL);
+            return new ProxyResponseContent(startText, new[] { mediaObject }, Array.Empty<MediaInfo>());
+        }
+
         if (post.Listing.Media != null && post.Listing.IsVideo)
         {
             var videoLink = GetVideoLink(post.Listing.Media);
             if (!string.IsNullOrWhiteSpace(videoLink))
-                return new ProxyResponseContent(startText, Array.Empty<string>(), new[] { videoLink });
-            return new ProxyResponseContent(startText, Array.Empty<string>(), Array.Empty<string>());
+            {
+                await mediaObject.SetMediaInfoAsync(videoLink);
+                return new ProxyResponseContent(startText, Array.Empty<MediaInfo>(), new[] { mediaObject });
+            }
+
+            return new ProxyResponseContent(startText, Array.Empty<MediaInfo>(), Array.Empty<MediaInfo>());
         }
 
-        return new ProxyResponseContent(startText, Array.Empty<string>(), new[] { post.Listing.URL });
+        await mediaObject.SetMediaInfoAsync(post.Listing.URL);
+        return new ProxyResponseContent(startText, Array.Empty<MediaInfo>(), new[] { mediaObject });
     }
 
     /// <summary>

@@ -11,7 +11,7 @@ public class ProxyResponseContent
     /// <param name="text">Text from post.</param>
     /// <param name="urlPicture">Array url pictures from post.</param>
     /// <param name="urlVideo">Array url video from post.</param>
-    public ProxyResponseContent(string text, string[] urlPicture, string[] urlVideo)
+    public ProxyResponseContent(string text, MediaInfo[] urlPicture, MediaInfo[] urlVideo)
     {
         Text = text;
         UrlPicture = urlPicture;
@@ -19,17 +19,17 @@ public class ProxyResponseContent
     }
 
     /// <summary>
-    ///     Gets or sets текст поста.
+    ///     Gets текст поста.
     /// </summary>
-    public string Text { get; set; }
+    public string Text { get; }
 
     /// <summary>
-    ///     Gets or sets картики в посте.
+    ///     Gets картики в посте.
     /// </summary>
-    public string[] UrlPicture { get; set; }
+    public MediaInfo[] UrlPicture { get; }
 
     /// <summary>
-    ///     Gets or sets видео в посте.
+    ///     Gets видео в посте.
     /// </summary>
-    public string[] UrlVideo { get; set; }
+    public MediaInfo[] UrlVideo { get; }
 }
