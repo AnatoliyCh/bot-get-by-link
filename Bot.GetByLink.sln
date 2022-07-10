@@ -20,7 +20,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Infras
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bot.GetByLink.Client.Telegram", "Bot.GetByLink.Client.Telegram", "{72747E0F-72ED-492D-835B-70A0F7B4A481}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot.GetByLink.Client.Telegram.Common", "Bot.GetByLink.Client.Telegram.Common\Bot.GetByLink.Client.Telegram.Common.csproj", "{DB0F827C-FF26-483D-B610-DA4E7357303E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Client.Telegram.Common", "Bot.GetByLink.Client.Telegram.Common\Bot.GetByLink.Client.Telegram.Common.csproj", "{DB0F827C-FF26-483D-B610-DA4E7357303E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bot.GetByLink.Proxy", "Bot.GetByLink.Proxy", "{B54D3DBE-AF8D-4044-912C-7CD74E64B17E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +55,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{E76CA920-A88D-4A20-91A3-7E09EA08099C} = {B54D3DBE-AF8D-4044-912C-7CD74E64B17E}
+		{D5B255DD-D449-4616-8EBB-52B4B401E1A8} = {72747E0F-72ED-492D-835B-70A0F7B4A481}
+		{41038BC2-FBA0-4376-BE4B-3903B40244C8} = {B54D3DBE-AF8D-4044-912C-7CD74E64B17E}
 		{6F74AA49-3120-4361-94D7-65E81E4FA6E2} = {0CBE5E20-C0A6-4CAC-BD65-F4B141CD775D}
 		{DB0F827C-FF26-483D-B610-DA4E7357303E} = {72747E0F-72ED-492D-835B-70A0F7B4A481}
 	EndGlobalSection
