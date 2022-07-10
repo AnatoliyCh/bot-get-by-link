@@ -1,6 +1,6 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Interfaces;
+﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Model;
-using System.Text.RegularExpressions;
 
 namespace Bot.GetByLink.Common.Infrastructure.Abstractions;
 

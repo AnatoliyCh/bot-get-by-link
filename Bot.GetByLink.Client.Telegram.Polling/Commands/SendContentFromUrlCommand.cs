@@ -38,7 +38,7 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     public IEnumerable<IProxyService> ProxyServices { get; }
 
     /// <summary>
-    ///     Collect and send content post reddit.
+    ///     //TODO RENAME: Collect and send content post reddit.
     /// </summary>
     /// <param name="ctx">Update client.</param>
     /// <returns>Empty Task.</returns>
