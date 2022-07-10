@@ -14,7 +14,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling;
 ///     Telegram client.
 ///     Connection Type: polling.
 /// </summary>
-internal sealed class ClientPolling : Common.Infrastructure.Abstractions.Client
+internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractions.Client
 {
     private readonly string? chatIdErrorHandling;
     private readonly ITelegramBotClient client;
