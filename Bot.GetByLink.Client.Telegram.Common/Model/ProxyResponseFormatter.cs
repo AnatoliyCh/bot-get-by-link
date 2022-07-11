@@ -7,13 +7,13 @@ namespace Bot.GetByLink.Client.Telegram.Polling;
 /// <summary>
 ///     Class for formating content for messages telegram.
 /// </summary>
-public class FormaterContentTelegram : IFormaterContent
+public class ProxyResponseFormatter : IFormatterContent
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="FormaterContentTelegram" /> class.
+    ///     Initializes a new instance of the <see cref="ProxyResponseFormatter" /> class.
     /// </summary>
     /// <param name="responseContent">Proxy content.</param>
-    public FormaterContentTelegram()
+    public ProxyResponseFormatter()
     {
         // TODO Потестить отдельно гифки
         MaxSizeMbPhoto = 5;

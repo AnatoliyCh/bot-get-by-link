@@ -86,7 +86,7 @@ public sealed class ProxyReddit : ProxyService
             {
                 size = await ProxyHelper.GetSizeContentUrlAsync(videoLink);
                 return new ProxyResponseContent(startText, Array.Empty<MediaInfo>(),
-                    new[] { new MediaInfo(post.Listing.URL, size, MediaType.Video) });
+                    new[] { new MediaInfo(videoLink, size, MediaType.Video) });
             }
         }
 

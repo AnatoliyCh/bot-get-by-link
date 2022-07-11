@@ -13,7 +13,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// </summary>
 internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
 {
-    private readonly FormaterContentTelegram formaterContent;
+    private readonly ProxyResponseFormatter formaterContent;
 
     private readonly string patternURL =
         @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
@@ -31,7 +31,7 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     {
         this.sendMessageCommand = sendMessageCommand ?? throw new ArgumentNullException(nameof(sendMessageCommand));
         ProxyServices = proxyServices ?? throw new ArgumentNullException(nameof(proxyServices));
-        formaterContent = new FormaterContentTelegram();
+        formaterContent = new ProxyResponseFormatter();
     }
 
     /// <summary>

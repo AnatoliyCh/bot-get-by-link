@@ -12,5 +12,5 @@ namespace Bot.GetByLink.Client.Telegram.Common.Model;
 /// <param name="Artifacts">Collection of Attached Artifacts.</param>
 /// <param name="ParseMode">Text parsing mode.</param>
 public sealed record Message
-(ChatId ChatId, IEnumerable<string> Text, IEnumerable<object>? Artifacts = null,
+(ChatId ChatId, IEnumerable<string> Text, IEnumerable<IAlbumInputMedia>? Artifacts = null,
     ParseMode? ParseMode = null) : IMessageContext;
