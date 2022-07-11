@@ -1,5 +1,6 @@
 ﻿using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Interfaces;
 
@@ -9,4 +10,8 @@ namespace Bot.GetByLink.Client.Telegram.Common.Interfaces;
 /// </summary>
 public interface IMessageContext : IMessageContext<ChatId, IEnumerable<string>, object>
 {
+    /// <summary>
+    ///     Gets text parsing mode.
+    /// </summary>
+    public ParseMode? ParseMode { get; init; }
 }
