@@ -5,7 +5,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Interfaces;
 /// <summary>
 ///     Interafece for formating content for messages telegram.
 /// </summary>
-public interface IFormaterContentTelegram
+public interface IFormaterContent
 {
     /// <summary>
     ///     Function for set content.

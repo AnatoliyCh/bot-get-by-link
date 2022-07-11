@@ -7,7 +7,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling;
 /// <summary>
 ///     Class for formating content for messages telegram.
 /// </summary>
-public class FormaterContentTelegram : IFormaterContentTelegram
+public class FormaterContentTelegram : IFormaterContent
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="FormaterContentTelegram" /> class.
