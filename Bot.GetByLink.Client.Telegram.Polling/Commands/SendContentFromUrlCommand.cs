@@ -13,6 +13,8 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// </summary>
 internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
 {
+    private readonly FormaterContentTelegram formaterContent;
+
     private readonly string patternURL =
         @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
 
@@ -29,6 +31,7 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     {
         this.sendMessageCommand = sendMessageCommand ?? throw new ArgumentNullException(nameof(sendMessageCommand));
         ProxyServices = proxyServices ?? throw new ArgumentNullException(nameof(proxyServices));
+        formaterContent = new FormaterContentTelegram();
     }
 
     /// <summary>
@@ -37,7 +40,7 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     public IEnumerable<IProxyService> ProxyServices { get; }
 
     /// <summary>
-    ///     //TODO RENAME: Collect and send content post reddit.
+    ///     //TODO RENAME: Collect and send content post.
     /// </summary>
     /// <param name="ctx">Update client.</param>
     /// <returns>Empty Task.</returns>
@@ -53,14 +56,10 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
         var matchProxy = ProxyServices.FirstOrDefault(proxy => proxy.IsMatch(url));
         if (matchProxy is null) return;
 
-        var postContent = await matchProxy.GetContentUrl(url);
+        var postContent = await matchProxy.GetContentUrlAsync(url);
         if (postContent is null) return;
-
-        // TODO: add foormatter
-        var sendText = new List<string> { postContent.Text ?? string.Empty };
-        var artifacts = new List<string>
-            { postContent.UrlPicture ?? string.Empty, postContent.UrlVideo ?? string.Empty };
-        var message = new Message(chatId, sendText, artifacts, ParseMode.MarkdownV2);
+        var content = formaterContent.GetFormattedContent(postContent);
+        var message = new Message(chatId, content.Messages, content.Artifacts, ParseMode.MarkdownV2);
         await sendMessageCommand.ExecuteAsync(message);
     }
 }

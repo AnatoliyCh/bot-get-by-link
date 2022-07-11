@@ -2,8 +2,10 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
+using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Model;
+using Bot.GetByLink.Proxy.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Reddit;
@@ -37,17 +39,6 @@ public sealed class ProxyReddit : ProxyService
     }
 
     /// <summary>
-    ///     Function for get url reddit video.
-    /// </summary>
-    /// <param name="media">Object media.</param>
-    /// <returns>Url reddit video.</returns>
-    private static string? GetVideoLink(object media)
-    {
-        if (media is not JObject mediaJsonObject) return string.Empty;
-        return mediaJsonObject?.SelectToken("reddit_video")?.SelectToken("fallback_url")?.Value<string>();
-    }
-
-    /// <summary>
     ///     Method for getting reddit post content by post url.
     /// </summary>
     /// <param name="url">Url to a reddit post in the format https://www.reddit.com/r/S+/comments/S+.</param>
@@ -72,7 +63,6 @@ public sealed class ProxyReddit : ProxyService
         var accsessToken = await GetAccessTokenAsync();
         var redditClient =
             new RedditClient(appId, appSecret: secretId, accessToken: accsessToken, userAgent: userAgent);
-        var mediaObject = new MediaInfo();
         var post = redditClient.LinkPost($"t3_{postId}").Info();
         var crossPostId = await GetParentPostIdAsync($"t3_{postId}");
         if (!string.IsNullOrWhiteSpace(crossPostId)) post = redditClient.LinkPost($"{crossPostId}").Info();
@@ -81,10 +71,12 @@ public sealed class ProxyReddit : ProxyService
             return new ProxyResponseContent($"{startText}{post.Listing.SelfText}", Array.Empty<MediaInfo>(),
                 Array.Empty<MediaInfo>());
 
+        long size;
         if (Regex.IsMatch(post.Listing.URL, @"https?://\S+(?:jpg|jpeg|png)", RegexOptions.IgnoreCase))
         {
-            await mediaObject.SetMediaInfoAsync(post.Listing.URL);
-            return new ProxyResponseContent(startText, new[] { mediaObject }, Array.Empty<MediaInfo>());
+            size = await ProxyHelper.GetSizeContentUrlAsync(post.Listing.URL);
+            return new ProxyResponseContent(startText, new[] { new MediaInfo(post.Listing.URL, size, MediaType.Photo) },
+                Array.Empty<MediaInfo>());
         }
 
         if (post.Listing.Media != null && post.Listing.IsVideo)
@@ -92,15 +84,26 @@ public sealed class ProxyReddit : ProxyService
             var videoLink = GetVideoLink(post.Listing.Media);
             if (!string.IsNullOrWhiteSpace(videoLink))
             {
-                await mediaObject.SetMediaInfoAsync(videoLink);
-                return new ProxyResponseContent(startText, Array.Empty<MediaInfo>(), new[] { mediaObject });
+                size = await ProxyHelper.GetSizeContentUrlAsync(videoLink);
+                return new ProxyResponseContent(startText, Array.Empty<MediaInfo>(),
+                    new[] { new MediaInfo(post.Listing.URL, size, MediaType.Video) });
             }
-
-            return new ProxyResponseContent(startText, Array.Empty<MediaInfo>(), Array.Empty<MediaInfo>());
         }
 
-        await mediaObject.SetMediaInfoAsync(post.Listing.URL);
-        return new ProxyResponseContent(startText, Array.Empty<MediaInfo>(), new[] { mediaObject });
+        size = await ProxyHelper.GetSizeContentUrlAsync(post.Listing.URL);
+        return new ProxyResponseContent(startText, Array.Empty<MediaInfo>(),
+            new[] { new MediaInfo(post.Listing.URL, size, MediaType.Video) });
+    }
+
+    /// <summary>
+    ///     Function for get url reddit video.
+    /// </summary>
+    /// <param name="media">Object media.</param>
+    /// <returns>Url reddit video.</returns>
+    private static string? GetVideoLink(object media)
+    {
+        if (media is not JObject mediaJsonObject) return string.Empty;
+        return mediaJsonObject?.SelectToken("reddit_video")?.SelectToken("fallback_url")?.Value<string>();
     }
 
     /// <summary>

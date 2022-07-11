@@ -1,5 +1,5 @@
 ﻿using Bot.GetByLink.Client.Telegram.Polling.Interfaces;
-using Bot.GetByLink.Common.Infrastructure;
+using Bot.GetByLink.Common.Infrastructure.Model;
 using Telegram.Bot.Types;
 
 namespace Bot.GetByLink.Client.Telegram.Polling;
@@ -16,23 +16,11 @@ public class FormaterContentTelegram : IFormaterContent
     public FormaterContentTelegram()
     {
         // TODO Потестить отдельно гифки
-        AlbumInputMedias = new List<IAlbumInputMedia>();
-        Messages = new List<string>();
         MaxSizeMbPhoto = 5;
         MaxSizeMbVideo = 20;
         MaxTextLenghtFirstMedia = 1024;
         MaxTextLenghtMessage = 4096;
     }
-
-    /// <summary>
-    ///     Gets text messages.
-    /// </summary>
-    public IEnumerable<string> Messages { get; private set; }
-
-    /// <summary>
-    ///     Gets media messages.
-    /// </summary>
-    public IEnumerable<IAlbumInputMedia> AlbumInputMedias { get; private set; }
 
     /// <summary>
     ///     Gets max size in mb photo for telegram bot.
@@ -58,7 +46,9 @@ public class FormaterContentTelegram : IFormaterContent
     ///     Function for set content.
     /// </summary>
     /// <param name="responseContent">Proxy content.</param>
-    public void SetFormaterContent(ProxyResponseContent responseContent)
+    /// <returns>Formatted content.</returns>
+    public (List<string> Messages, List<IAlbumInputMedia> Artifacts) GetFormattedContent(
+        ProxyResponseContent responseContent)
     {
         var (textUrl, urlPictures, urlVideo) =
             GetTextUrlAndValidUrl(responseContent.UrlPicture.ToList(), responseContent.UrlVideo.ToList());
@@ -68,8 +58,7 @@ public class FormaterContentTelegram : IFormaterContent
         var captionMedia = textMessage[..captionLength];
         var albumInputMedias = GetPhotoInputMedia(urlPictures, captionMedia);
         albumInputMedias.AddRange(GetVideoInputMedia(urlVideo, captionMedia, albumInputMedias.Count < 1));
-        AlbumInputMedias = albumInputMedias;
-        Messages = GetMessageArray(textMessage, captionLength);
+        return (GetMessageList(textMessage, captionLength), albumInputMedias);
     }
 
     /// <summary>
@@ -84,7 +73,7 @@ public class FormaterContentTelegram : IFormaterContent
         {
             var listInputMediaPhoto = new List<InputMediaPhoto>();
             foreach (var inputMediaPhoto in urlPictures)
-                listInputMediaPhoto.Add(new InputMediaPhoto(inputMediaPhoto.UrlMedia));
+                listInputMediaPhoto.Add(new InputMediaPhoto(inputMediaPhoto.Url));
 
             listInputMediaPhoto[0].Caption = captionMedia;
             albumInputMedias = listInputMediaPhoto.ToList<IAlbumInputMedia>();
@@ -106,7 +95,7 @@ public class FormaterContentTelegram : IFormaterContent
         {
             var listInputMediaVideo = new List<InputMediaVideo>();
             foreach (var inputMediaVideo in urlVideo)
-                listInputMediaVideo.Add(new InputMediaVideo(inputMediaVideo.UrlMedia));
+                listInputMediaVideo.Add(new InputMediaVideo(inputMediaVideo.Url));
 
             if (isFirstMedia) listInputMediaVideo[0].Caption = captionMedia;
 
@@ -130,14 +119,14 @@ public class FormaterContentTelegram : IFormaterContent
         var mutableUrlPicture = new List<MediaInfo>();
         var mutableUrlVideo = new List<MediaInfo>();
         foreach (var inputMediaPhoto in mediaPicture)
-            if (inputMediaPhoto.SizeMedia < 0 || inputMediaPhoto.SizeMedia > MaxSizeMbPhoto)
-                urlText = $"{inputMediaPhoto.UrlMedia}\n{urlText}";
+            if (inputMediaPhoto.Size < 0 || inputMediaPhoto.Size > MaxSizeMbPhoto)
+                urlText = $"{inputMediaPhoto.Url}\n{urlText}";
             else
                 mutableUrlPicture.Add(inputMediaPhoto);
 
         foreach (var inputMediaVideo in mediaVideo)
-            if (inputMediaVideo.SizeMedia < 0 || inputMediaVideo.SizeMedia > MaxSizeMbVideo)
-                urlText = $"{inputMediaVideo.UrlMedia}\n{urlText}";
+            if (inputMediaVideo.Size < 0 || inputMediaVideo.Size > MaxSizeMbVideo)
+                urlText = $"{inputMediaVideo.Url}\n{urlText}";
             else
                 mutableUrlVideo.Add(inputMediaVideo);
 
@@ -150,7 +139,7 @@ public class FormaterContentTelegram : IFormaterContent
     /// <param name="textPost">Text post.</param>
     /// <param name="captionLength">Lenght text caption picture or video.</param>
     /// <returns>Formating list IAlbumInputMedia.</returns>
-    private List<string> GetMessageArray(string textPost, int captionLength)
+    private List<string> GetMessageList(string textPost, int captionLength)
     {
         var messages = new List<string>();
         if (textPost.Length > captionLength)
