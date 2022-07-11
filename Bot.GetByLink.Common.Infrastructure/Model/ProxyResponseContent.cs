@@ -1,4 +1,4 @@
-﻿namespace Bot.GetByLink.Common.Infrastructure;
+﻿namespace Bot.GetByLink.Common.Infrastructure.Model;
 
 /// <summary>
 ///     TODO: temporary implementation. Сlass for returned object from proxy.

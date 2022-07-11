@@ -2,8 +2,9 @@
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Message = Bot.GetByLink.Client.Telegram.Common.Model.Message;
 
 namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 
@@ -12,24 +13,22 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// </summary>
 internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
 {
-    private readonly ITelegramBotClient client;
-
     private readonly string patternURL =
         @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
+
+    private readonly IAsyncCommand<CommandName> sendMessageCommand;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="SendContentFromUrlCommand" /> class.
     /// </summary>
-    /// <param name="name">Command name.</param>
-    /// <param name="client">Telegram Client.</param>
+    /// <param name="sendMessageCommand">Sends a message to the client.</param>
     /// <param name="proxyServices">Proxy collection.</param>
-    public SendContentFromUrlCommand(ITelegramBotClient client, IEnumerable<IProxyService> proxyServices)
+    public SendContentFromUrlCommand(IAsyncCommand<CommandName> sendMessageCommand,
+        IEnumerable<IProxyService> proxyServices)
         : base(CommandName.SendContentFromUrl)
     {
-        if (proxyServices is null) throw new ArgumentNullException(nameof(proxyServices));
-
-        ProxyServices = proxyServices;
-        this.client = client;
+        this.sendMessageCommand = sendMessageCommand ?? throw new ArgumentNullException(nameof(sendMessageCommand));
+        ProxyServices = proxyServices ?? throw new ArgumentNullException(nameof(proxyServices));
     }
 
     /// <summary>
@@ -38,32 +37,31 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     public IEnumerable<IProxyService> ProxyServices { get; }
 
     /// <summary>
-    ///     Collect and send content post reddit.
+    ///     //TODO RENAME: Collect and send content post reddit.
     /// </summary>
     /// <param name="ctx">Update client.</param>
     /// <returns>Empty Task.</returns>
     public override async Task ExecuteAsync(object? ctx)
     {
-        if (ctx is not Update) return;
-        var update = ctx as Update;
-        var chatId = update?.Message?.Chat.Id;
-        var text = update?.Message?.Text;
+        if (ctx is not Update update) return;
+        var chatId = update.Message?.Chat.Id;
+        var text = update.Message?.Text;
+        if (chatId is null || string.IsNullOrWhiteSpace(text)) return;
 
-        if (update is null || chatId is null || string.IsNullOrWhiteSpace(text)) return;
         var url = Regex.Match(text, patternURL).Value;
-
         if (string.IsNullOrWhiteSpace(url)) return;
-        var matchProxy = ProxyServices.FirstOrDefault(x => x.IsMatch(url));
 
-        if (matchProxy == null) return;
+        var matchProxy = ProxyServices.FirstOrDefault(proxy => proxy.IsMatch(url));
+        if (matchProxy is null) return;
+
         var postContent = await matchProxy.GetContentUrl(url);
         if (postContent is null) return;
-        var cts = new CancellationTokenSource();
-        if (!string.IsNullOrWhiteSpace(postContent.UrlPicture))
-            await client.SendTextMessageAsync(chatId, postContent.UrlPicture, cancellationToken: cts.Token);
-        if (!string.IsNullOrWhiteSpace(postContent.Text))
-            await client.SendTextMessageAsync(chatId, postContent.Text, cancellationToken: cts.Token);
-        if (!string.IsNullOrWhiteSpace(postContent.UrlVideo))
-            await client.SendTextMessageAsync(chatId, postContent.UrlVideo, cancellationToken: cts.Token);
+
+        // TODO: add foormatter
+        var sendText = new List<string> { postContent.Text ?? string.Empty };
+        var artifacts = new List<string>
+            { postContent.UrlPicture ?? string.Empty, postContent.UrlVideo ?? string.Empty };
+        var message = new Message(chatId, sendText, artifacts, ParseMode.MarkdownV2);
+        await sendMessageCommand.ExecuteAsync(message);
     }
 }

@@ -10,21 +10,29 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 internal sealed class CommandInvoker : ICommandInvoker<CommandName>
 {
     private readonly IDictionary<CommandName, ICommand<CommandName>> commands;
+    private readonly SendMessageCommand sendMessageCommand;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="CommandInvoker" /> class.
     /// </summary>
+    /// <param name="config">Bot configuration.</param>
     /// <param name="client">Telegram Client.</param>
     /// <param name="proxyServices">Proxy collection.</param>
-    public CommandInvoker(ITelegramBotClient client, IEnumerable<IProxyService> proxyServices)
+    public CommandInvoker(IBotConfiguration config, ITelegramBotClient client, IEnumerable<IProxyService> proxyServices)
     {
-        if (client is null) throw new ArgumentNullException(nameof(client));
-        if (proxyServices is null) throw new ArgumentNullException(nameof(proxyServices));
+        ArgumentNullException.ThrowIfNull(config);
+        ArgumentNullException.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(proxyServices);
 
-        var chatInfoCommand = new ChatInfoCommand(client);
-        var sendContentFromUrl = new SendContentFromUrlCommand(client, proxyServices);
+        sendMessageCommand = new SendMessageCommand(client, config.Clients.Telegram.ChatIdLog);
+        var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
+        var sendContentFromUrl = new SendContentFromUrlCommand(sendMessageCommand, proxyServices);
         commands = new Dictionary<CommandName, ICommand<CommandName>>
-            { { chatInfoCommand.Name, chatInfoCommand }, { sendContentFromUrl.Name, sendContentFromUrl } };
+        {
+            { chatInfoCommand.Name, chatInfoCommand },
+            { sendContentFromUrl.Name, sendContentFromUrl },
+            { sendMessageCommand.Name, sendMessageCommand }
+        };
     }
 
     /// <summary>
@@ -49,9 +57,7 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.ToString());
-
-            // TODO: команда отправки сообщений в чат лога
+            await sendMessageCommand.TrySendLogAsync(ex.ToString());
         }
     }
 

@@ -1,4 +1,6 @@
-﻿namespace Bot.GetByLink.Common.Infrastructure.Interfaces;
+﻿using Bot.GetByLink.Common.Infrastructure.Model;
+
+namespace Bot.GetByLink.Common.Infrastructure.Interfaces;
 
 /// <summary>
 ///     Proxy interface.
