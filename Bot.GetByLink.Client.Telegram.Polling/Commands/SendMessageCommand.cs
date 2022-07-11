@@ -1,19 +1,21 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
+using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Telegram.Bot;
-using Telegram.Bot.Types;
-using Message = Bot.GetByLink.Client.Telegram.Common.Model.Message;
+using Telegram.Bot.Types.Enums;
+using TelegramBotTypes = Telegram.Bot.Types;
 
 namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 
 /// <summary>
 ///     Sends a message to the client.
 /// </summary>
-internal sealed class SendMessageCommand : AsyncCommand<CommandName>
+internal sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposable
 {
     private readonly ITelegramBotClient client;
-    private readonly ChatId? logChatId;
+    private readonly TelegramBotTypes.ChatId? logChatId;
+    private CancellationTokenSource? cts;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="SendMessageCommand" /> class.
@@ -24,7 +26,19 @@ internal sealed class SendMessageCommand : AsyncCommand<CommandName>
         : base(CommandName.SendMessage)
     {
         this.client = client ?? throw new ArgumentNullException(nameof(client));
-        this.logChatId = logChatId is not null ? new ChatId(logChatId) : null;
+        this.logChatId = !string.IsNullOrWhiteSpace(logChatId) ? new TelegramBotTypes.ChatId(logChatId) : null;
+        cts = new CancellationTokenSource();
+    }
+
+    /// <summary>
+    ///     Token Cancellation.
+    /// </summary>
+    public void Dispose()
+    {
+        if (cts is null) return;
+        cts.Cancel();
+        cts.Dispose();
+        cts = null;
     }
 
     /// <summary>
@@ -63,9 +77,11 @@ internal sealed class SendMessageCommand : AsyncCommand<CommandName>
 
     private async Task SendMessageAsync(IMessageContext message)
     {
+        if (cts is null || cts.IsCancellationRequested) cts = new CancellationTokenSource();
+
         // text
         foreach (var text in message.Text.Where(text => !string.IsNullOrWhiteSpace(text)))
-            await client.SendTextMessageAsync(message.ChatId, text);
+            await client.SendTextMessageAsync(message.ChatId, text, ParseMode.MarkdownV2, cancellationToken: cts.Token);
 
         // TODO: artifacts
     }

@@ -1,8 +1,10 @@
 ﻿using System.Text.RegularExpressions;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
+using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Message = Bot.GetByLink.Client.Telegram.Common.Model.Message;
 
 namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 
@@ -12,16 +14,18 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 internal sealed class ChatInfoCommand : AsyncCommand<CommandName>
 {
     private readonly ITelegramBotClient client;
+    private readonly IAsyncCommand<CommandName> sendMessageCommand;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ChatInfoCommand" /> class.
     /// </summary>
-    /// <param name="name">Command name.</param>
-    /// <param name="client">Telegram Client.</param>
-    public ChatInfoCommand(ITelegramBotClient client)
+    /// <param name="client"> Telegram client.</param>
+    /// <param name="sendMessageCommand">Sends a message to the client.</param>
+    public ChatInfoCommand(ITelegramBotClient client, IAsyncCommand<CommandName> sendMessageCommand)
         : base(CommandName.ChatInfo)
     {
-        this.client = client;
+        this.client = client ?? throw new ArgumentNullException(nameof(client));
+        this.sendMessageCommand = sendMessageCommand ?? throw new ArgumentNullException(nameof(sendMessageCommand));
     }
 
     /// <summary>
@@ -31,15 +35,18 @@ internal sealed class ChatInfoCommand : AsyncCommand<CommandName>
     /// <returns>Empty Task.</returns>
     public override async Task ExecuteAsync(object? ctx)
     {
-        if (ctx is not Update) return;
-        var update = ctx as Update;
-        var chatId = update?.Message?.Chat.Id;
-        if (update is null || chatId is null) return;
+        if (ctx is not Update update) return;
+        var chatId = update.Message?.Chat.Id;
+        if (chatId is null) return;
 
         var cts = new CancellationTokenSource();
         var chat = await client.GetChatAsync(chatId, cts.Token);
+
         var info = GetInfoByUpdate(chat, update);
-        await client.SendTextMessageAsync(chatId, info, cancellationToken: cts.Token);
+        var message = new Message(chatId, new List<string> { info });
+        await sendMessageCommand.ExecuteAsync(message);
+
+        cts.Cancel();
     }
 
     private static string GetInfoByUpdate(Chat chat, Update update)
@@ -47,7 +54,7 @@ internal sealed class ChatInfoCommand : AsyncCommand<CommandName>
         var from = update.Message?.From;
         var chatId = $"Chat Id: {chat.Id}";
         var chatType = $"Chat Type: {chat.Type}";
-        var fromUser = $"From User: {from?.FirstName} {from?.LastName} @{from?.Username}";
+        var fromUser = $"From User: {from?.FirstName} {from?.LastName} @{from?.Username} id:{from?.Id}";
 
         var info = new[] { chatId, chatType, fromUser };
         for (var i = 0; i < info.Length; i++) info[i] = Regex.Replace(info[i], @"\s+", " ").Trim();
