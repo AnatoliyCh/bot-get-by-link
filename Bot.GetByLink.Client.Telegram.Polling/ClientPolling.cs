@@ -1,9 +1,9 @@
 ﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Client.Telegram.Polling.Commands;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Telegram.Bot;
-using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -14,9 +14,8 @@ namespace Bot.GetByLink.Client.Telegram.Polling;
 ///     Telegram client.
 ///     Connection Type: polling.
 /// </summary>
-internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractions.Client
+internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractions.Client, IDisposable
 {
-    private readonly string? chatIdErrorHandling;
     private readonly ITelegramBotClient client;
     private readonly ICommandInvoker<CommandName> commandInvoker;
     private readonly string patternCommand = "^\\/[a-zA-Z]+";
@@ -27,6 +26,7 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
     private readonly string projectName;
 
     private readonly ReceiverOptions receiverOptions;
+    private readonly SendMessageCommand sendMessageCommand;
 
     private CancellationTokenSource? cts;
 
@@ -38,15 +38,25 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
     /// <param name="invoker">Command Executor.</param>
     public ClientPolling(IBotConfiguration config, ITelegramBotClient client, ICommandInvoker<CommandName> invoker)
     {
-        if (config is null) throw new ArgumentNullException(nameof(config));
+        ArgumentNullException.ThrowIfNull(config);
         this.client = client ?? throw new ArgumentNullException(nameof(client));
         commandInvoker = invoker ?? throw new ArgumentNullException(nameof(invoker));
-
+        sendMessageCommand = invoker.GetCommand<SendMessageCommand>() ??
+                             throw new ArgumentException(nameof(SendMessageCommand));
         projectName = config.ProjectName ?? throw new NullReferenceException(nameof(projectName));
-        var chatId = config.Clients.Telegram.ChatIdLog;
 
-        if (!string.IsNullOrWhiteSpace(chatId)) chatIdErrorHandling = chatId;
         receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
+    }
+
+    /// <summary>
+    ///     /// Token Cancellation.
+    /// </summary>
+    public void Dispose()
+    {
+        if (cts is null) return;
+        cts.Cancel();
+        cts.Dispose();
+        cts = null;
     }
 
     /// <summary>
@@ -60,8 +70,8 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
         var validToken = await client.TestApiAsync(cts.Token);
         if (!validToken)
         {
-            RemoveToken();
-            Console.WriteLine($"{projectName}: token is not valid");
+            Dispose();
+            await sendMessageCommand.TrySendLogAsync($"{projectName}: token is not valid");
             return false;
         }
 
@@ -76,7 +86,7 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
     /// <returns>Execution result.</returns>
     public override Task<bool> Stop()
     {
-        RemoveToken();
+        Dispose();
         State = Status.Off;
         return Task.FromResult(true);
     }
@@ -88,19 +98,8 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
     /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
     public async Task TrySendTextMessageToLogChatAsync(string message)
     {
-        if (string.IsNullOrWhiteSpace(message) ||
-            string.IsNullOrWhiteSpace(chatIdErrorHandling) ||
-            cts is null || State == Status.Off)
-            return;
-
-        try
-        {
-            await client.SendTextMessageAsync(chatIdErrorHandling, message, cancellationToken: cts.Token);
-        }
-        catch (Exception exception)
-        {
-            await HandleErrorAsync(client, exception, cts.Token);
-        }
+        if (cts is null || cts.IsCancellationRequested || State == Status.Off) return;
+        await sendMessageCommand.TrySendLogAsync(message);
     }
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken ct)
@@ -128,19 +127,7 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
 
     private async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken ct)
     {
-        if (exception is not ApiRequestException apiRequestException) return;
-        var exceptionInString = apiRequestException.ToString();
-        Console.WriteLine(exceptionInString);
-
-        if (string.IsNullOrWhiteSpace(chatIdErrorHandling) || apiRequestException.Message == "Unauthorized") return;
-        await botClient.SendTextMessageAsync(chatIdErrorHandling, exceptionInString, cancellationToken: ct);
-    }
-
-    private void RemoveToken()
-    {
-        if (cts is null) return;
-        cts.Cancel();
-        cts.Dispose();
-        cts = null;
+        var exceptionInString = exception.ToString();
+        await sendMessageCommand.TrySendLogAsync(exceptionInString);
     }
 }

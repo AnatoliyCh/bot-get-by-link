@@ -20,7 +20,6 @@ var launched = await client.Start();
 if (launched)
 {
     var startMessage = $"{configuration.ProjectName}: start";
-    Console.WriteLine(startMessage);
     await client.TrySendTextMessageToLogChatAsync(startMessage);
 }
 
