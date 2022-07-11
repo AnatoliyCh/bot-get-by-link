@@ -1,9 +1,9 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
-using Bot.GetByLink.Common.Infrastructure;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Common.Infrastructure.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Reddit;
