@@ -1,8 +1,8 @@
-﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Polling.Commands;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
@@ -16,6 +16,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling;
 /// </summary>
 internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractions.Client, IDisposable
 {
+    private readonly ILogger logger;
     private readonly ITelegramBotClient client;
     private readonly ICommandInvoker<CommandName> commandInvoker;
     private readonly string patternCommand = "^\\/[a-zA-Z]+";
@@ -26,7 +27,6 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
     private readonly string projectName;
 
     private readonly ReceiverOptions receiverOptions;
-    private readonly SendMessageCommand sendMessageCommand;
 
     private CancellationTokenSource? cts;
 
@@ -34,15 +34,20 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
     ///     Initializes a new instance of the <see cref="ClientPolling" /> class.
     /// </summary>
     /// <param name="config">Bot configuration.</param>
+    /// <param name="logger">Interface for logging.</param>
     /// <param name="client">Telegram Client.</param>
     /// <param name="invoker">Command Executor.</param>
-    public ClientPolling(IBotConfiguration config, ITelegramBotClient client, ICommandInvoker<CommandName> invoker)
+    public ClientPolling(
+        IBotConfiguration config,
+        ILogger<ClientPolling> logger,
+        ITelegramBotClient client,
+        ICommandInvoker<CommandName> invoker)
     {
         ArgumentNullException.ThrowIfNull(config);
+
+        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         this.client = client ?? throw new ArgumentNullException(nameof(client));
         commandInvoker = invoker ?? throw new ArgumentNullException(nameof(invoker));
-        sendMessageCommand = invoker.GetCommand<SendMessageCommand>() ??
-                             throw new ArgumentException(nameof(SendMessageCommand));
         projectName = config.ProjectName ?? throw new NullReferenceException(nameof(projectName));
 
         receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
@@ -71,7 +76,7 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
         if (!validToken)
         {
             Dispose();
-            await sendMessageCommand.TrySendLogAsync($"{projectName}: token is not valid");
+            logger.LogCritical($"{projectName}: token is not valid");
             return false;
         }
 
@@ -89,17 +94,6 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
         Dispose();
         State = Status.Off;
         return Task.FromResult(true);
-    }
-
-    /// <summary>
-    ///     Sends a message to the chat for the log.
-    /// </summary>
-    /// <param name="message">Message content.</param>
-    /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-    public async Task TrySendTextMessageToLogChatAsync(string message)
-    {
-        if (cts is null || cts.IsCancellationRequested || State == Status.Off) return;
-        await sendMessageCommand.TrySendLogAsync(message);
     }
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken ct)
@@ -127,7 +121,6 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
 
     private async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken ct)
     {
-        var exceptionInString = exception.ToString();
-        await sendMessageCommand.TrySendLogAsync(exceptionInString);
+        await Task.Run(() => logger.LogError(exception, "HandleErrorAsync"));
     }
 }

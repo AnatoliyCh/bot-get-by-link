@@ -1,5 +1,6 @@
 ﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 
 namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
@@ -9,30 +10,37 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// </summary>
 internal sealed class CommandInvoker : ICommandInvoker<CommandName>
 {
+    private readonly ILogger logger;
     private readonly IDictionary<CommandName, ICommand<CommandName>> commands;
-    private readonly SendMessageCommand sendMessageCommand;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="CommandInvoker" /> class.
     /// </summary>
     /// <param name="config">Bot configuration.</param>
+    /// <param name="logger">Interface for logging.</param>
     /// <param name="client">Telegram Client.</param>
     /// <param name="proxyServices">Proxy collection.</param>
-    public CommandInvoker(IBotConfiguration config, ITelegramBotClient client, IEnumerable<IProxyService> proxyServices)
+    /// <param name="serviceCommands">Service commands.</param>
+    public CommandInvoker(
+        IBotConfiguration config,
+        ILogger<CommandInvoker> logger,
+        ITelegramBotClient client,
+        IEnumerable<IProxyService> proxyServices,
+        IEnumerable<ICommand<CommandName>> serviceCommands)
     {
         ArgumentNullException.ThrowIfNull(config);
         ArgumentNullException.ThrowIfNull(client);
         ArgumentNullException.ThrowIfNull(proxyServices);
 
-        sendMessageCommand = new SendMessageCommand(client, config.Clients.Telegram.ChatIdLog);
+        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        var sendMessageCommand = (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ?? throw new NullReferenceException("Command: SendMessage is null");
         var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
         var sendContentFromUrl = new SendContentFromUrlCommand(sendMessageCommand, proxyServices);
-        commands = new Dictionary<CommandName, ICommand<CommandName>>
-        {
-            { chatInfoCommand.Name, chatInfoCommand },
-            { sendContentFromUrl.Name, sendContentFromUrl },
-            { sendMessageCommand.Name, sendMessageCommand }
-        };
+
+        commands = serviceCommands
+            .Concat(new List<ICommand<CommandName>>() { chatInfoCommand, sendContentFromUrl })
+            .DistinctBy(command => command.Name)
+            .ToDictionary(command => command.Name, command => command);
     }
 
     /// <summary>
@@ -57,7 +65,8 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
         }
         catch (Exception ex)
         {
-            await sendMessageCommand.TrySendLogAsync(ex.ToString());
+            string message = $"ICommand: {command?.Name.ToString()}";
+            logger.LogError(ex, message);
         }
     }
 
