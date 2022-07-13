@@ -1,8 +1,8 @@
-﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
@@ -16,9 +16,9 @@ namespace Bot.GetByLink.Client.Telegram.Polling;
 /// </summary>
 internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractions.Client, IDisposable
 {
-    private readonly ILogger logger;
     private readonly ITelegramBotClient client;
     private readonly ICommandInvoker<CommandName> commandInvoker;
+    private readonly ILogger logger;
     private readonly string patternCommand = "^\\/[a-zA-Z]+";
 
     private readonly string patternURL =

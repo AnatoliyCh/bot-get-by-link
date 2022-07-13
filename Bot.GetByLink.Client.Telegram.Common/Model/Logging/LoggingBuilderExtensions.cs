@@ -4,12 +4,12 @@ using Microsoft.Extensions.Logging;
 namespace Bot.GetByLink.Client.Telegram.Common.Model.Logging;
 
 /// <summary>
-/// Type extension for ILoggingBuilder.
+///     Type extension for ILoggingBuilder.
 /// </summary>
 public static class LoggingBuilderExtensions
 {
     /// <summary>
-    /// Adds the given Microsoft.Extensions.Logging.ILoggerProvider to the Microsoft.Extensions.Logging.ILoggingBuilder.
+    ///     Adds the given Microsoft.Extensions.Logging.ILoggerProvider to the Microsoft.Extensions.Logging.ILoggingBuilder.
     /// </summary>
     /// <typeparam name="T">The type of the object being added to the DI container.</typeparam>
     /// <param name="builder">The Microsoft.Extensions.Logging.ILoggingBuilder to add the provider to.</param>

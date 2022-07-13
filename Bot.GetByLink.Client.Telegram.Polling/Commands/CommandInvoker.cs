@@ -10,8 +10,8 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// </summary>
 internal sealed class CommandInvoker : ICommandInvoker<CommandName>
 {
-    private readonly ILogger logger;
     private readonly IDictionary<CommandName, ICommand<CommandName>> commands;
+    private readonly ILogger logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="CommandInvoker" /> class.
@@ -33,12 +33,14 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
         ArgumentNullException.ThrowIfNull(proxyServices);
 
         this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        var sendMessageCommand = (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ?? throw new NullReferenceException("Command: SendMessage is null");
+        var sendMessageCommand =
+            (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ??
+            throw new NullReferenceException("Command: SendMessage is null");
         var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
         var sendContentFromUrl = new SendContentFromUrlCommand(sendMessageCommand, proxyServices);
 
         commands = serviceCommands
-            .Concat(new List<ICommand<CommandName>>() { chatInfoCommand, sendContentFromUrl })
+            .Concat(new List<ICommand<CommandName>> { chatInfoCommand, sendContentFromUrl })
             .DistinctBy(command => command.Name)
             .ToDictionary(command => command.Name, command => command);
     }
@@ -65,7 +67,7 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
         }
         catch (Exception ex)
         {
-            string message = $"ICommand: {command?.Name.ToString()}";
+            var message = $"ICommand: {command?.Name.ToString()}";
             logger.LogError(ex, message);
         }
     }
