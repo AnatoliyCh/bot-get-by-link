@@ -1,4 +1,4 @@
-﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -21,12 +21,14 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
     /// <param name="client">Telegram Client.</param>
     /// <param name="proxyServices">Proxy collection.</param>
     /// <param name="serviceCommands">Service commands.</param>
+    /// <param name="regexWrappers">Regular expressions for checks.</param>
     public CommandInvoker(
         IBotConfiguration config,
         ILogger<CommandInvoker> logger,
         ITelegramBotClient client,
         IEnumerable<IProxyService> proxyServices,
-        IEnumerable<ICommand<CommandName>> serviceCommands)
+        IEnumerable<ICommand<CommandName>> serviceCommands,
+        IEnumerable<IRegexWrapper> regexWrappers)
     {
         ArgumentNullException.ThrowIfNull(config);
         ArgumentNullException.ThrowIfNull(client);
@@ -37,7 +39,7 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
             (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ??
             throw new NullReferenceException("Command: SendMessage is null");
         var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
-        var sendContentFromUrl = new SendContentFromUrlCommand(sendMessageCommand, proxyServices);
+        var sendContentFromUrl = new SendContentFromUrlCommand(sendMessageCommand, proxyServices, regexWrappers);
 
         commands = serviceCommands
             .Concat(new List<ICommand<CommandName>> { chatInfoCommand, sendContentFromUrl })
@@ -51,7 +53,7 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
     /// <param name="command">Given command.</param>
     /// <param name="ctx">Context command.</param>
     /// <returns>Empty Task.</returns>
-    public async Task TryExecuteCommand(ICommand<CommandName>? command, object? ctx)
+    public async Task TryExecuteCommandAsync(ICommand<CommandName>? command, object? ctx)
     {
         try
         {
@@ -78,10 +80,10 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
     /// <param name="commandName">Command name.</param>
     /// <param name="ctx">Context command.</param>
     /// <returns>Empty Task.</returns>
-    public async Task TryExecuteCommand(CommandName commandName, object? ctx)
+    public async Task TryExecuteCommandAsync(CommandName commandName, object? ctx)
     {
         commands.TryGetValue(commandName, out var command);
-        await TryExecuteCommand(command, ctx);
+        await TryExecuteCommandAsync(command, ctx);
     }
 
     /// <summary>

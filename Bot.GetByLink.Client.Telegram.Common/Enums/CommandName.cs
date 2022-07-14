@@ -1,4 +1,4 @@
-﻿namespace Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿namespace Bot.GetByLink.Client.Telegram.Common.Enums;
 
 /// <summary>
 ///     Command names for telegram client.

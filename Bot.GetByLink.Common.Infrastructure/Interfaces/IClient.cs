@@ -17,11 +17,11 @@ public interface IClient
     ///     Client start.
     /// </summary>
     /// <returns>Execution result.</returns>
-    public Task<bool> Start();
+    public Task<bool> StartAsync();
 
     /// <summary>
     ///     Client stop.
     /// </summary>
     /// <returns>Execution result.</returns>
-    public Task<bool> Stop();
+    public Task<bool> StopAsync();
 }

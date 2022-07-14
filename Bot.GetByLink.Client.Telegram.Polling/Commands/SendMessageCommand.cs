@@ -1,5 +1,5 @@
-﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Telegram.Bot;
 
@@ -17,7 +17,6 @@ internal sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposabl
     ///     Initializes a new instance of the <see cref="SendMessageCommand" /> class.
     /// </summary>
     /// <param name="client">Telegram Client.</param>
-    /// <param name="logChatId">Chat for logging issues (database not used).</param>
     public SendMessageCommand(ITelegramBotClient client)
         : base(CommandName.SendMessage)
     {

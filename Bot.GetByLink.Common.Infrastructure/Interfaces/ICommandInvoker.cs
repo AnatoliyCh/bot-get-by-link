@@ -12,7 +12,7 @@ public interface ICommandInvoker<in TCommandName>
     /// <param name="command">Given command.</param>
     /// <param name="ctx">Context command.</param>
     /// <returns>Empty Task.</returns>
-    public Task TryExecuteCommand(ICommand<TCommandName>? command, object? ctx);
+    public Task TryExecuteCommandAsync(ICommand<TCommandName>? command, object? ctx);
 
     /// <summary>
     ///     Calls the given command.
@@ -20,7 +20,7 @@ public interface ICommandInvoker<in TCommandName>
     /// <param name="commandName">Command name.</param>
     /// <param name="ctx">Context command.</param>
     /// <returns>Empty Task.</returns>
-    public Task TryExecuteCommand(TCommandName commandName, object? ctx);
+    public Task TryExecuteCommandAsync(TCommandName commandName, object? ctx);
 
     /// <summary>
     ///     Returns a command of the given type.
