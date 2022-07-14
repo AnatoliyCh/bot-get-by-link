@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Client.Telegram.Common.Model.Logging;
 using Bot.GetByLink.Client.Telegram.Polling;
 using Bot.GetByLink.Client.Telegram.Polling.Commands;
@@ -19,7 +20,7 @@ var logger = serviceProvider.GetService<ILogger<Program>>()!;
 
 var client = serviceProvider.GetService<ClientPolling>()!;
 
-var launched = await client.Start();
+var launched = await client.StartAsync();
 
 var looping = true;
 
@@ -34,17 +35,35 @@ while (looping)
     {
         case "exit polling":
             looping = false;
-            await client.Stop();
+            await client.StopAsync();
             break;
         case "start polling":
-            await client.Start();
+            await client.StartAsync();
             logger.LogInformation($"{configuration.ProjectName}: starting polling...");
             break;
         case "stop polling":
-            await client.Stop();
+            await client.StopAsync();
             logger.LogInformation($"{configuration.ProjectName}: stoping polling...");
             break;
     }
+}
+
+static IServiceProvider ConfigureServices()
+{
+    var configuration = GetConfiguration();
+    var client = GetTelegramClient(configuration);
+
+    IServiceCollection services = new ServiceCollection();
+    services.AddSingleton(client);
+    services.AddSingleton(configuration);
+    services.AddScoped<IProxyService, ProxyReddit>();
+    services.AddScoped<ICommand<CommandName>, SendMessageCommand>();
+    services.AddScoped<ICommandInvoker<CommandName>, CommandInvoker>();
+    services.AddScoped<ClientPolling>();
+
+    AddLogging(services);
+    AddRegexWrapper(services);
+    return services.BuildServiceProvider();
 }
 
 static IBotConfiguration GetConfiguration()
@@ -63,6 +82,13 @@ static IBotConfiguration GetConfiguration()
     return botConfiguration;
 }
 
+static ITelegramBotClient GetTelegramClient(IBotConfiguration configuration)
+{
+    var token = configuration?.Clients?.Telegram?.Token;
+    if (!string.IsNullOrWhiteSpace(token)) return new TelegramBotClient(token);
+    throw new ArgumentException("Token");
+}
+
 static void AddLogging(IServiceCollection services)
 {
     services.AddLogging(builder =>
@@ -72,26 +98,8 @@ static void AddLogging(IServiceCollection services)
     });
 }
 
-static ITelegramBotClient GetTelegramClient(IBotConfiguration configuration)
+static void AddRegexWrapper(IServiceCollection services)
 {
-    var token = configuration?.Clients?.Telegram?.Token;
-    if (!string.IsNullOrWhiteSpace(token)) return new TelegramBotClient(token);
-    throw new ArgumentException("Token");
-}
-
-static IServiceProvider ConfigureServices()
-{
-    var configuration = GetConfiguration();
-    var client = GetTelegramClient(configuration);
-
-    IServiceCollection services = new ServiceCollection();
-    services.AddSingleton(client);
-    services.AddSingleton(configuration);
-    services.AddScoped<IProxyService, ProxyReddit>();
-    services.AddScoped<ICommand<CommandName>, SendMessageCommand>();
-    services.AddScoped<ICommandInvoker<CommandName>, CommandInvoker>();
-    services.AddScoped<ClientPolling>();
-
-    AddLogging(services);
-    return services.BuildServiceProvider();
+    services.AddScoped<IRegexWrapper, UrlRegexWrapper>();
+    services.AddScoped<IRegexWrapper, CommandRegexWrapper>();
 }
