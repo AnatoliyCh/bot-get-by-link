@@ -1,4 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Client.Telegram.Common.Interfaces;
+using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
@@ -26,12 +28,12 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     /// <param name="sendMessageCommand">Sends a message to the client.</param>
     /// <param name="proxyServices">Proxy collection.</param>
     public SendContentFromUrlCommand(IAsyncCommand<CommandName> sendMessageCommand,
-        IEnumerable<IProxyService> proxyServices)
+        IEnumerable<IProxyService> proxyServices, IFormatterContent formatterContent)
         : base(CommandName.SendContentFromUrl)
     {
         this.sendMessageCommand = sendMessageCommand ?? throw new ArgumentNullException(nameof(sendMessageCommand));
+        formaterContent = (ProxyResponseFormatter)formatterContent;
         ProxyServices = proxyServices ?? throw new ArgumentNullException(nameof(proxyServices));
-        formaterContent = new ProxyResponseFormatter();
     }
 
     /// <summary>
@@ -40,7 +42,7 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     public IEnumerable<IProxyService> ProxyServices { get; }
 
     /// <summary>
-    ///     //TODO RENAME: Collect and send content post.
+    ///     Collect and send content post.
     /// </summary>
     /// <param name="ctx">Update client.</param>
     /// <returns>Empty Task.</returns>

@@ -1,8 +1,8 @@
-﻿using Bot.GetByLink.Client.Telegram.Polling.Interfaces;
+﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Model;
 using Telegram.Bot.Types;
 
-namespace Bot.GetByLink.Client.Telegram.Polling;
+namespace Bot.GetByLink.Client.Telegram.Common.Model;
 
 /// <summary>
 ///     Class for formating content for messages telegram.
@@ -15,7 +15,7 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="responseContent">Proxy content.</param>
     public ProxyResponseFormatter()
     {
-        // TODO Потестить отдельно гифки
+        // TODO test with gif
         MaxSizeMbPhoto = 5;
         MaxSizeMbVideo = 20;
         MaxTextLenghtFirstMedia = 1024;

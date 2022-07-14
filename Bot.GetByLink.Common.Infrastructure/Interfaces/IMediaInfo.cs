@@ -14,11 +14,4 @@ public interface IMediaInfo
     ///     Gets or sets for size in mb on url media.
     /// </summary>
     public double SizeMedia { get; set; }
-
-    /// <summary>
-    ///     Function for set imfo media on url media.
-    /// </summary>
-    /// <param name="url">Url media.</param>
-    /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-    public Task SetMediaInfoAsync(string url);
 }

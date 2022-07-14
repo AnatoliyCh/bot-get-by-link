@@ -1,7 +1,7 @@
 ﻿using Bot.GetByLink.Common.Infrastructure.Model;
 using Telegram.Bot.Types;
 
-namespace Bot.GetByLink.Client.Telegram.Polling.Interfaces;
+namespace Bot.GetByLink.Client.Telegram.Common.Interfaces;
 
 /// <summary>
 ///     Interafece for formating content for messages telegram.

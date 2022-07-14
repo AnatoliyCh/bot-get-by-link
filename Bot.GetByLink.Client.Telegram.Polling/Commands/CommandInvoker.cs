@@ -1,4 +1,5 @@
-﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Common.Model;
+using Bot.GetByLink.Client.Telegram.Polling.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Telegram.Bot;
 
@@ -26,7 +27,8 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
 
         sendMessageCommand = new SendMessageCommand(client, config.Clients.Telegram.ChatIdLog);
         var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
-        var sendContentFromUrl = new SendContentFromUrlCommand(sendMessageCommand, proxyServices);
+        var formaterContent = new ProxyResponseFormatter();
+        var sendContentFromUrl = new SendContentFromUrlCommand(sendMessageCommand, proxyServices, formaterContent);
         commands = new Dictionary<CommandName, ICommand<CommandName>>
         {
             { chatInfoCommand.Name, chatInfoCommand },
