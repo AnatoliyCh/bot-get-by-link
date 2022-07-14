@@ -18,17 +18,29 @@ public abstract class RegexWrapper : IRegexWrapper
         Regex = regex ?? throw new ArgumentNullException(nameof(regex));
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets regular expression.
+    /// </summary>
     public string Regex { get; }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Whether a match was found in the input string.
+    /// </summary>
+    /// <param name="input">The input string.</param>
+    /// <param name="options">Parameters for matching.</param>
+    /// <returns>True if the regular expression finds a match; otherwise, false.</returns>
     public virtual bool IsMatch(string? input, RegexOptions? options = null)
     {
         if (string.IsNullOrWhiteSpace(input)) return false;
         return System.Text.RegularExpressions.Regex.IsMatch(input, Regex, options ?? RegexOptions.None);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Finds a substring in an input string.
+    /// </summary>
+    /// <param name="input">The input string.</param>
+    /// <param name="options">Parameters for matching.</param>
+    /// <returns>An object that contains information about the match or null.</returns>
     public virtual Match? Match(string? input, RegexOptions? options = null)
     {
         if (string.IsNullOrWhiteSpace(input)) return null;

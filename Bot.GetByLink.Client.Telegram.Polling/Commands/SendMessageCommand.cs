@@ -17,7 +17,6 @@ internal sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposabl
     ///     Initializes a new instance of the <see cref="SendMessageCommand" /> class.
     /// </summary>
     /// <param name="client">Telegram Client.</param>
-    /// <param name="logChatId">Chat for logging issues (database not used).</param>
     public SendMessageCommand(ITelegramBotClient client)
         : base(CommandName.SendMessage)
     {
