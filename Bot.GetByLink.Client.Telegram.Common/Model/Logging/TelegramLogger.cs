@@ -41,7 +41,7 @@ internal sealed class TelegramLogger : ILogger
     ///     Indicates if the logger is available for use.
     /// </summary>
     /// <param name="logLevel">Logging level.</param>
-    /// <returns>true/false</returns>
+    /// <returns>true if enabled.</returns>
     public bool IsEnabled(LogLevel logLevel)
     {
         return true;
