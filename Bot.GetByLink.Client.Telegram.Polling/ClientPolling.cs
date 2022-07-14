@@ -1,8 +1,9 @@
 ﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Polling.Commands;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
@@ -18,15 +19,12 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
 {
     private readonly ITelegramBotClient client;
     private readonly ICommandInvoker<CommandName> commandInvoker;
-    private readonly string patternCommand = "^\\/[a-zA-Z]+";
-
-    private readonly string patternURL =
-        @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
+    private readonly ILogger logger;
 
     private readonly string projectName;
 
     private readonly ReceiverOptions receiverOptions;
-    private readonly SendMessageCommand sendMessageCommand;
+    private readonly IEnumerable<IRegexWrapper> regexWrappers;
 
     private CancellationTokenSource? cts;
 
@@ -34,16 +32,26 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
     ///     Initializes a new instance of the <see cref="ClientPolling" /> class.
     /// </summary>
     /// <param name="config">Bot configuration.</param>
+    /// <param name="logger">Interface for logging.</param>
     /// <param name="client">Telegram Client.</param>
     /// <param name="invoker">Command Executor.</param>
-    public ClientPolling(IBotConfiguration config, ITelegramBotClient client, ICommandInvoker<CommandName> invoker)
+    /// <param name="regexWrappers">Regular expressions for checks.</param>
+    public ClientPolling(
+        IBotConfiguration config,
+        ILogger<ClientPolling> logger,
+        ITelegramBotClient client,
+        ICommandInvoker<CommandName> invoker,
+        IEnumerable<IRegexWrapper> regexWrappers)
     {
         ArgumentNullException.ThrowIfNull(config);
+
+        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         this.client = client ?? throw new ArgumentNullException(nameof(client));
         commandInvoker = invoker ?? throw new ArgumentNullException(nameof(invoker));
-        sendMessageCommand = invoker.GetCommand<SendMessageCommand>() ??
-                             throw new ArgumentException(nameof(SendMessageCommand));
         projectName = config.ProjectName ?? throw new NullReferenceException(nameof(projectName));
+        if (regexWrappers is null || !regexWrappers.Any()) throw new ArgumentNullException(nameof(regexWrappers));
+
+        this.regexWrappers = regexWrappers;
 
         receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
     }
@@ -63,15 +71,15 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
     ///     Client launch or reset.
     /// </summary>
     /// <returns>A <see cref="Task{TResult}" /> representing the result of the asynchronous operation.</returns>
-    public override async Task<bool> Start()
+    public override async Task<bool> StartAsync()
     {
-        if (State == Status.On || cts is not null) await Stop();
+        if (State == Status.On || cts is not null) await StopAsync();
         cts = new CancellationTokenSource();
         var validToken = await client.TestApiAsync(cts.Token);
         if (!validToken)
         {
             Dispose();
-            await sendMessageCommand.TrySendLogAsync($"{projectName}: token is not valid");
+            logger.LogCritical($"{projectName}: token is not valid");
             return false;
         }
 
@@ -84,22 +92,11 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
     ///     Client stop.
     /// </summary>
     /// <returns>Execution result.</returns>
-    public override Task<bool> Stop()
+    public override Task<bool> StopAsync()
     {
         Dispose();
         State = Status.Off;
         return Task.FromResult(true);
-    }
-
-    /// <summary>
-    ///     Sends a message to the chat for the log.
-    /// </summary>
-    /// <param name="message">Message content.</param>
-    /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-    public async Task TrySendTextMessageToLogChatAsync(string message)
-    {
-        if (cts is null || cts.IsCancellationRequested || State == Status.Off) return;
-        await sendMessageCommand.TrySendLogAsync(message);
     }
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken ct)
@@ -107,27 +104,40 @@ internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractio
         var text = update.Message!.Text ?? string.Empty;
 
         // only command message (/**) and URL
-        if (!(update.Message!.Type == MessageType.Text &&
-              (Regex.IsMatch(text, patternCommand) || Regex.IsMatch(text, patternURL)))) return;
+        if (update.Message!.Type != MessageType.Text && regexWrappers.Any(regex => regex.IsMatch(text))) return;
 
         var words = text.Split(" ");
         if (words is null || words.Length == 0) return;
 
         // commands
         var firstWord = words.First();
-        var commandNameText = Regex.Replace(firstWord, "/", string.Empty);
-        if (Regex.IsMatch(firstWord, patternURL)) commandNameText = CommandName.SendContentFromUrl.ToString();
+        var commandName = GetCommandNameByString(firstWord);
+        if (commandName is null) return;
 
-        commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
-        if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return;
-        var commandName = Enum.Parse<CommandName>(commandNameText, true);
-
-        await commandInvoker.TryExecuteCommand(commandName, update);
+        await commandInvoker.TryExecuteCommandAsync((CommandName)commandName, update);
     }
 
     private async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken ct)
     {
-        var exceptionInString = exception.ToString();
-        await sendMessageCommand.TrySendLogAsync(exceptionInString);
+        await Task.Run(() => logger.LogError(exception, "HandleErrorAsync"));
+    }
+
+    private CommandName? GetCommandNameByString(string input)
+    {
+        foreach (var regex in regexWrappers)
+            switch (regex)
+            {
+                case UrlRegexWrapper urlRegex:
+                    if (urlRegex.IsMatch(input)) return CommandName.SendContentFromUrl;
+                    break;
+                case CommandRegexWrapper commandRegex:
+                    if (!commandRegex.IsMatch(input)) return null;
+                    var commandNameText = Regex.Replace(input, "/", string.Empty);
+                    commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
+                    if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return null;
+                    return Enum.Parse<CommandName>(commandNameText, true);
+            }
+
+        return null;
     }
 }

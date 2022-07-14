@@ -19,20 +19,20 @@ public sealed class ProxyReddit : ProxyService
 {
     private readonly string appId;
     private readonly string secretId;
-    private readonly string uriString = "www.reddit.com";
+    private readonly string urlBase = "www.reddit.com";
     private readonly string userAgent = "bot-get-by-link-web";
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyReddit" /> class.
     /// </summary>
     /// <param name="configuration">Bot configuration.</param>
-    public ProxyReddit(IBotConfiguration configuration)
+    public ProxyReddit(IBotConfiguration? configuration)
         : base(new[]
         {
             @"https?:\/\/www.reddit.com\/r\/\S+/comments\/\S+"
         }) // TODO: переделать на фабрику / найти подходящее место.
     {
-        if (configuration is null) throw new ArgumentNullException(nameof(configuration));
+        ArgumentNullException.ThrowIfNull(configuration);
 
         appId = configuration.Proxy.Reddit.AppId ?? string.Empty;
         secretId = configuration.Proxy.Reddit.Secret ?? string.Empty;
@@ -118,7 +118,7 @@ public sealed class ProxyReddit : ProxyService
     {
         var client = new HttpClient
         {
-            BaseAddress = new Uri($"https://{uriString}")
+            BaseAddress = new Uri($"https://{urlBase}")
         };
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/access_token");
 

@@ -2,6 +2,7 @@
 using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Telegram.Bot.Types;
@@ -15,25 +16,29 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// </summary>
 internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
 {
-    private readonly ProxyResponseFormatter formaterContent;
-
-    private readonly string patternURL =
-        @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
-
+	private readonly ProxyResponseFormatter formaterContent;
     private readonly IAsyncCommand<CommandName> sendMessageCommand;
+    private readonly IRegexWrapper urlRegex;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="SendContentFromUrlCommand" /> class.
     /// </summary>
     /// <param name="sendMessageCommand">Sends a message to the client.</param>
     /// <param name="proxyServices">Proxy collection.</param>
-    public SendContentFromUrlCommand(IAsyncCommand<CommandName> sendMessageCommand,
-        IEnumerable<IProxyService> proxyServices, IFormatterContent formatterContent)
+    /// <param name="regexWrappers">Regular expressions for checks.</param>
+    /// <param name="formatterContent">Formatter content.</param>
+    public SendContentFromUrlCommand(
+        IAsyncCommand<CommandName> sendMessageCommand,
+        IEnumerable<IProxyService> proxyServices,
+        IEnumerable<IRegexWrapper> regexWrappers,
+		IFormatterContent formatterContent)
         : base(CommandName.SendContentFromUrl)
     {
         this.sendMessageCommand = sendMessageCommand ?? throw new ArgumentNullException(nameof(sendMessageCommand));
         formaterContent = (ProxyResponseFormatter)formatterContent;
         ProxyServices = proxyServices ?? throw new ArgumentNullException(nameof(proxyServices));
+        urlRegex = GetUrlRegexWrapperByIRegexWrappers(regexWrappers) ??
+                   throw new ArgumentNullException(nameof(regexWrappers));
     }
 
     /// <summary>
@@ -53,7 +58,7 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
         var text = update.Message?.Text;
         if (chatId is null || string.IsNullOrWhiteSpace(text)) return;
 
-        var url = Regex.Match(text, patternURL).Value;
+        var url = urlRegex.Match(text)?.Value;
         if (string.IsNullOrWhiteSpace(url)) return;
         var matchProxy = ProxyServices.FirstOrDefault(proxy => proxy.IsMatch(url));
         if (matchProxy is null) return;
@@ -63,5 +68,15 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
         var content = formaterContent.GetFormattedContent(postContent);
         var message = new Message(chatId, content.Messages, content.Artifacts, ParseMode.MarkdownV2);
         await sendMessageCommand.ExecuteAsync(message);
+    }
+
+    private static UrlRegexWrapper? GetUrlRegexWrapperByIRegexWrappers(IEnumerable<IRegexWrapper>? regexWrappers)
+    {
+        if (regexWrappers is null || !regexWrappers.Any()) return null;
+        foreach (var regex in regexWrappers)
+            if (regex is UrlRegexWrapper urlRegex)
+                return urlRegex;
+
+        return null;
     }
 }

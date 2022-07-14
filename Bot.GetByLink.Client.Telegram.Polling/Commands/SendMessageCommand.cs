@@ -1,6 +1,5 @@
-﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
-using Bot.GetByLink.Client.Telegram.Common.Model;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Telegram.Bot;
 using TelegramBotTypes = Telegram.Bot.Types;
@@ -13,19 +12,16 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 internal sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposable
 {
     private readonly ITelegramBotClient client;
-    private readonly TelegramBotTypes.ChatId? logChatId;
     private CancellationTokenSource? cts;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="SendMessageCommand" /> class.
     /// </summary>
     /// <param name="client">Telegram Client.</param>
-    /// <param name="logChatId">Chat for logging issues (database not used).</param>
-    public SendMessageCommand(ITelegramBotClient client, string? logChatId = null)
+    public SendMessageCommand(ITelegramBotClient client)
         : base(CommandName.SendMessage)
     {
         this.client = client ?? throw new ArgumentNullException(nameof(client));
-        this.logChatId = !string.IsNullOrWhiteSpace(logChatId) ? new TelegramBotTypes.ChatId(logChatId) : null;
         cts = new CancellationTokenSource();
     }
 
@@ -51,35 +47,13 @@ internal sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposabl
         await SendMessageAsync(message);
     }
 
-    /// <summary>
-    ///     Logging (database not used).
-    /// </summary>
-    /// <param name="text">message.</param>
-    /// <returns>Empty Task.</returns>
-    public async Task TrySendLogAsync(string text)
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        try
-        {
-            Console.WriteLine(text);
-            if (logChatId is not null) await SendMessageAsync(new Message(logChatId, new List<string> { text }));
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.ToString());
-        }
-        finally
-        {
-            Console.ResetColor();
-        }
-    }
-
     private async Task SendMessageAsync(IMessageContext message)
     {
         if (cts is null || cts.IsCancellationRequested) cts = new CancellationTokenSource();
 
         if (message.Artifacts?.Count() > 0)
             await client.SendMediaGroupAsync(message.ChatId, message.Artifacts, cancellationToken: cts.Token);
+        // text
 
         foreach (var text in message.Text.Where(text => !string.IsNullOrWhiteSpace(text)))
             await client.SendTextMessageAsync(message.ChatId, text, cancellationToken: cts.Token);
