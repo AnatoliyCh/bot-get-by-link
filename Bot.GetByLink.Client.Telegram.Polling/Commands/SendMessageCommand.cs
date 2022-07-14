@@ -1,5 +1,5 @@
-﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Telegram.Bot;
 

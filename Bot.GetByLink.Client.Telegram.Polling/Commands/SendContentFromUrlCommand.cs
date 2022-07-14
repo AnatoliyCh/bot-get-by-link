@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Telegram.Bot.Types;
