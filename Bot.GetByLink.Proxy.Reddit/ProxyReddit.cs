@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
+using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
@@ -72,7 +73,8 @@ public sealed class ProxyReddit : ProxyService
                 Array.Empty<MediaInfo>());
 
         long size;
-        if (Regex.IsMatch(post.Listing.URL, @"https?://\S+(?:jpg|jpeg|png)", RegexOptions.IgnoreCase))
+        var picturesRegex = new PictureRegexWrapper();
+        if (picturesRegex.IsMatch(post.Listing.URL))
         {
             size = await ProxyHelper.GetSizeContentUrlAsync(post.Listing.URL);
             return new ProxyResponseContent(startText, new[] { new MediaInfo(post.Listing.URL, size, MediaType.Photo) },
