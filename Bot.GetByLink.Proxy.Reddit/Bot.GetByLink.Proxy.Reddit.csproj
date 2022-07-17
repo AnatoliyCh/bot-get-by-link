@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bot.GetByLink.Client.Telegram.Common\Bot.GetByLink.Client.Telegram.Common.csproj" />
     <ProjectReference Include="..\Bot.GetByLink.Common.Infrastructure\Bot.GetByLink.Common.Infrastructure.csproj" />
     <ProjectReference Include="..\Bot.GetByLink.Proxy.Common\Bot.GetByLink.Proxy.Common.csproj" />
   </ItemGroup>

@@ -1,6 +1,6 @@
 ﻿using Bot.GetByLink.Common.Infrastructure.Abstractions;
 
-namespace Bot.GetByLink.Client.Telegram.Common.Model;
+namespace Bot.GetByLink.Common.Infrastructure.Model;
 
 /// <summary>
 ///     Regular expression for picture.
