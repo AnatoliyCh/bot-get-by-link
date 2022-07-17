@@ -22,6 +22,7 @@ public sealed class ProxyReddit : ProxyService
     private readonly string secretId;
     private readonly string urlBase = "www.reddit.com";
     private readonly string userAgent = "bot-get-by-link-web";
+    private readonly PictureRegexWrapper picturesRegex;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyReddit" /> class.
@@ -37,6 +38,7 @@ public sealed class ProxyReddit : ProxyService
 
         appId = configuration.Proxy.Reddit.AppId ?? string.Empty;
         secretId = configuration.Proxy.Reddit.Secret ?? string.Empty;
+        picturesRegex = new PictureRegexWrapper();
     }
 
     /// <summary>
@@ -73,8 +75,7 @@ public sealed class ProxyReddit : ProxyService
                 Array.Empty<MediaInfo>());
 
         long size;
-        var picturesRegex = new PictureRegexWrapper();
-        if (picturesRegex.IsMatch(post.Listing.URL))
+        if (picturesRegex.IsMatch(post.Listing.URL, RegexOptions.IgnoreCase))
         {
             size = await ProxyHelper.GetSizeContentUrlAsync(post.Listing.URL);
             return new ProxyResponseContent(startText, new[] { new MediaInfo(post.Listing.URL, size, MediaType.Photo) },
