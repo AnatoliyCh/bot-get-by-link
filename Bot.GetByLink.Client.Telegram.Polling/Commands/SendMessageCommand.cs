@@ -51,7 +51,7 @@ internal sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposabl
     {
         if (cts is null || cts.IsCancellationRequested) cts = new CancellationTokenSource();
 
-        if (message.Artifacts?.Count() > 0)
+        if (message.Artifacts.Any())
             await client.SendMediaGroupAsync(message.ChatId, message.Artifacts, cancellationToken: cts.Token);
         // text
 
