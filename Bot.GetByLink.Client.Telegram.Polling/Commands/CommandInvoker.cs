@@ -1,4 +1,5 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -39,7 +40,9 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
             (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ??
             throw new NullReferenceException("Command: SendMessage is null");
         var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
-        var sendContentFromUrl = new SendContentFromUrlCommand(sendMessageCommand, proxyServices, regexWrappers);
+        var formaterContent = new ProxyResponseFormatter();
+        var sendContentFromUrl =
+            new SendContentFromUrlCommand(sendMessageCommand, proxyServices, regexWrappers, formaterContent);
 
         commands = serviceCommands
             .Concat(new List<ICommand<CommandName>> { chatInfoCommand, sendContentFromUrl })

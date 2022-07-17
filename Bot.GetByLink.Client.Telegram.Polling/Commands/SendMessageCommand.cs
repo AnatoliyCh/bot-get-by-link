@@ -2,6 +2,7 @@
 using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Telegram.Bot;
+using TelegramBotTypes = Telegram.Bot.Types;
 
 namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 
@@ -50,10 +51,11 @@ internal sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposabl
     {
         if (cts is null || cts.IsCancellationRequested) cts = new CancellationTokenSource();
 
+        if (message.Artifacts?.Any() ?? false)
+            await client.SendMediaGroupAsync(message.ChatId, message.Artifacts, cancellationToken: cts.Token);
         // text
+
         foreach (var text in message.Text.Where(text => !string.IsNullOrWhiteSpace(text)))
             await client.SendTextMessageAsync(message.ChatId, text, cancellationToken: cts.Token);
-
-        // TODO: artifacts
     }
 }

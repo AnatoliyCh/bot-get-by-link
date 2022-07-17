@@ -6,9 +6,8 @@ namespace Bot.GetByLink.Client.Telegram.Common.Interfaces;
 
 /// <summary>
 ///     The interface of an object that contains all the data to send a message.
-///     TODO: сменить object на тип.
 /// </summary>
-public interface IMessageContext : IMessageContext<ChatId, IEnumerable<string>, object>
+public interface IMessageContext : IMessageContext<ChatId, IEnumerable<string>, IAlbumInputMedia>
 {
     /// <summary>
     ///     Gets text parsing mode.
