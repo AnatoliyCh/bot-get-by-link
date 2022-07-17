@@ -19,10 +19,10 @@ namespace Bot.GetByLink.Proxy.Reddit;
 public sealed class ProxyReddit : ProxyService
 {
     private readonly string appId;
+    private readonly IRegexWrapper picturesRegex;
     private readonly string secretId;
     private readonly string urlBase = "www.reddit.com";
     private readonly string userAgent = "bot-get-by-link-web";
-    private readonly PictureRegexWrapper picturesRegex;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyReddit" /> class.

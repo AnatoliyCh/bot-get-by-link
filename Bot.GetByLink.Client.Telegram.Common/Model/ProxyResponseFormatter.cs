@@ -67,7 +67,8 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="urlPictures">Array url picture.</param>
     /// <param name="captionMedia">Caption picture.</param>
     /// <returns>Formating list IAlbumInputMedia.</returns>
-    private static IEnumerable<IAlbumInputMedia> GetPhotoInputMedia(IEnumerable<IMediaInfo> urlPictures, string captionMedia)
+    private static IEnumerable<IAlbumInputMedia> GetPhotoInputMedia(IEnumerable<IMediaInfo> urlPictures,
+        string captionMedia)
     {
         var albumInputMedias = new List<IAlbumInputMedia>();
         if (urlPictures.Any())
@@ -90,7 +91,8 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="captionMedia">Caption video.</param>
     /// <param name="isFirstMedia">True if this first media.</param>
     /// <returns>Formating list IAlbumInputMedia.</returns>
-    private static IEnumerable<IAlbumInputMedia> GetVideoInputMedia(IEnumerable<IMediaInfo> urlVideo, string captionMedia,
+    private static IEnumerable<IAlbumInputMedia> GetVideoInputMedia(IEnumerable<IMediaInfo> urlVideo,
+        string captionMedia,
         bool isFirstMedia)
     {
         var albumInputMedias = new List<IAlbumInputMedia>();
