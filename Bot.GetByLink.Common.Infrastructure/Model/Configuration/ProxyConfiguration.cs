@@ -1,12 +1,13 @@
 ﻿using System.Text.Json.Serialization;
-using Bot.GetByLink.Common.Infrastructure.Configuration.Proxy;
+using Bot.GetByLink.Common.Infrastructure.Interfaces.Configuration;
+using Bot.GetByLink.Common.Infrastructure.Model.Configuration.Proxy;
 
-namespace Bot.GetByLink.Common.Infrastructure.Configuration;
+namespace Bot.GetByLink.Common.Infrastructure.Model.Configuration;
 
 /// <summary>
 ///     Collection of proxy configurations.
 /// </summary>
-public sealed class ProxyConfiguration
+public sealed class ProxyConfiguration : IProxyConfiguration
 {
     /// <summary>
     ///     Gets Reddit proxy configuration.

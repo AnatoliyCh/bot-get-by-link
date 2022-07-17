@@ -1,4 +1,4 @@
-﻿namespace Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿namespace Bot.GetByLink.Client.Telegram.Common.Enums;
 
 /// <summary>
 ///     Command names for telegram client.
@@ -11,7 +11,12 @@ public enum CommandName
     ChatInfo,
 
     /// <summary>
-    ///     Send content post from url in tg.
+    ///     Sends a message to the client.
+    /// </summary>
+    SendMessage,
+
+    /// <summary>
+    ///     Send content post from url in client.
     /// </summary>
     SendContentFromUrl
 }

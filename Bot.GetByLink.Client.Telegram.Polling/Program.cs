@@ -1,50 +1,69 @@
 ﻿using System.Reflection;
+using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Model;
+using Bot.GetByLink.Client.Telegram.Common.Model.Logging;
 using Bot.GetByLink.Client.Telegram.Polling;
 using Bot.GetByLink.Client.Telegram.Polling.Commands;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
-using Bot.GetByLink.Common.Infrastructure.Configuration;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Common.Infrastructure.Model.Configuration;
 using Bot.GetByLink.Proxy.Reddit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 
 var serviceProvider = ConfigureServices();
 
 var configuration = serviceProvider.GetService<IBotConfiguration>()!;
 
+var logger = serviceProvider.GetService<ILogger<Program>>()!;
+
 var client = serviceProvider.GetService<ClientPolling>()!;
 
-var launched = await client.Start();
-
-if (launched)
-{
-    var startMessage = $"{configuration.ProjectName}: start";
-    Console.WriteLine(startMessage);
-    await client.SendTextMessageToLogChatAsync(startMessage);
-}
+var launched = await client.StartAsync();
 
 var looping = true;
 
+if (launched) logger.LogInformation($"{configuration.ProjectName}: starting polling...");
+else return;
+
 while (looping)
 {
-    Console.Write("Command: ");
+    Console.WriteLine("Command: ");
     var command = Console.ReadLine();
     switch (command)
     {
         case "exit polling":
             looping = false;
-            await client.Stop();
+            await client.StopAsync();
             break;
         case "start polling":
-            Console.WriteLine($"{configuration.ProjectName}: starting polling...");
-            await client.Start();
+            await client.StartAsync();
+            logger.LogInformation($"{configuration.ProjectName}: starting polling...");
             break;
         case "stop polling":
-            Console.WriteLine($"{configuration.ProjectName}: stoping polling...");
-            await client.Stop();
+            await client.StopAsync();
+            logger.LogInformation($"{configuration.ProjectName}: stoping polling...");
             break;
     }
+}
+
+static IServiceProvider ConfigureServices()
+{
+    var configuration = GetConfiguration();
+    var client = GetTelegramClient(configuration);
+
+    IServiceCollection services = new ServiceCollection();
+    services.AddSingleton(client);
+    services.AddSingleton(configuration);
+    services.AddScoped<IProxyService, ProxyReddit>();
+    services.AddScoped<ICommand<CommandName>, SendMessageCommand>();
+    services.AddScoped<ICommandInvoker<CommandName>, CommandInvoker>();
+    services.AddScoped<ClientPolling>();
+
+    AddLogging(services);
+    AddRegexWrapper(services);
+    return services.BuildServiceProvider();
 }
 
 static IBotConfiguration GetConfiguration()
@@ -59,6 +78,7 @@ static IBotConfiguration GetConfiguration()
     configuration["ProjectName"] = projectName;
 
     configuration.Bind(botConfiguration);
+
     return botConfiguration;
 }
 
@@ -66,20 +86,20 @@ static ITelegramBotClient GetTelegramClient(IBotConfiguration configuration)
 {
     var token = configuration?.Clients?.Telegram?.Token;
     if (!string.IsNullOrWhiteSpace(token)) return new TelegramBotClient(token);
-    throw new ArgumentException("Telegram:Token");
+    throw new ArgumentException("Token");
 }
 
-static IServiceProvider ConfigureServices()
+static void AddLogging(IServiceCollection services)
 {
-    var configuration = GetConfiguration();
-    var client = GetTelegramClient(configuration);
+    services.AddLogging(builder =>
+    {
+        builder.AddProvider<TelegramLoggerProvider<CommandName>>();
+        builder.AddConsole();
+    });
+}
 
-    IServiceCollection services = new ServiceCollection();
-    services.AddSingleton(configuration);
-    services.AddSingleton(client);
-    services.AddScoped<IProxyService, ProxyReddit>();
-    services.AddScoped<ICommandInvoker<CommandName>, CommandInvoker>();
-    services.AddScoped<ClientPolling>();
-
-    return services.BuildServiceProvider();
+static void AddRegexWrapper(IServiceCollection services)
+{
+    services.AddScoped<IRegexWrapper, UrlRegexWrapper>();
+    services.AddScoped<IRegexWrapper, CommandRegexWrapper>();
 }

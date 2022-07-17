@@ -1,7 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Common.Infrastructure.Interfaces.Configuration;
 
-namespace Bot.GetByLink.Common.Infrastructure.Configuration;
+namespace Bot.GetByLink.Common.Infrastructure.Model.Configuration;
 
 /// <summary>
 ///     Bot сonfiguration class.
@@ -18,11 +19,11 @@ public sealed class BotConfiguration : IBotConfiguration
     ///     Gets сollection of client configurations.
     /// </summary>
     [JsonPropertyName("Clients")]
-    public ClientsConfiguration Clients { get; init; } = new();
+    public IClientConfiguration Clients { get; init; } = new ClientsConfiguration();
 
     /// <summary>
     ///     Gets сollection of proxy configurations.
     /// </summary>
     [JsonPropertyName("Proxy")]
-    public ProxyConfiguration Proxy { get; init; } = new();
+    public IProxyConfiguration Proxy { get; init; } = new ProxyConfiguration();
 }

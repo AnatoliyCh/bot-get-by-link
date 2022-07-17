@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Bot.GetByLink.Common.Infrastructure.Configuration.Clients;
+namespace Bot.GetByLink.Common.Infrastructure.Model.Configuration.Clients;
 
 /// <summary>
 ///     Client Configuration.

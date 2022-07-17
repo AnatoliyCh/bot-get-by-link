@@ -18,11 +18,11 @@ public abstract class Client : IClient
     ///     Client start.
     /// </summary>
     /// <returns>Execution result.</returns>
-    public abstract Task<bool> Start();
+    public abstract Task<bool> StartAsync();
 
     /// <summary>
     ///     Client stop.
     /// </summary>
     /// <returns>Execution result.</returns>
-    public abstract Task<bool> Stop();
+    public abstract Task<bool> StopAsync();
 }
