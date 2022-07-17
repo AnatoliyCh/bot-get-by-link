@@ -47,17 +47,17 @@ public class ProxyResponseFormatter : IFormatterContent
     /// </summary>
     /// <param name="responseContent">Proxy content.</param>
     /// <returns>Formatted content.</returns>
-    public (List<string> Messages, List<IAlbumInputMedia> Artifacts) GetFormattedContent(
+    public (IEnumerable<string> Messages, IEnumerable<IAlbumInputMedia> Artifacts) GetFormattedContent(
         ProxyResponseContent responseContent)
     {
         var (textUrl, urlPictures, urlVideo) =
             GetTextUrlAndValidUrl(responseContent.UrlPicture.ToList(), responseContent.UrlVideo.ToList());
-        var hasMedia = urlPictures.Count > 0 || urlVideo.Count > 0;
+        var hasMedia = urlPictures.Any() || urlVideo.Any();
         var textMessage = $"{textUrl}{responseContent.Text}";
         var captionLength = hasMedia ? Math.Min(MaxTextLenghtFirstMedia, textMessage.Length) : 0;
         var captionMedia = textMessage[..captionLength];
         var albumInputMedias = GetPhotoInputMedia(urlPictures, captionMedia);
-        albumInputMedias.AddRange(GetVideoInputMedia(urlVideo, captionMedia, albumInputMedias.Count < 1));
+        albumInputMedias.Concat(GetVideoInputMedia(urlVideo, captionMedia, albumInputMedias.Count() < 1));
         return (GetMessageList(textMessage, captionLength), albumInputMedias);
     }
 
@@ -67,10 +67,10 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="urlPictures">Array url picture.</param>
     /// <param name="captionMedia">Caption picture.</param>
     /// <returns>Formating list IAlbumInputMedia.</returns>
-    private static List<IAlbumInputMedia> GetPhotoInputMedia(List<IMediaInfo> urlPictures, string captionMedia)
+    private static IEnumerable<IAlbumInputMedia> GetPhotoInputMedia(IEnumerable<IMediaInfo> urlPictures, string captionMedia)
     {
         var albumInputMedias = new List<IAlbumInputMedia>();
-        if (urlPictures.Count > 0)
+        if (urlPictures.Any())
         {
             var listInputMediaPhoto = new List<InputMediaPhoto>();
             foreach (var inputMediaPhoto in urlPictures)
@@ -90,11 +90,11 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="captionMedia">Caption video.</param>
     /// <param name="isFirstMedia">True if this first media.</param>
     /// <returns>Formating list IAlbumInputMedia.</returns>
-    private static List<IAlbumInputMedia> GetVideoInputMedia(List<IMediaInfo> urlVideo, string captionMedia,
+    private static IEnumerable<IAlbumInputMedia> GetVideoInputMedia(IEnumerable<IMediaInfo> urlVideo, string captionMedia,
         bool isFirstMedia)
     {
         var albumInputMedias = new List<IAlbumInputMedia>();
-        if (urlVideo.Count > 0)
+        if (urlVideo.Any())
         {
             var listInputMediaVideo = new List<InputMediaVideo>();
             foreach (var inputMediaVideo in urlVideo)
@@ -114,7 +114,7 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="mediaPicture">Array media info pictures.</param>
     /// <param name="mediaVideo">Array media info viedos.</param>
     /// <returns>Text with url and array valid url.</returns>
-    private (string MutableUrlText, List<IMediaInfo> MutableUrlPicture, List<IMediaInfo> MutableUrlVideo)
+    private (string MutableUrlText, IEnumerable<IMediaInfo> MutableUrlPicture, IEnumerable<IMediaInfo> MutableUrlVideo)
         GetTextUrlAndValidUrl(
             List<IMediaInfo> mediaPicture, List<IMediaInfo> mediaVideo)
     {

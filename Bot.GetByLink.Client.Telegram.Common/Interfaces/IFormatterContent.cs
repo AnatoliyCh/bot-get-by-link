@@ -13,6 +13,6 @@ public interface IFormatterContent
     /// </summary>
     /// <param name="responseContent">Proxy content.</param>
     /// <returns>Formatted content.</returns>
-    public (List<string> Messages, List<IAlbumInputMedia> Artifacts) GetFormattedContent(
+    public (IEnumerable<string> Messages, IEnumerable<IAlbumInputMedia> Artifacts) GetFormattedContent(
         ProxyResponseContent responseContent);
 }
