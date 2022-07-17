@@ -13,7 +13,6 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyResponseFormatter" /> class.
     /// </summary>
-    /// <param name="responseContent">Proxy content.</param>
     public ProxyResponseFormatter()
     {
         // TODO test with gif
@@ -66,6 +65,7 @@ public class ProxyResponseFormatter : IFormatterContent
     ///     Function for get formating list IAlbumInputMedia from array picture.
     /// </summary>
     /// <param name="urlPictures">Array url picture.</param>
+    /// <param name="captionMedia">Caption picture.</param>
     /// <returns>Formating list IAlbumInputMedia.</returns>
     private static List<IAlbumInputMedia> GetPhotoInputMedia(List<IMediaInfo> urlPictures, string captionMedia)
     {
@@ -87,6 +87,8 @@ public class ProxyResponseFormatter : IFormatterContent
     ///     Function for get formating list IAlbumInputMedia from array video.
     /// </summary>
     /// <param name="urlVideo">Array url video.</param>
+    /// <param name="captionMedia">Caption video.</param>
+    /// <param name="isFirstMedia">True if this first media.</param>
     /// <returns>Formating list IAlbumInputMedia.</returns>
     private static List<IAlbumInputMedia> GetVideoInputMedia(List<IMediaInfo> urlVideo, string captionMedia,
         bool isFirstMedia)
