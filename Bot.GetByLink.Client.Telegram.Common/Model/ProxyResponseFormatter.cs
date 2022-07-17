@@ -1,4 +1,5 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
+using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Model;
 using Telegram.Bot.Types;
 
@@ -66,7 +67,7 @@ public class ProxyResponseFormatter : IFormatterContent
     /// </summary>
     /// <param name="urlPictures">Array url picture.</param>
     /// <returns>Formating list IAlbumInputMedia.</returns>
-    private static List<IAlbumInputMedia> GetPhotoInputMedia(List<MediaInfo> urlPictures, string captionMedia)
+    private static List<IAlbumInputMedia> GetPhotoInputMedia(List<IMediaInfo> urlPictures, string captionMedia)
     {
         var albumInputMedias = new List<IAlbumInputMedia>();
         if (urlPictures.Count > 0)
@@ -87,7 +88,7 @@ public class ProxyResponseFormatter : IFormatterContent
     /// </summary>
     /// <param name="urlVideo">Array url video.</param>
     /// <returns>Formating list IAlbumInputMedia.</returns>
-    private static List<IAlbumInputMedia> GetVideoInputMedia(List<MediaInfo> urlVideo, string captionMedia,
+    private static List<IAlbumInputMedia> GetVideoInputMedia(List<IMediaInfo> urlVideo, string captionMedia,
         bool isFirstMedia)
     {
         var albumInputMedias = new List<IAlbumInputMedia>();
@@ -111,13 +112,13 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="mediaPicture">Array media info pictures.</param>
     /// <param name="mediaVideo">Array media info viedos.</param>
     /// <returns>Text with url and array valid url.</returns>
-    private (string MutableUrlText, List<MediaInfo> MutableUrlPicture, List<MediaInfo> MutableUrlVideo)
+    private (string MutableUrlText, List<IMediaInfo> MutableUrlPicture, List<IMediaInfo> MutableUrlVideo)
         GetTextUrlAndValidUrl(
-            List<MediaInfo> mediaPicture, List<MediaInfo> mediaVideo)
+            List<IMediaInfo> mediaPicture, List<IMediaInfo> mediaVideo)
     {
         var urlText = string.Empty;
-        var mutableUrlPicture = new List<MediaInfo>();
-        var mutableUrlVideo = new List<MediaInfo>();
+        var mutableUrlPicture = new List<IMediaInfo>();
+        var mutableUrlVideo = new List<IMediaInfo>();
         foreach (var inputMediaPhoto in mediaPicture)
             if (inputMediaPhoto.Size < 0 || inputMediaPhoto.Size > MaxSizeMbPhoto)
                 urlText = $"{inputMediaPhoto.Url}\n{urlText}";
