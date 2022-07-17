@@ -1,4 +1,6 @@
-﻿namespace Bot.GetByLink.Common.Infrastructure.Interfaces;
+﻿using Bot.GetByLink.Common.Infrastructure.Enums;
+
+namespace Bot.GetByLink.Common.Infrastructure.Interfaces;
 
 /// <summary>
 ///     Interface for info media.
@@ -6,12 +8,17 @@
 public interface IMediaInfo
 {
     /// <summary>
-    ///     Gets or sets for url media.
+    ///     Gets for url media.
     /// </summary>
-    public string UrlMedia { get; set; }
+    public string Url { get; init; }
 
     /// <summary>
-    ///     Gets or sets for size in mb on url media.
+    ///     Gets for size in mb on url media.
     /// </summary>
-    public double SizeMedia { get; set; }
+    public double Size { get; init; }
+
+    /// <summary>
+    ///     Gets type media.
+    /// </summary>
+    public MediaType Type { get; init; }
 }

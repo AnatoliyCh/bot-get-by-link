@@ -1,8 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Client.Telegram.Common.Model;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
-﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Telegram.Bot.Types;
@@ -16,7 +14,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// </summary>
 internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
 {
-	private readonly ProxyResponseFormatter formaterContent;
+    private readonly ProxyResponseFormatter formaterContent;
     private readonly IAsyncCommand<CommandName> sendMessageCommand;
     private readonly IRegexWrapper urlRegex;
 
@@ -31,7 +29,7 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
         IAsyncCommand<CommandName> sendMessageCommand,
         IEnumerable<IProxyService> proxyServices,
         IEnumerable<IRegexWrapper> regexWrappers,
-		IFormatterContent formatterContent)
+        IFormatterContent formatterContent)
         : base(CommandName.SendContentFromUrl)
     {
         this.sendMessageCommand = sendMessageCommand ?? throw new ArgumentNullException(nameof(sendMessageCommand));

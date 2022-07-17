@@ -152,7 +152,7 @@ public sealed class ProxyReddit : ProxyService
     private async Task<string?> GetParentPostIdAsync(string postId)
     {
         var client = new HttpClient();
-        client.BaseAddress = new Uri($"https://{uriString}");
+        client.BaseAddress = new Uri($"https://{urlBase}");
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api/info.json?id={postId}");
 
         var response = await client.SendAsync(request);

@@ -1,4 +1,5 @@
 ﻿using Bot.GetByLink.Common.Infrastructure.Enums;
+using Bot.GetByLink.Common.Infrastructure.Interfaces;
 
 namespace Bot.GetByLink.Common.Infrastructure.Model;
 
@@ -8,4 +9,4 @@ namespace Bot.GetByLink.Common.Infrastructure.Model;
 /// <param name="Url">Url media.</param>
 /// <param name="Size">Size media.</param>
 /// <param name="Type">Type media.</param>
-public sealed record MediaInfo(string Url, long Size, MediaType Type);
+public sealed record MediaInfo(string Url, double Size, MediaType Type) : IMediaInfo;
