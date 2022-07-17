@@ -57,7 +57,7 @@ public class ProxyResponseFormatter : IFormatterContent
         var captionLength = hasMedia ? Math.Min(MaxTextLenghtFirstMedia, textMessage.Length) : 0;
         var captionMedia = textMessage[..captionLength];
         var albumInputMedias = GetPhotoInputMedia(urlPictures, captionMedia);
-        albumInputMedias.Concat(GetVideoInputMedia(urlVideo, captionMedia, albumInputMedias.Count() < 1));
+        albumInputMedias = albumInputMedias.Concat(GetVideoInputMedia(urlVideo, captionMedia, albumInputMedias.Count() < 1));
         return (GetMessageList(textMessage, captionLength), albumInputMedias);
     }
 
