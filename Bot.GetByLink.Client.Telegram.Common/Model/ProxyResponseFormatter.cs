@@ -15,7 +15,7 @@ public class ProxyResponseFormatter : IFormatterContent
     /// </summary>
     public ProxyResponseFormatter()
     {
-        // TODO test with gif
+        // TODO: test with gif
         MaxSizeMbPhoto = 5;
         MaxSizeMbVideo = 20;
         MaxTextLenghtFirstMedia = 1024;
