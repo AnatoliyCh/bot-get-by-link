@@ -1,6 +1,7 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Model;
+using Bot.GetByLink.Common.Infrastructure.Model.Configuration.Clients;
 using Telegram.Bot.Types;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model;
@@ -13,16 +14,13 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyResponseFormatter" /> class.
     /// </summary>
-    /// <param name="maxSizeMbPhoto">Max size in mb for one photo in message.</param>
-    /// <param name="maxSizeMbVideo">Max size in mb for one video in message.</param>
-    /// <param name="maxTextLenghtFirstMedia">Max text lenght for first media.</param>
-    /// <param name="maxTextLenghtMessage">Max text lenght for message.</param>
-    public ProxyResponseFormatter(double maxSizeMbPhoto, double maxSizeMbVideo, int maxTextLenghtFirstMedia, int maxTextLenghtMessage)
+    /// <param name="configuration">Client Configuration.</param>
+    public ProxyResponseFormatter(ClientConfiguration configuration)
     {
-        MaxSizeMbPhoto = maxSizeMbPhoto;
-        MaxSizeMbVideo = maxSizeMbVideo;
-        MaxTextLenghtFirstMedia = maxTextLenghtFirstMedia;
-        MaxTextLenghtMessage = maxTextLenghtMessage;
+        MaxSizeMbPhoto = configuration.MaxSizeMbPhoto;
+        MaxSizeMbVideo = configuration.MaxSizeMbVideo;
+        MaxTextLenghtFirstMedia = configuration.MaxTextLenghtFirstMedia;
+        MaxTextLenghtMessage = configuration.MaxTextLenghtMessage;
     }
 
     /// <summary>
