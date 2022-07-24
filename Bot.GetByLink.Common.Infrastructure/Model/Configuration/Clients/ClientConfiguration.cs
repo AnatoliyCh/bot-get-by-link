@@ -18,4 +18,28 @@ public sealed class ClientConfiguration
     /// </summary>
     [JsonPropertyName("ChatIdLog")]
     public string ChatIdLog { get; init; } = string.Empty;
+
+    /// <summary>
+    ///     Gets max size in mb for one photo in message.
+    /// </summary>
+    [JsonPropertyName("MaxSizeMbPhoto")]
+    public double MaxSizeMbPhoto { get; init; } = 0;
+
+    /// <summary>
+    ///     Gets max size in mb for one video in message.
+    /// </summary>
+    [JsonPropertyName("MaxSizeMbVideo")]
+    public double MaxSizeMbVideo { get; init; } = 0;
+
+    /// <summary>
+    ///     Gets max text lenght for caption first  media.
+    /// </summary>
+    [JsonPropertyName("MaxTextLenghtFirstMedia")]
+    public int MaxTextLenghtFirstMedia { get; init; } = 0;
+
+    /// <summary>
+    ///     Gets max text lenght for message.
+    /// </summary>
+    [JsonPropertyName("MaxTextLenghtMessage")]
+    public int MaxTextLenghtMessage { get; init; } = 0;
 }

@@ -1,9 +1,12 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Model;
+using Bot.GetByLink.Common.Infrastructure.Model.Configuration.Clients;
 using Telegram.Bot.Types;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model;
+
+// TODO: test with gif
 
 /// <summary>
 ///     Class for formating content for messages telegram.
@@ -13,13 +16,14 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyResponseFormatter" /> class.
     /// </summary>
-    public ProxyResponseFormatter()
+    /// <param name="configuration">Client Configuration.</param>
+    public ProxyResponseFormatter(ClientConfiguration configuration)
     {
-        // TODO: test with gif
-        MaxSizeMbPhoto = 5;
-        MaxSizeMbVideo = 20;
-        MaxTextLenghtFirstMedia = 1024;
-        MaxTextLenghtMessage = 4096;
+        ArgumentNullException.ThrowIfNull(configuration);
+        MaxSizeMbPhoto = configuration.MaxSizeMbPhoto;
+        MaxSizeMbVideo = configuration.MaxSizeMbVideo;
+        MaxTextLenghtFirstMedia = configuration.MaxTextLenghtFirstMedia;
+        MaxTextLenghtMessage = configuration.MaxTextLenghtMessage;
     }
 
     /// <summary>
