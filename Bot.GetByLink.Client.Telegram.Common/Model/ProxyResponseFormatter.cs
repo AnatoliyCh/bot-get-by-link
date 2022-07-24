@@ -5,7 +5,9 @@ using Bot.GetByLink.Common.Infrastructure.Model.Configuration.Clients;
 using Telegram.Bot.Types;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model;
+
 // TODO: test with gif
+
 /// <summary>
 ///     Class for formating content for messages telegram.
 /// </summary>
@@ -17,6 +19,7 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="configuration">Client Configuration.</param>
     public ProxyResponseFormatter(ClientConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(configuration);
         MaxSizeMbPhoto = configuration.MaxSizeMbPhoto;
         MaxSizeMbVideo = configuration.MaxSizeMbVideo;
         MaxTextLenghtFirstMedia = configuration.MaxTextLenghtFirstMedia;
