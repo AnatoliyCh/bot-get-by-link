@@ -58,13 +58,15 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
 
         var url = urlRegex.Match(text)?.Value;
         if (string.IsNullOrWhiteSpace(url)) return;
+
         var matchProxy = ProxyServices.FirstOrDefault(proxy => proxy.IsMatch(url));
         if (matchProxy is null) return;
 
         var postContent = await matchProxy.GetContentUrlAsync(url);
         if (postContent is null) return;
-        var content = formaterContent.GetFormattedContent(postContent);
-        var message = new Message(chatId, content.Messages, content.Artifacts, ParseMode.MarkdownV2);
+
+        var (messages, artifacts) = formaterContent.GetFormattedContent(postContent);
+        var message = new Message(chatId, messages, artifacts, ParseMode.MarkdownV2);
         await sendMessageCommand.ExecuteAsync(message);
     }
 

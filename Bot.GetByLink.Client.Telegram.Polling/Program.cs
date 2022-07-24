@@ -7,6 +7,7 @@ using Bot.GetByLink.Client.Telegram.Polling.Commands;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Model.Configuration;
 using Bot.GetByLink.Proxy.Reddit;
+using Bot.GetByLink.Proxy.Vk;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -57,6 +58,7 @@ static IServiceProvider ConfigureServices()
     services.AddSingleton(client);
     services.AddSingleton(configuration);
     services.AddScoped<IProxyService, ProxyReddit>();
+    services.AddScoped<IProxyService, ProxyVK>();
     services.AddScoped<ICommand<CommandName>, SendMessageCommand>();
     services.AddScoped<ICommandInvoker<CommandName>, CommandInvoker>();
     services.AddScoped<ClientPolling>();
