@@ -3,7 +3,7 @@
 /// <summary>
 ///     Interface for returned object from proxy.
 /// </summary>
-internal interface IProxyContent
+public interface IProxyContent
 {
     /// <summary>
     ///     Gets текст поста.
@@ -13,10 +13,10 @@ internal interface IProxyContent
     /// <summary>
     ///     Gets картики в посте.
     /// </summary>
-    public IMediaInfo[] UrlPicture { get; init; }
+    public IEnumerable<IMediaInfo>? UrlPicture { get; init; }
 
     /// <summary>
     ///     Gets видео в посте.
     /// </summary>
-    public IMediaInfo[] UrlVideo { get; init; }
+    public IEnumerable<IMediaInfo>? UrlVideo { get; init; }
 }

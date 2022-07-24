@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Bot.GetByLink.Common.Infrastructure.Model;
 
 namespace Bot.GetByLink.Common.Infrastructure.Abstractions;
 
@@ -38,5 +37,5 @@ public abstract class ProxyService : IProxyService
     /// </summary>
     /// <param name="url">Url to post.</param>
     /// <returns>An object with text and links to pictures and videos present in the post.</returns>
-    public abstract Task<ProxyResponseContent> GetContentUrlAsync(string url);
+    public abstract Task<IProxyContent?> GetContentUrlAsync(string url);
 }

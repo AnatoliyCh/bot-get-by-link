@@ -1,4 +1,4 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Model;
+﻿using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Telegram.Bot.Types;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Interfaces;
@@ -14,5 +14,5 @@ public interface IFormatterContent
     /// <param name="responseContent">Proxy content.</param>
     /// <returns>Formatted content.</returns>
     public (IEnumerable<string> Messages, IEnumerable<IAlbumInputMedia> Artifacts) GetFormattedContent(
-        ProxyResponseContent responseContent);
+        IProxyContent responseContent);
 }

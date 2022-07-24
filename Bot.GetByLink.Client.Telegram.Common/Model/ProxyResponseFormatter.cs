@@ -1,6 +1,5 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Bot.GetByLink.Common.Infrastructure.Model;
 using Bot.GetByLink.Common.Infrastructure.Model.Configuration.Clients;
 using Telegram.Bot.Types;
 
@@ -52,10 +51,10 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="responseContent">Proxy content.</param>
     /// <returns>Formatted content.</returns>
     public (IEnumerable<string> Messages, IEnumerable<IAlbumInputMedia> Artifacts) GetFormattedContent(
-        ProxyResponseContent responseContent)
+        IProxyContent responseContent)
     {
         var (textUrl, urlPictures, urlVideo) =
-            GetTextUrlAndValidUrl(responseContent.UrlPicture.ToList(), responseContent.UrlVideo.ToList());
+            GetTextUrlAndValidUrl(responseContent.UrlPicture, responseContent.UrlVideo);
         var hasMedia = urlPictures.Any() || urlVideo.Any();
         var textMessage = $"{textUrl}{responseContent.Text}";
         var captionLength = hasMedia ? Math.Min(MaxTextLenghtFirstMedia, textMessage.Length) : 0;
@@ -96,8 +95,7 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="isFirstMedia">True if this first media.</param>
     /// <returns>Formating list IAlbumInputMedia.</returns>
     private static IEnumerable<IAlbumInputMedia> GetVideoInputMedia(IEnumerable<IMediaInfo> urlVideo,
-        string captionMedia,
-        bool isFirstMedia)
+        string captionMedia, bool isFirstMedia)
     {
         var albumInputMedias = new List<IAlbumInputMedia>();
         if (urlVideo.Any())
@@ -121,23 +119,23 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="mediaVideo">Array media info viedos.</param>
     /// <returns>Text with url and array valid url.</returns>
     private (string MutableUrlText, IEnumerable<IMediaInfo> MutableUrlPicture, IEnumerable<IMediaInfo> MutableUrlVideo)
-        GetTextUrlAndValidUrl(
-            List<IMediaInfo> mediaPicture, List<IMediaInfo> mediaVideo)
+        GetTextUrlAndValidUrl(IEnumerable<IMediaInfo>? mediaPicture, IEnumerable<IMediaInfo>? mediaVideo)
     {
         var urlText = string.Empty;
         var mutableUrlPicture = new List<IMediaInfo>();
         var mutableUrlVideo = new List<IMediaInfo>();
-        foreach (var inputMediaPhoto in mediaPicture)
-            if (inputMediaPhoto.Size < 0 || inputMediaPhoto.Size > MaxSizeMbPhoto)
-                urlText = $"{inputMediaPhoto.Url}\n{urlText}";
-            else
-                mutableUrlPicture.Add(inputMediaPhoto);
 
-        foreach (var inputMediaVideo in mediaVideo)
-            if (inputMediaVideo.Size < 0 || inputMediaVideo.Size > MaxSizeMbVideo)
-                urlText = $"{inputMediaVideo.Url}\n{urlText}";
-            else
-                mutableUrlVideo.Add(inputMediaVideo);
+        if (mediaPicture?.Any() ?? false)
+            foreach (var inputMediaPhoto in mediaPicture)
+                if (inputMediaPhoto.Size < 0 || inputMediaPhoto.Size > MaxSizeMbPhoto)
+                    urlText = $"{inputMediaPhoto.Url}\n{urlText}";
+                else mutableUrlPicture.Add(inputMediaPhoto);
+
+        if (mediaVideo?.Any() ?? false)
+            foreach (var inputMediaVideo in mediaVideo)
+                if (inputMediaVideo.Size < 0 || inputMediaVideo.Size > MaxSizeMbVideo)
+                    urlText = $"{inputMediaVideo.Url}\n{urlText}";
+                else mutableUrlVideo.Add(inputMediaVideo);
 
         return (urlText, mutableUrlPicture, mutableUrlVideo);
     }

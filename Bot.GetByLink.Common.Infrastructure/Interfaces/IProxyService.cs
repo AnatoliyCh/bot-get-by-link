@@ -1,6 +1,4 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Model;
-
-namespace Bot.GetByLink.Common.Infrastructure.Interfaces;
+﻿namespace Bot.GetByLink.Common.Infrastructure.Interfaces;
 
 /// <summary>
 ///     Proxy interface.
@@ -24,5 +22,5 @@ public interface IProxyService
     /// </summary>
     /// <param name="url">Url to post.</param>
     /// <returns>An object with text and links to pictures and videos present in the post.</returns>
-    public Task<ProxyResponseContent> GetContentUrlAsync(string url);
+    public Task<IProxyContent?> GetContentUrlAsync(string url);
 }

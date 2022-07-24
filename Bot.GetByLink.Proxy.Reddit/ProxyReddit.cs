@@ -45,7 +45,7 @@ public sealed class ProxyReddit : ProxyService
     /// </summary>
     /// <param name="url">Url to a reddit post in the format https://www.reddit.com/r/S+/comments/S+.</param>
     /// <returns>An object with text and links to pictures and videos present in the post.</returns>
-    public override async Task<ProxyResponseContent> GetContentUrlAsync(string url)
+    public override async Task<IProxyContent?> GetContentUrlAsync(string url)
     {
         var cutUrlPost = url[(url.IndexOf("comments/") + "comments/".Length)..];
         var postId = cutUrlPost[..cutUrlPost.IndexOf("/")];
@@ -58,7 +58,7 @@ public sealed class ProxyReddit : ProxyService
     /// <param name="postId">Post ID.</param>
     /// <returns>An object with text and links to pictures and videos present in the post.</returns>
     /// <exception cref="ArgumentNullException">Returned if an empty postId was passed.</exception>
-    public async Task<ProxyResponseContent> GetContentIdAsync(string postId)
+    public async Task<IProxyContent> GetContentIdAsync(string postId)
     {
         if (string.IsNullOrWhiteSpace(postId)) throw new ArgumentNullException(nameof(postId), "Пустой id поста");
 
@@ -70,15 +70,14 @@ public sealed class ProxyReddit : ProxyService
         if (!string.IsNullOrWhiteSpace(crossPostId)) post = redditClient.LinkPost($"{crossPostId}").Info();
         var startText = $"https://www.reddit.com{post.Permalink}\n\n{post.Title}\n";
         if (post.Listing.Media == null && !post.Listing.IsVideo && !post.Listing.IsRedditMediaDomain)
-            return new ProxyResponseContent($"{startText}{post.Listing.SelfText}", Array.Empty<MediaInfo>(),
-                Array.Empty<MediaInfo>());
+            return new ProxyResponseContent($"{startText}{post.Listing.SelfText}");
 
         long size;
         if (picturesRegex.IsMatch(post.Listing.URL, RegexOptions.IgnoreCase))
         {
             size = await ProxyHelper.GetSizeContentUrlAsync(post.Listing.URL);
-            return new ProxyResponseContent(startText, new[] { new MediaInfo(post.Listing.URL, size, MediaType.Photo) },
-                Array.Empty<MediaInfo>());
+            return new ProxyResponseContent(startText,
+                new[] { new MediaInfo(post.Listing.URL, size, MediaType.Photo) });
         }
 
         if (post.Listing.Media != null && post.Listing.IsVideo)
@@ -87,13 +86,13 @@ public sealed class ProxyReddit : ProxyService
             if (!string.IsNullOrWhiteSpace(videoLink))
             {
                 size = await ProxyHelper.GetSizeContentUrlAsync(videoLink);
-                return new ProxyResponseContent(startText, Array.Empty<MediaInfo>(),
+                return new ProxyResponseContent(startText, null,
                     new[] { new MediaInfo(videoLink, size, MediaType.Video) });
             }
         }
 
         size = await ProxyHelper.GetSizeContentUrlAsync(post.Listing.URL);
-        return new ProxyResponseContent(startText, Array.Empty<MediaInfo>(),
+        return new ProxyResponseContent(startText, null,
             new[] { new MediaInfo(post.Listing.URL, size, MediaType.Video) });
     }
 
@@ -153,8 +152,10 @@ public sealed class ProxyReddit : ProxyService
     /// <returns>Id parent post if there is parent post.</returns>
     private async Task<string?> GetParentPostIdAsync(string postId)
     {
-        var client = new HttpClient();
-        client.BaseAddress = new Uri($"https://{urlBase}");
+        var client = new HttpClient
+        {
+            BaseAddress = new Uri($"https://{urlBase}")
+        };
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api/info.json?id={postId}");
 
         var response = await client.SendAsync(request);
