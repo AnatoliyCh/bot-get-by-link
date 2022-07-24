@@ -40,7 +40,7 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
             (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ??
             throw new NullReferenceException("Command: SendMessage is null");
         var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
-        var formaterContent = new ProxyResponseFormatter();
+        var formaterContent = new ProxyResponseFormatter(config.Clients.Telegram.MaxSizeMbPhoto, config.Clients.Telegram.MaxSizeMbVideo, config.Clients.Telegram.MaxTextLenghtFirstMedia, config.Clients.Telegram.MaxTextLenghtMessage);
         var sendContentFromUrl =
             new SendContentFromUrlCommand(sendMessageCommand, proxyServices, regexWrappers, formaterContent);
 

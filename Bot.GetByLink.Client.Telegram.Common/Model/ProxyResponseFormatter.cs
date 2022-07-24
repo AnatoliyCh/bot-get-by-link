@@ -4,7 +4,7 @@ using Bot.GetByLink.Common.Infrastructure.Model;
 using Telegram.Bot.Types;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model;
-
+// TODO: test with gif
 /// <summary>
 ///     Class for formating content for messages telegram.
 /// </summary>
@@ -13,13 +13,16 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyResponseFormatter" /> class.
     /// </summary>
-    public ProxyResponseFormatter()
+    /// <param name="maxSizeMbPhoto">Max size in mb for one photo in message.</param>
+    /// <param name="maxSizeMbVideo">Max size in mb for one video in message.</param>
+    /// <param name="maxTextLenghtFirstMedia">Max text lenght for first media.</param>
+    /// <param name="maxTextLenghtMessage">Max text lenght for message.</param>
+    public ProxyResponseFormatter(double maxSizeMbPhoto, double maxSizeMbVideo, int maxTextLenghtFirstMedia, int maxTextLenghtMessage)
     {
-        // TODO: test with gif
-        MaxSizeMbPhoto = 5;
-        MaxSizeMbVideo = 20;
-        MaxTextLenghtFirstMedia = 1024;
-        MaxTextLenghtMessage = 4096;
+        MaxSizeMbPhoto = maxSizeMbPhoto;
+        MaxSizeMbVideo = maxSizeMbVideo;
+        MaxTextLenghtFirstMedia = maxTextLenghtFirstMedia;
+        MaxTextLenghtMessage = maxTextLenghtMessage;
     }
 
     /// <summary>
