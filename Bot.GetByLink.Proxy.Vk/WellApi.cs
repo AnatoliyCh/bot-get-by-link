@@ -68,15 +68,13 @@ public sealed class WellApi
 
             var data = await api.Wall.GetByIdAsync(new List<string> { wallId });
             var (message, urlPicture, urlVideo) = await GetContentAsync(data);
+            if (message is null && urlPicture is null && urlVideo is null) return null;
 
-            var content = new ProxyResponseContent(message ?? string.Empty, urlPicture, urlVideo);
-
-            return content;
+            return new ProxyResponseContent(message ?? string.Empty, urlPicture, urlVideo);
         }
         catch (Exception ex)
         {
-            var message = "ProxyVK : WellApi";
-            logger.LogError(ex, message);
+            logger.LogError(ex, "ProxyVK : WellApi");
             return null;
         }
     }
@@ -86,19 +84,28 @@ public sealed class WellApi
     {
         if (obect is null) return (null, null, null);
 
-        // TODO: сделать обработку видео?
-        var urlPicture = new List<MediaInfo>();
-
         var post = obect.WallPosts?.FirstOrDefault();
         if (post is null) return (null, null, null);
 
-        foreach (var item in post.Attachments)
-            if (item.Instance is Photo photo)
+        // TODO: сделать обработку видео?
+        var capacity = post.Attachments.Count;
+        var urlPicture = new MediaInfo[capacity];
+        var tasks = new Task[capacity];
+
+        for (var i = 0; i < capacity; i++)
+            if (post.Attachments[i].Instance is Photo photo)
             {
-                var maxSize = photo.Sizes.Aggregate((a, b) => a.Height + a.Width > b.Height + b.Width ? a : b);
-                var size = await ProxyHelper.GetSizeContentUrlAsync(maxSize.Url.AbsoluteUri);
-                urlPicture.Add(new MediaInfo(maxSize.Url.AbsoluteUri, size, MediaType.Photo));
+                var position = i; // i is needed to arrange the artifacts in order.
+                tasks[position] = Task.Run(async () =>
+                {
+                    var maxSize = photo.Sizes.Aggregate((a, b) => a.Height + a.Width > b.Height + b.Width ? a : b);
+                    var size = await ProxyHelper.GetSizeContentUrlAsync(maxSize.Url.AbsoluteUri);
+                    urlPicture[position] = new MediaInfo(maxSize.Url.AbsoluteUri, size, MediaType.Photo);
+                });
             }
+
+        await Task.WhenAll(tasks);
+        urlPicture = urlPicture.Where(item => item is not null).ToArray();
 
         return (post.Text, urlPicture, null);
     }

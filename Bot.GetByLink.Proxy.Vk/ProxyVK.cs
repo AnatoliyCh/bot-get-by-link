@@ -1,5 +1,6 @@
 ﻿using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Proxy.Vk.Regex;
 using Microsoft.Extensions.Logging;
 using VkNet;
 using VkNet.Model;
@@ -20,7 +21,7 @@ public sealed class ProxyVK : ProxyService
     /// <param name="configuration">Bot configuration.</param>
     /// <param name="loggerWellApi">Interface for logging.</param>
     public ProxyVK(IBotConfiguration? configuration, ILogger<WellApi> loggerWellApi)
-        : base(new[] { @"https?:\/\/vk\.com\/(wall-\d+_\d+$|feed\?w=wall-\d+_\d+$|wall\d+_\d+$)" })
+        : base(new[] { new WallRegexWrapper() })
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(loggerWellApi);

@@ -8,7 +8,7 @@ public interface IProxyService
     /// <summary>
     ///     Gets regex url for proxy.
     /// </summary>
-    public string[] RegexUrl { get; }
+    public IRegexWrapper[] RegexUrl { get; }
 
     /// <summary>
     ///     Get match url with regex for this proxy.

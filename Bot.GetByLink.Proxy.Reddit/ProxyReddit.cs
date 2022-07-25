@@ -6,6 +6,7 @@ using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Model;
 using Bot.GetByLink.Proxy.Common;
+using Bot.GetByLink.Proxy.Reddit.Regex;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Reddit;
@@ -28,10 +29,7 @@ public sealed class ProxyReddit : ProxyService
     /// </summary>
     /// <param name="configuration">Bot configuration.</param>
     public ProxyReddit(IBotConfiguration? configuration)
-        : base(new[]
-        {
-            @"https?:\/\/www.reddit.com\/r\/\S+/comments\/\S+"
-        }) // TODO: переделать на фабрику / найти подходящее место.
+        : base(new[] { new RedditPostRegexWrapper() })
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
