@@ -92,8 +92,7 @@ public sealed class WellApi
         var urlPicture = new MediaInfo[capacity];
         var tasks = new Task[capacity];
 
-        for (int i = 0; i < capacity; i++)
-        {
+        for (var i = 0; i < capacity; i++)
             if (post.Attachments[i].Instance is Photo photo)
             {
                 var position = i; // i is needed to arrange the artifacts in order.
@@ -104,7 +103,6 @@ public sealed class WellApi
                     urlPicture[position] = new MediaInfo(maxSize.Url.AbsoluteUri, size, MediaType.Photo);
                 });
             }
-        }
 
         await Task.WhenAll(tasks);
         urlPicture = urlPicture.Where(item => item is not null).ToArray();

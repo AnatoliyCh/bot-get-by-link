@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
+﻿using Bot.GetByLink.Common.Infrastructure.Interfaces;
 
 namespace Bot.GetByLink.Common.Infrastructure.Abstractions;
 
@@ -12,7 +11,7 @@ public abstract class ProxyService : IProxyService
     ///     Initializes a new instance of the <see cref="ProxyService" /> class.
     /// </summary>
     /// <param name="regexUrl">Regex url for proxy.</param>
-    protected ProxyService(string[] regexUrl)
+    protected ProxyService(IRegexWrapper[] regexUrl)
     {
         RegexUrl = regexUrl;
     }
@@ -20,7 +19,7 @@ public abstract class ProxyService : IProxyService
     /// <summary>
     ///     Gets regex url for proxy.
     /// </summary>
-    public string[] RegexUrl { get; }
+    public IRegexWrapper[] RegexUrl { get; }
 
     /// <summary>
     ///     Get match url with regex for this proxy.
@@ -29,7 +28,7 @@ public abstract class ProxyService : IProxyService
     /// <returns>Did pass url.</returns>
     public bool IsMatch(string url)
     {
-        return RegexUrl.Any(x => Regex.IsMatch(url, x));
+        return RegexUrl.Any(regex => regex.IsMatch(url));
     }
 
     /// <summary>
