@@ -1,5 +1,7 @@
-﻿using Bot.GetByLink.Client.Telegram.Polling.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 
 namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
@@ -10,21 +12,42 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 internal sealed class CommandInvoker : ICommandInvoker<CommandName>
 {
     private readonly IDictionary<CommandName, ICommand<CommandName>> commands;
+    private readonly ILogger logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="CommandInvoker" /> class.
     /// </summary>
+    /// <param name="config">Bot configuration.</param>
+    /// <param name="logger">Interface for logging.</param>
     /// <param name="client">Telegram Client.</param>
     /// <param name="proxyServices">Proxy collection.</param>
-    public CommandInvoker(ITelegramBotClient client, IEnumerable<IProxyService> proxyServices)
+    /// <param name="serviceCommands">Service commands.</param>
+    /// <param name="regexWrappers">Regular expressions for checks.</param>
+    public CommandInvoker(
+        IBotConfiguration config,
+        ILogger<CommandInvoker> logger,
+        ITelegramBotClient client,
+        IEnumerable<IProxyService> proxyServices,
+        IEnumerable<ICommand<CommandName>> serviceCommands,
+        IEnumerable<IRegexWrapper> regexWrappers)
     {
-        if (client is null) throw new ArgumentNullException(nameof(client));
-        if (proxyServices is null) throw new ArgumentNullException(nameof(proxyServices));
+        ArgumentNullException.ThrowIfNull(config);
+        ArgumentNullException.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(proxyServices);
 
-        var chatInfoCommand = new ChatInfoCommand(client);
-        var sendContentFromUrl = new SendContentFromUrlCommand(client, proxyServices);
-        commands = new Dictionary<CommandName, ICommand<CommandName>>
-            { { chatInfoCommand.Name, chatInfoCommand }, { sendContentFromUrl.Name, sendContentFromUrl } };
+        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        var sendMessageCommand =
+            (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ??
+            throw new NullReferenceException("Command: SendMessage is null");
+        var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
+        var formaterContent = new ProxyResponseFormatter(config.Clients.Telegram);
+        var sendContentFromUrl =
+            new SendContentFromUrlCommand(sendMessageCommand, proxyServices, regexWrappers, formaterContent);
+
+        commands = serviceCommands
+            .Concat(new List<ICommand<CommandName>> { chatInfoCommand, sendContentFromUrl })
+            .DistinctBy(command => command.Name)
+            .ToDictionary(command => command.Name, command => command);
     }
 
     /// <summary>
@@ -33,7 +56,7 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
     /// <param name="command">Given command.</param>
     /// <param name="ctx">Context command.</param>
     /// <returns>Empty Task.</returns>
-    public async Task TryExecuteCommand(ICommand<CommandName>? command, object? ctx)
+    public async Task TryExecuteCommandAsync(ICommand<CommandName>? command, object? ctx)
     {
         try
         {
@@ -49,9 +72,8 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.ToString());
-
-            // TODO: команда отправки сообщений в чат лога
+            var message = $"ICommand: {command?.Name.ToString()}";
+            logger.LogError(ex, message);
         }
     }
 
@@ -61,10 +83,10 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
     /// <param name="commandName">Command name.</param>
     /// <param name="ctx">Context command.</param>
     /// <returns>Empty Task.</returns>
-    public async Task TryExecuteCommand(CommandName commandName, object? ctx)
+    public async Task TryExecuteCommandAsync(CommandName commandName, object? ctx)
     {
         commands.TryGetValue(commandName, out var command);
-        await TryExecuteCommand(command, ctx);
+        await TryExecuteCommandAsync(command, ctx);
     }
 
     /// <summary>

@@ -1,9 +1,10 @@
 ﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Polling.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Common.Infrastructure.Enums;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
-using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -14,19 +15,16 @@ namespace Bot.GetByLink.Client.Telegram.Polling;
 ///     Telegram client.
 ///     Connection Type: polling.
 /// </summary>
-internal sealed class ClientPolling : Common.Infrastructure.Abstractions.Client
+internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractions.Client, IDisposable
 {
-    private readonly string? chatIdErrorHandling;
     private readonly ITelegramBotClient client;
     private readonly ICommandInvoker<CommandName> commandInvoker;
-    private readonly string patternCommand = "^\\/[a-zA-Z]+";
-
-    private readonly string patternURL =
-        @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
+    private readonly ILogger logger;
 
     private readonly string projectName;
 
     private readonly ReceiverOptions receiverOptions;
+    private readonly IEnumerable<IRegexWrapper> regexWrappers;
 
     private CancellationTokenSource? cts;
 
@@ -34,34 +32,54 @@ internal sealed class ClientPolling : Common.Infrastructure.Abstractions.Client
     ///     Initializes a new instance of the <see cref="ClientPolling" /> class.
     /// </summary>
     /// <param name="config">Bot configuration.</param>
+    /// <param name="logger">Interface for logging.</param>
     /// <param name="client">Telegram Client.</param>
     /// <param name="invoker">Command Executor.</param>
-    public ClientPolling(IBotConfiguration config, ITelegramBotClient client, ICommandInvoker<CommandName> invoker)
+    /// <param name="regexWrappers">Regular expressions for checks.</param>
+    public ClientPolling(
+        IBotConfiguration config,
+        ILogger<ClientPolling> logger,
+        ITelegramBotClient client,
+        ICommandInvoker<CommandName> invoker,
+        IEnumerable<IRegexWrapper> regexWrappers)
     {
-        if (config is null) throw new ArgumentNullException(nameof(config));
+        ArgumentNullException.ThrowIfNull(config);
+
+        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         this.client = client ?? throw new ArgumentNullException(nameof(client));
         commandInvoker = invoker ?? throw new ArgumentNullException(nameof(invoker));
-
         projectName = config.ProjectName ?? throw new NullReferenceException(nameof(projectName));
-        var chatId = config.Clients.Telegram.ChatIdLog;
+        if (regexWrappers is null || !regexWrappers.Any()) throw new ArgumentNullException(nameof(regexWrappers));
 
-        if (!string.IsNullOrWhiteSpace(chatId)) chatIdErrorHandling = chatId;
+        this.regexWrappers = regexWrappers;
+
         receiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
+    }
+
+    /// <summary>
+    ///     /// Token Cancellation.
+    /// </summary>
+    public void Dispose()
+    {
+        if (cts is null) return;
+        cts.Cancel();
+        cts.Dispose();
+        cts = null;
     }
 
     /// <summary>
     ///     Client launch or reset.
     /// </summary>
     /// <returns>A <see cref="Task{TResult}" /> representing the result of the asynchronous operation.</returns>
-    public override async Task<bool> Start()
+    public override async Task<bool> StartAsync()
     {
-        if (State == Status.On || cts is not null) await Stop();
+        if (State == Status.On || cts is not null) await StopAsync();
         cts = new CancellationTokenSource();
         var validToken = await client.TestApiAsync(cts.Token);
         if (!validToken)
         {
-            RemoveToken();
-            Console.WriteLine($"{projectName}: token is not valid");
+            Dispose();
+            logger.LogCritical($"{projectName}: token is not valid");
             return false;
         }
 
@@ -74,33 +92,11 @@ internal sealed class ClientPolling : Common.Infrastructure.Abstractions.Client
     ///     Client stop.
     /// </summary>
     /// <returns>Execution result.</returns>
-    public override Task<bool> Stop()
+    public override Task<bool> StopAsync()
     {
-        RemoveToken();
+        Dispose();
         State = Status.Off;
         return Task.FromResult(true);
-    }
-
-    /// <summary>
-    ///     Sends a message to the chat for the log.
-    /// </summary>
-    /// <param name="message">Message content.</param>
-    /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-    public async Task TrySendTextMessageToLogChatAsync(string message)
-    {
-        if (string.IsNullOrWhiteSpace(message) ||
-            string.IsNullOrWhiteSpace(chatIdErrorHandling) ||
-            cts is null || State == Status.Off)
-            return;
-
-        try
-        {
-            await client.SendTextMessageAsync(chatIdErrorHandling, message, cancellationToken: cts.Token);
-        }
-        catch (Exception exception)
-        {
-            await HandleErrorAsync(client, exception, cts.Token);
-        }
     }
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken ct)
@@ -108,39 +104,40 @@ internal sealed class ClientPolling : Common.Infrastructure.Abstractions.Client
         var text = update.Message!.Text ?? string.Empty;
 
         // only command message (/**) and URL
-        if (!(update.Message!.Type == MessageType.Text &&
-              (Regex.IsMatch(text, patternCommand) || Regex.IsMatch(text, patternURL)))) return;
+        if (update.Message!.Type != MessageType.Text && regexWrappers.Any(regex => regex.IsMatch(text))) return;
 
         var words = text.Split(" ");
         if (words is null || words.Length == 0) return;
 
         // commands
         var firstWord = words.First();
-        var commandNameText = Regex.Replace(firstWord, "/", string.Empty);
-        if (Regex.IsMatch(firstWord, patternURL)) commandNameText = CommandName.SendContentFromUrl.ToString();
+        var commandName = GetCommandNameByString(firstWord);
+        if (commandName is null) return;
 
-        commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
-        if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return;
-        var commandName = Enum.Parse<CommandName>(commandNameText, true);
-
-        await commandInvoker.TryExecuteCommand(commandName, update);
+        await commandInvoker.TryExecuteCommandAsync((CommandName)commandName, update);
     }
 
     private async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken ct)
     {
-        if (exception is not ApiRequestException apiRequestException) return;
-        var exceptionInString = apiRequestException.ToString();
-        Console.WriteLine(exceptionInString);
-
-        if (string.IsNullOrWhiteSpace(chatIdErrorHandling) || apiRequestException.Message == "Unauthorized") return;
-        await botClient.SendTextMessageAsync(chatIdErrorHandling, exceptionInString, cancellationToken: ct);
+        await Task.Run(() => logger.LogError(exception, "HandleErrorAsync"));
     }
 
-    private void RemoveToken()
+    private CommandName? GetCommandNameByString(string input)
     {
-        if (cts is null) return;
-        cts.Cancel();
-        cts.Dispose();
-        cts = null;
+        foreach (var regex in regexWrappers)
+            switch (regex)
+            {
+                case UrlRegexWrapper urlRegex:
+                    if (urlRegex.IsMatch(input)) return CommandName.SendContentFromUrl;
+                    break;
+                case CommandRegexWrapper commandRegex:
+                    if (!commandRegex.IsMatch(input)) return null;
+                    var commandNameText = Regex.Replace(input, "/", string.Empty);
+                    commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
+                    if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return null;
+                    return Enum.Parse<CommandName>(commandNameText, true);
+            }
+
+        return null;
     }
 }

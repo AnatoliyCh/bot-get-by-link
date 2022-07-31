@@ -8,7 +8,7 @@ public interface IProxyService
     /// <summary>
     ///     Gets regex url for proxy.
     /// </summary>
-    public string[] RegexUrl { get; }
+    public IRegexWrapper[] RegexUrl { get; }
 
     /// <summary>
     ///     Get match url with regex for this proxy.
@@ -22,5 +22,5 @@ public interface IProxyService
     /// </summary>
     /// <param name="url">Url to post.</param>
     /// <returns>An object with text and links to pictures and videos present in the post.</returns>
-    public Task<ProxyResponseContent> GetContentUrl(string url);
+    public Task<IProxyContent?> GetContentUrlAsync(string url);
 }

@@ -2,7 +2,7 @@
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Bot.GetByLink.Common.Infrastructure.Interfaces.Configuration;
 
-namespace Bot.GetByLink.Common.Infrastructure.Configuration;
+namespace Bot.GetByLink.Common.Infrastructure.Model.Configuration;
 
 /// <summary>
 ///     Bot сonfiguration class.
