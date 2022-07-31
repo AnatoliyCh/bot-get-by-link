@@ -11,4 +11,4 @@
 ## Naming Convention
 
 -   [English](https://github.com/AnatoliyCh/bot-get-by-link/blob/change-documentation/Documentation/NamingConvention/README.en.md);
--   [Русский](https://github.com/anatoliych/bot-get-by-link/blob/change-documentation/documentation/namingconvention/README.ru.md);
+-   [Русский](https://github.com/AnatoliyCh/bot-get-by-link/blob/change-documentation/Documentation/NamingConvention/README.ru.md);
