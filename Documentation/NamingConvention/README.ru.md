@@ -3,7 +3,7 @@
 # Введение
 
 Данный гайд опирается на официальные [рекомендации от Microsoft][1]. В основном используются `PascalCase` и `camelCase` стили наименования.
-Для именования **git-веток** используется `kebab-case` стиль наименования.
+Для именования **git-веток** используется стиль наименования `kebab-case`.
 
 Навигация:
 
@@ -13,52 +13,74 @@
 
 ## Папки и директории
 
-| Объект                       | Рекомендация                                             | Пример                                            |
-| ---------------------------- | -------------------------------------------------------- | ------------------------------------------------- |
-| Решение                      | MyCompany.MyTechnology                                   | Bot.GetByLink                                     |
-| Папка решения                | MyCompany.MyTechnology.TotalName                         | Bot.GetByLink.Common                              |
-| Проект                       | MyCompany.MyTechnology.FirstFeature                      | Bot.GetByLink.Common.Infrastructure               |
-| Папка проекта                | PascalCase                                               | Abstractions                                      |
-| Файл class / record / struct | PascalCase                                               | ProxyResponseContent.cs                           |
-| Файл интерфейса              | IPascalCase                                              | IProxyContent.cs                                  |
-| Файл конфигурации **.json**  | appsettings or PascalCase                                | appsettings.json                                  |
-| Блоки и поля **.json**       | "PascalCase"                                             | "Clients": { "Telegram": { "Token": "", }, },     |
-| Пространства имен            | MyCompany.(Product\|Technology)[.Feature][.subnamespace] | Bot.GetByLink.Common.Infrastructure.Abstractions; |
+| Объект                       | Рекомендация                                             | Пример                                           |
+| ---------------------------- | -------------------------------------------------------- | ------------------------------------------------ |
+| Решение                      | MyCompany.MyTechnology                                   | Bot.GetByLink                                    |
+| Папка решения                | MyCompany.MyTechnology.TotalName                         | Bot.GetByLink.Common                             |
+| Проект                       | MyCompany.MyTechnology.FirstFeature                      | Bot.GetByLink.Common.Infrastructure              |
+| Папка проекта                | PascalCase                                               | Abstractions                                     |
+| Файл class / record / struct | PascalCase                                               | ProxyResponseContent.cs                          |
+| Файл интерфейса              | IPascalCase                                              | IProxyContent.cs                                 |
+| Файл конфигурации **.json**  | appsettings или PascalCase                               | appsettings.json                                 |
+| Блоки и поля **.json**       | "PascalCase"                                             | "Clients": { "Telegram": { "Token": "", }, },    |
+| Пространства имен            | MyCompany.(Product\|Technology)[.Feature][.subnamespace] | Bot.GetByLink.Common.Infrastructure.Abstractions |
 
 ## Элементы языка
 
-У всех элементов языка (поля, методы, свойства и т.д.) **необходимо ЯВНО указывать модификатор доступа**, в том числе и у интерфейсов и их полей/методов/свойств.
+У всех **объектов** языка _(класс, структура, запись, интерфейс и т.д.)_ **необходимо ЯВНО указывать модификатор доступа** у полей, методов/функций, свойств и т.д.
+Все `public` элементы (поля, методы/функции, свойства и т.д.) должны быть описаны: `/// <summary> Comment </summary>`.
 
 #### Объекты языка
+
+Названия параметров универсальных шаблонов имеет вид `T` или `TName`: `public abstract class AsyncCommand<TName>`, `public interface IMessageContext<TChatId, TText, TArtifact>`.
+Используется ковариантность (`out T`) и контравариантность (`in T`) параметров универсальных шаблонов: `public interface ICommandInvoker<in TCommandName>`.
+У конструктора **абстрактного класса** указывать модификатор доступа `protected`. При наличии хотябы 1 `abstract` элемента, класс невобходимо сделать **абстрактным**.
 
 | Объект            | Рекомендация                             | Пример                                       |
 | ----------------- | ---------------------------------------- | -------------------------------------------- |
 | Класс / структура | public sealed class PascalCase           | public sealed class UrlRegexWrapper          |
 | Класс-расширение  | public static class PascalCaseExtensions | public static class LoggingBuilderExtensions |
-| Запись (record)   | public sealed record PascalCase          | public sealed record Message                 |
+| Запись (`record`) | public sealed record PascalCase          | public sealed record Message                 |
 | Интерфейс         | IPascalCase                              | public interface IMessageContext             |
+
+#### Поля / свойства
+
+Сортировка **полей** в файле по признаку доступности: `private readonly`, `private`, `public`, `protected`.
+Для разрешения `null-значения` используется `?`: `private CancellationTokenSource? cts;`.
+**Поле / свойство** только для чтения: `private readonly Type camelCase`, `public Type PascalCase { get; }`.
+
+| Объект                                       | Рекомендация                          | Пример                               |
+| -------------------------------------------- | ------------------------------------- | ------------------------------------ |
+| Поле `private`                               | private Type camelCase                | private CancellationTokenSource? cts |
+| Поле `private readonly`                      | private readonly Type camelCase       | private readonly ILogger logger      |
+| Поле `public`                                | public Type PascalCase                | public ILogger Logger                |
+| Поле `protected`                             | protected Type camelCase              | protected ILogger logger             |
+| Свойство `public`                            | public Type PascalCase { get; set; }  | public string Url { get; set; }      |
+| Свойство `public` c начальной инициализацией | public Type PascalCase { get; init; } | public string Url { get; init; }     |
+| Свойство `public readonly`                   | public Type PascalCase { get; }       | public Status State { get; }         |
 
 #### Функции / Методы
 
-Сортировка методов в файле по признаку доступности: `public`, `protected`, `private`.
-**Async-методы** должны всегда возвращать Task (даже вместо **void**), так как может наблюдатся неоднозначность поведения.
+Сортировка **методов / функций** в файле по признаку доступности: `public`, `protected`, `private`.
+**Async-методы** должны всегда возвращать `Task<T>` (вместо **void** `Task`), так как может наблюдатся неоднозначность поведения.
 
-| Объект                                | Рекомендация                                                                 | Пример                 | Возвращаемый тип    |
-| ------------------------------------- | ---------------------------------------------------------------------------- | ---------------------- | ------------------- |
-| Метод / функция                       | PascalCase                                                                   | Execute                | Любой \| null       |
-| Метод **async/await**                 | PascalCaseAsync                                                              | ExecuteAsync           | Task<Любой \| null> |
-| Метод с **try/catch**                 | TryPascalCase                                                                | TryGetValue            | Любой \| null       |
-| Метод **async/await** + **try/catch** | TryPascalCaseAsync                                                           | TryExecuteCommandAsync | Task<Любой \| null> |
-| Аргументы метода / функции            | PascalCase(type camelCasing, type camelCasing)                               | IsMatch(string url);   | Любой \| null       |
-| Локальные переменные                  | PascalCase(type camelCasing, type camelCasing) { var/type camelCasing = ...} |                        | Любой \| null       |
+| Объект                                | Рекомендация                                                                 | Пример                 | Возвращаемый тип     |
+| ------------------------------------- | ---------------------------------------------------------------------------- | ---------------------- | -------------------- |
+| Метод / функция                       | PascalCase                                                                   | Execute                | object \| null       |
+| Метод **async/await**                 | PascalCaseAsync                                                              | ExecuteAsync           | Task<object \| null> |
+| Метод с **try/catch**                 | TryPascalCase                                                                | TryGetValue            | object \| null       |
+| Метод **async/await** + **try/catch** | TryPascalCaseAsync                                                           | TryExecuteCommandAsync | Task<object \| null> |
+| Аргументы метода / функции            | PascalCase(type camelCasing, type camelCasing)                               | IsMatch(string url)    | object \| null       |
+| Локальные переменные                  | PascalCase(type camelCasing, type camelCasing) { var/type camelCasing = ...} |                        |                      |
 
 ## Советы по коду
 
 -   Абстрактные / бызовые классы называть общим именем без приписок по типу `Base`;
--   У классов указывать ключевое слово `sealed`: `public sealed class ClassName`, при отсутвии наследования;
+-   У классов указывать ключевое слово `sealed`: `public sealed class PascalCase`, при отсутвии наследования;
 -   Неизменяемые данные лучше хранить в типе `record`;
--   Входящие аргументы в конструктор **ВСЕГДА** проверять на null, можно через метод: `ArgumentNullException.ThrowIfNull()`;
+-   Входящие аргументы в конструктор **ВСЕГДА** проверять на `null`, можно через метод: `ArgumentNullException.ThrowIfNull()`;
 -   **По возможности** все аргументы конструктора и поля, которым они присваиваются, должны быть интерфейсом;
+-   **Поля** лучше инкапсулировать и использовать вместо них свойства.
 
 [1]: https://docs.microsoft.com/ru-ru/dotnet/standard/design-guidelines/naming-guidelines
 [2]: https://github.com/AnatoliyCh/bot-get-by-link/blob/change-documentation/Documentation/NamingConvention/README.ru.md#папки-и-директории
