@@ -29,7 +29,7 @@ dotnet tool restore
 При настройке проекта использовалась [данная статья][2].
 
 Для поддержания "чистоты" кода используется [ReSharper command line tools][3].  
-Происк проблем в коде:
+Поиск проблем в коде:
 
 ```PowerShell
 dotnet jb inspectcode Bot.GetByLink.sln
