@@ -1,6 +1,6 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Interfaces;
+﻿using Bot.GetByLink.Common.Interfaces.Proxy;
 
-namespace Bot.GetByLink.Common.Infrastructure.Model;
+namespace Bot.GetByLink.Common.Infrastructure.Proxy;
 
 /// <summary>
 ///     Сlass for returned object from proxy.

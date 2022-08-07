@@ -1,8 +1,7 @@
-﻿using System.Text.Json.Serialization;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Bot.GetByLink.Common.Infrastructure.Interfaces.Configuration;
+﻿using Bot.GetByLink.Common.Interfaces.Configuration;
+using System.Text.Json.Serialization;
 
-namespace Bot.GetByLink.Common.Infrastructure.Model.Configuration;
+namespace Bot.GetByLink.Common.Infrastructure.Configuration;
 
 /// <summary>
 ///     Bot сonfiguration class.

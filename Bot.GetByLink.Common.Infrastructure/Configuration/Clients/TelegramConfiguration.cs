@@ -1,11 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿using Bot.GetByLink.Common.Interfaces.Configuration.Clients;
+using System.Text.Json.Serialization;
 
-namespace Bot.GetByLink.Common.Infrastructure.Model.Configuration.Clients;
+namespace Bot.GetByLink.Common.Infrastructure.Configuration.Clients;
 
 /// <summary>
 ///     Client Configuration.
 /// </summary>
-public sealed class ClientConfiguration
+public sealed class TelegramConfiguration : ITelegramConfiguration
 {
     /// <summary>
     ///     Gets access token.
