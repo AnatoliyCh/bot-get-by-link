@@ -1,7 +1,7 @@
-﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Common.Enums;
-using Bot.GetByLink.Common.Infrastructure.Abstractions;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
+﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Common.Abstractions.Command;
+using Bot.GetByLink.Common.Interfaces.Command;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Message = Bot.GetByLink.Client.Telegram.Common.Model.Message;

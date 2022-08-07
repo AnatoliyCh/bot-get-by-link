@@ -1,6 +1,6 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Bot.GetByLink.Common.Infrastructure.Model.Configuration.Clients;
+using Bot.GetByLink.Common.Interfaces.Configuration.Clients;
+using Bot.GetByLink.Common.Interfaces.Proxy;
 using Telegram.Bot.Types;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model;
@@ -16,7 +16,7 @@ public class ProxyResponseFormatter : IFormatterContent
     ///     Initializes a new instance of the <see cref="ProxyResponseFormatter" /> class.
     /// </summary>
     /// <param name="configuration">Client Configuration.</param>
-    public ProxyResponseFormatter(ClientConfiguration configuration)
+    public ProxyResponseFormatter(ITelegramConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         MaxSizeMbPhoto = configuration.MaxSizeMbPhoto;

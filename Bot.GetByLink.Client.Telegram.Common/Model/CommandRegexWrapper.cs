@@ -1,5 +1,5 @@
-﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Common.Infrastructure.Abstractions;
+﻿using Bot.GetByLink.Common.Abstractions;
+using System.Text.RegularExpressions;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model;
 

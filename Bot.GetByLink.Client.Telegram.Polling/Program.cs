@@ -1,16 +1,19 @@
-﻿using System.Reflection;
-using Bot.GetByLink.Client.Telegram.Common.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Client.Telegram.Common.Model.Logging;
 using Bot.GetByLink.Client.Telegram.Polling;
 using Bot.GetByLink.Client.Telegram.Polling.Commands;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Bot.GetByLink.Common.Infrastructure.Model.Configuration;
+using Bot.GetByLink.Common.Infrastructure.Configuration;
+using Bot.GetByLink.Common.Interfaces;
+using Bot.GetByLink.Common.Interfaces.Command;
+using Bot.GetByLink.Common.Interfaces.Configuration;
+using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Reddit;
 using Bot.GetByLink.Proxy.Vk;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 using Telegram.Bot;
 
 var serviceProvider = ConfigureServices();
