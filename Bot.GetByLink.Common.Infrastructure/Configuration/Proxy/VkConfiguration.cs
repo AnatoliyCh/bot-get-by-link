@@ -1,5 +1,5 @@
-﻿using Bot.GetByLink.Common.Interfaces.Configuration.Proxy;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using Bot.GetByLink.Common.Interfaces.Configuration.Proxy;
 
 namespace Bot.GetByLink.Common.Infrastructure.Configuration.Proxy;
 
@@ -9,7 +9,7 @@ namespace Bot.GetByLink.Common.Infrastructure.Configuration.Proxy;
 public sealed class VkConfiguration : IVkConfiguration
 {
     /// <summary>
-    /// Gets a value indicating whether whether to start a proxy.
+    ///     Gets a value indicating whether whether to start a proxy.
     /// </summary>
     [JsonPropertyName("Run")]
     public bool Run { get; init; } = false;

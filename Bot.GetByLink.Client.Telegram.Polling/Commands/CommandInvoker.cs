@@ -39,7 +39,8 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
         ArgumentNullException.ThrowIfNull(proxyServices);
 
         this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        var sendMessageCommand = (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ??
+        var sendMessageCommand =
+            (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ??
             throw new NullReferenceException("Command: SendMessage is null");
 
         var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);

@@ -1,4 +1,5 @@
-﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+﻿using System.Reflection;
+using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Client.Telegram.Common.Model.Logging;
 using Bot.GetByLink.Client.Telegram.Polling;
@@ -13,7 +14,6 @@ using Bot.GetByLink.Proxy.Vk;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
 using Telegram.Bot;
 
 var serviceProvider = ConfigureServices();

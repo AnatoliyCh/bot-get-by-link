@@ -1,7 +1,7 @@
 ﻿namespace Bot.GetByLink.Common.Interfaces.Proxy;
 
 /// <summary>
-/// Interface for returned object from proxy.
+///     Interface for returned object from proxy.
 /// </summary>
 public interface IProxyContent
 {

@@ -1,7 +1,7 @@
 ﻿namespace Bot.GetByLink.Common.Interfaces.Proxy;
 
 /// <summary>
-/// Interface for info media.
+///     Interface for info media.
 /// </summary>
 public interface IMediaInfo
 {

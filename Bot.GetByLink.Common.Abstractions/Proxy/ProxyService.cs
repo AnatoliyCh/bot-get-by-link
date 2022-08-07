@@ -1,5 +1,5 @@
-﻿using Bot.GetByLink.Common.Interfaces.Proxy;
-using System.Linq;
+﻿using System.Linq;
+using Bot.GetByLink.Common.Interfaces.Proxy;
 
 namespace Bot.GetByLink.Common.Abstractions.Proxy;
 
