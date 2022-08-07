@@ -1,8 +1,10 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Client.Telegram.Common.Model;
-using Bot.GetByLink.Common.Infrastructure.Abstractions;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Common.Abstractions.Command;
+using Bot.GetByLink.Common.Interfaces;
+using Bot.GetByLink.Common.Interfaces.Command;
+using Bot.GetByLink.Common.Interfaces.Proxy;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Message = Bot.GetByLink.Client.Telegram.Common.Model.Message;

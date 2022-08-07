@@ -1,6 +1,7 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Enums;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Bot.GetByLink.Common.Infrastructure.Model;
+﻿using Bot.GetByLink.Common.Enums;
+using Bot.GetByLink.Common.Infrastructure.Proxy;
+using Bot.GetByLink.Common.Interfaces;
+using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Common;
 using Bot.GetByLink.Proxy.Vk.Regex;
 using Microsoft.Extensions.Logging;

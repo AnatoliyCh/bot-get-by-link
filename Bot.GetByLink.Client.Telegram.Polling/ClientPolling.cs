@@ -1,8 +1,10 @@
 ﻿using System.Text.RegularExpressions;
 using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Model;
-using Bot.GetByLink.Common.Infrastructure.Enums;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Common.Enums;
+using Bot.GetByLink.Common.Interfaces;
+using Bot.GetByLink.Common.Interfaces.Command;
+using Bot.GetByLink.Common.Interfaces.Configuration;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
@@ -15,7 +17,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling;
 ///     Telegram client.
 ///     Connection Type: polling.
 /// </summary>
-internal sealed class ClientPolling : GetByLink.Common.Infrastructure.Abstractions.Client, IDisposable
+internal sealed class ClientPolling : GetByLink.Common.Abstractions.Client, IDisposable
 {
     private readonly ITelegramBotClient client;
     private readonly ICommandInvoker<CommandName> commandInvoker;

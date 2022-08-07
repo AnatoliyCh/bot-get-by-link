@@ -1,6 +1,9 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Model;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Common.Interfaces;
+using Bot.GetByLink.Common.Interfaces.Command;
+using Bot.GetByLink.Common.Interfaces.Configuration;
+using Bot.GetByLink.Common.Interfaces.Proxy;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 
@@ -39,6 +42,7 @@ internal sealed class CommandInvoker : ICommandInvoker<CommandName>
         var sendMessageCommand =
             (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ??
             throw new NullReferenceException("Command: SendMessage is null");
+
         var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
         var formaterContent = new ProxyResponseFormatter(config.Clients.Telegram);
         var sendContentFromUrl =

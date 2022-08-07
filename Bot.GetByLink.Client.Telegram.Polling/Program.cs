@@ -4,8 +4,11 @@ using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Client.Telegram.Common.Model.Logging;
 using Bot.GetByLink.Client.Telegram.Polling;
 using Bot.GetByLink.Client.Telegram.Polling.Commands;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Bot.GetByLink.Common.Infrastructure.Model.Configuration;
+using Bot.GetByLink.Common.Infrastructure.Configuration;
+using Bot.GetByLink.Common.Interfaces;
+using Bot.GetByLink.Common.Interfaces.Command;
+using Bot.GetByLink.Common.Interfaces.Configuration;
+using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Reddit;
 using Bot.GetByLink.Proxy.Vk;
 using Microsoft.Extensions.Configuration;
@@ -57,12 +60,12 @@ static IServiceProvider ConfigureServices()
     IServiceCollection services = new ServiceCollection();
     services.AddSingleton(client);
     services.AddSingleton(configuration);
-    services.AddScoped<IProxyService, ProxyReddit>();
-    services.AddScoped<IProxyService, ProxyVK>();
+
     services.AddScoped<ICommand<CommandName>, SendMessageCommand>();
     services.AddScoped<ICommandInvoker<CommandName>, CommandInvoker>();
     services.AddScoped<ClientPolling>();
 
+    AddProxyServices(services, configuration.Proxy);
     AddLogging(services);
     AddRegexWrapper(services);
     return services.BuildServiceProvider();
@@ -104,4 +107,10 @@ static void AddRegexWrapper(IServiceCollection services)
 {
     services.AddScoped<IRegexWrapper, UrlRegexWrapper>();
     services.AddScoped<IRegexWrapper, CommandRegexWrapper>();
+}
+
+static void AddProxyServices(IServiceCollection services, IProxyConfiguration proxyConfiguration)
+{
+    if (proxyConfiguration.Reddit.Run) services.AddScoped<IProxyService, ProxyReddit>();
+    if (proxyConfiguration.Vk.Run) services.AddScoped<IProxyService, ProxyVK>();
 }
