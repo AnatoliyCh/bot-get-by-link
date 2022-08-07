@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Bot.GetByLink.Common.Abstractions\Bot.GetByLink.Common.Abstractions.csproj" />
+    <ProjectReference Include="..\Bot.GetByLink.Common.Infrastructure\Bot.GetByLink.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\Bot.GetByLink.Common.Interfaces\Bot.GetByLink.Common.Interfaces.csproj" />
+  </ItemGroup>
+
 </Project>
