@@ -1,17 +1,16 @@
-﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Common.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Common.Abstractions.Command;
 using Bot.GetByLink.Common.Interfaces.Command;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Message = Bot.GetByLink.Client.Telegram.Common.Model.Message;
 
-namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
+namespace Bot.GetByLink.Client.Telegram.Common.Model.Commands;
 
 /// <summary>
 ///     Returns information about the current chat and the sender.
 /// </summary>
-internal sealed class ChatInfoCommand : AsyncCommand<CommandName>
+public sealed class ChatInfoCommand : AsyncCommand<CommandName>
 {
     private readonly ITelegramBotClient client;
     private readonly IAsyncCommand<CommandName> sendMessageCommand;

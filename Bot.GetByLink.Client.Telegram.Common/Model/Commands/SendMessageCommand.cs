@@ -3,12 +3,12 @@ using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Common.Abstractions.Command;
 using Telegram.Bot;
 
-namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
+namespace Bot.GetByLink.Client.Telegram.Common.Model.Commands;
 
 /// <summary>
 ///     Sends a message to the client.
 /// </summary>
-internal sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposable
+public sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposable
 {
     private readonly ITelegramBotClient client;
     private CancellationTokenSource? cts;

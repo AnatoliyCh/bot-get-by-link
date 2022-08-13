@@ -1,11 +1,11 @@
-﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Common.Enums;
-using Bot.GetByLink.Client.Telegram.Common.Model;
+﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Model.Regexs;
 using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;

@@ -1,6 +1,6 @@
 ﻿using Bot.GetByLink.Common.Abstractions;
 
-namespace Bot.GetByLink.Proxy.Vk.Regex;
+namespace Bot.GetByLink.Proxy.Vk.Regexs;
 
 /// <summary>
 ///     Regular expression for Wall VK.

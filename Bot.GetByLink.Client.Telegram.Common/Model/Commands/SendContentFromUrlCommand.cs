@@ -1,20 +1,19 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Interfaces;
-using Bot.GetByLink.Client.Telegram.Common.Model;
+using Bot.GetByLink.Client.Telegram.Common.Model.Regexs;
 using Bot.GetByLink.Common.Abstractions.Command;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Message = Bot.GetByLink.Client.Telegram.Common.Model.Message;
 
-namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
+namespace Bot.GetByLink.Client.Telegram.Common.Model.Commands;
 
 /// <summary>
 ///     Returns content post Reddit.
 /// </summary>
-internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
+public sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
 {
     private readonly ProxyResponseFormatter formaterContent;
     private readonly IAsyncCommand<CommandName> sendMessageCommand;

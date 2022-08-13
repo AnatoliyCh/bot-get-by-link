@@ -1,6 +1,6 @@
 ﻿using Bot.GetByLink.Common.Abstractions;
 
-namespace Bot.GetByLink.Proxy.Reddit.Regex;
+namespace Bot.GetByLink.Proxy.Reddit.Regexs;
 
 /// <summary>
 ///     Regular expression for Reddit main comment.
