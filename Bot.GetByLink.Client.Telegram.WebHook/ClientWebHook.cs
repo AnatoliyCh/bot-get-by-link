@@ -1,9 +1,9 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Abstractions;
 using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.WebHook.Interfaces.Configuration;
 using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
-using Bot.GetByLink.Common.Interfaces.Configuration;
 using Telegram.Bot;
 
 namespace Bot.GetByLink.Client.Telegram.WebHook;
@@ -14,8 +14,7 @@ namespace Bot.GetByLink.Client.Telegram.WebHook;
 /// </summary>
 internal sealed class ClientWebHook : TelegramClient
 {
-    private readonly Interfaces.Configuration.IBotConfiguration config;
-
+    private readonly string url;
     /// <summary>
     /// Initializes a new instance of the <see cref="ClientWebHook"/> class.
     /// </summary>
@@ -26,13 +25,13 @@ internal sealed class ClientWebHook : TelegramClient
     /// <param name="regexWrappers">Regular expressions for checks.</param>
     public ClientWebHook(
         ILogger<ClientWebHook> logger,
-        IBotConfiguration config,
+        IBotWebHookConfiguration config,
         ITelegramBotClient client,
         ICommandInvoker<CommandName> invoker,
         IEnumerable<IRegexWrapper> regexWrappers)
         : base(logger, config, client, invoker, regexWrappers)
     {
-        this.config = (Interfaces.Configuration.IBotConfiguration)config;
+        url = $"{config.Server.Url}/bot{config.Clients.Telegram.Token}";
     }
 
     /// <summary>
@@ -51,7 +50,7 @@ internal sealed class ClientWebHook : TelegramClient
             return false;
         }
 
-        await Client.SetWebhookAsync($"{config.Hosting.Url}/{config.Clients.Telegram.Token}", allowedUpdates: ReceiverOptions.AllowedUpdates);
+        await Client.SetWebhookAsync(url, allowedUpdates: ReceiverOptions.AllowedUpdates);
         State = Status.On;
         return true;
     }
