@@ -6,7 +6,7 @@ namespace Bot.GetByLink.Client.Telegram.WebHook.Model.Configuration;
 /// <summary>
 /// Heroku hosting settings.
 /// </summary>
-public sealed class HostingHeroku : IHostingHeroku
+public sealed class DeployConfiguration : IDeployConfiguration
 {
     /// <summary>
     ///     Gets the url.

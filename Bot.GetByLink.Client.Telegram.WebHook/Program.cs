@@ -3,6 +3,7 @@ using Bot.GetByLink.Client.Telegram.Common.Model.Commands;
 using Bot.GetByLink.Client.Telegram.Common.Model.Logging;
 using Bot.GetByLink.Client.Telegram.Common.Model.Regexs;
 using Bot.GetByLink.Client.Telegram.WebHook;
+using Bot.GetByLink.Client.Telegram.WebHook.Interfaces.Configuration;
 using Bot.GetByLink.Client.Telegram.WebHook.Model.Configuration;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
@@ -10,10 +11,8 @@ using Bot.GetByLink.Common.Interfaces.Configuration;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Reddit;
 using Bot.GetByLink.Proxy.Vk;
-using Microsoft.AspNetCore.Mvc;
 using System.Reflection;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,18 +20,20 @@ ConfigureServices(builder);
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
-
 var client = app.Services.GetService<ClientWebHook>()!;
 
-var configuration = app.Services.GetService<IBotConfiguration>()!;
+var configuration = app.Services.GetService<IBotWebHookConfiguration>()!;
 
-app.MapPost($"/{configuration.Clients.Telegram.Token}", async ([FromBody] Update update) => await client.HandleUpdateAsync(update));
+app.MapGet($"bot{configuration.Clients.Telegram.Token}", () => "MapGet");
 
-app.Urls.Add("https://*:443");
-app.Urls.Add("https://*:80");
-app.Urls.Add("https://*:88");
-app.Urls.Add("https://*:8443");
+app.MapPost($"bot{configuration.Clients.Telegram.Token}", (object data) =>
+{
+    app.Logger.LogInformation(data.ToString());
+
+    //await client.HandleUpdateAsync(update);
+});
+
+if (!app.Environment.IsDevelopment()) app.Urls.Add("http://*:" + configuration.Server.Port);
 
 app.Run();
 
@@ -44,6 +45,7 @@ static void ConfigureServices(WebApplicationBuilder builder)
     var client = GetTelegramClient(configuration);
 
     builder.Services.AddSingleton(client);
+    builder.Services.AddSingleton((IBotConfiguration)configuration);
     builder.Services.AddSingleton(configuration);
 
     builder.Services.AddTransient<ICommand<CommandName>, SendMessageCommand>();
@@ -55,9 +57,9 @@ static void ConfigureServices(WebApplicationBuilder builder)
     AddRegexWrapper(builder.Services);
 }
 
-static IBotConfiguration GetConfiguration(ConfigurationManager configuration)
+static IBotWebHookConfiguration GetConfiguration(ConfigurationManager configuration)
 {
-    var botConfiguration = new BotConfiguration();
+    var botConfiguration = new BotWebHookConfiguration();
     var sharedConfiguration = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json", true, true)
         .AddEnvironmentVariables().Build();
@@ -66,23 +68,12 @@ static IBotConfiguration GetConfiguration(ConfigurationManager configuration)
     var projectName = Assembly.GetExecutingAssembly().GetName().Name;
     configuration["ProjectName"] = projectName;
 
+    // get server url and port
+    configuration["Server:Url"] = sharedConfiguration["URL"];
+    configuration["Server:Port"] = sharedConfiguration["PORT"];
+
     configuration.AddConfiguration(sharedConfiguration);
-
-    var hostingHeroku = new HostingHeroku
-    {
-        Url = sharedConfiguration["HOST"] ?? string.Empty,
-        Port = sharedConfiguration["PORT"] ?? string.Empty,
-    };
-
     configuration.Bind(botConfiguration);
-
-    botConfiguration = new BotConfiguration
-    {
-        ProjectName = botConfiguration.ProjectName,
-        Clients = botConfiguration.Clients,
-        Proxy = botConfiguration.Proxy,
-        Hosting = hostingHeroku,
-    };
 
     return botConfiguration;
 }

@@ -1,4 +1,6 @@
 ﻿using Bot.GetByLink.Client.Telegram.WebHook.Interfaces.Configuration;
+using Bot.GetByLink.Common.Infrastructure.Configuration;
+using System.Text.Json.Serialization;
 
 namespace Bot.GetByLink.Client.Telegram.WebHook.Model.Configuration;
 
@@ -6,10 +8,11 @@ namespace Bot.GetByLink.Client.Telegram.WebHook.Model.Configuration;
 ///     Bot сonfiguration class.
 ///     Hosting: Heroku.
 /// </summary>
-public class BotConfiguration : GetByLink.Common.Infrastructure.Configuration.BotConfiguration, IBotConfiguration
+public sealed class BotWebHookConfiguration : BotConfiguration, IBotWebHookConfiguration
 {
     /// <summary>
     ///    Gets hosting settings.
     /// </summary>
-    public IHostingHeroku Hosting { get; init; } = new HostingHeroku();
+    [JsonPropertyName("Server")]
+    public IDeployConfiguration Server { get; init; } = new DeployConfiguration();
 }
