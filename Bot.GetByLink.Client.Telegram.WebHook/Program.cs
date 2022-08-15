@@ -11,8 +11,10 @@ using Bot.GetByLink.Common.Interfaces.Configuration;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Reddit;
 using Bot.GetByLink.Proxy.Vk;
+using Newtonsoft.Json;
 using System.Reflection;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,13 +26,16 @@ var client = app.Services.GetService<ClientWebHook>()!;
 
 var configuration = app.Services.GetService<IBotWebHookConfiguration>()!;
 
-app.MapGet($"bot{configuration.Clients.Telegram.Token}", () => "MapGet");
-
-app.MapPost($"bot{configuration.Clients.Telegram.Token}", (object data) =>
+app.MapPost($"bot{configuration.Clients.Telegram.Token}", async (object? data) =>
 {
-    app.Logger.LogInformation(data.ToString());
+    var update = JsonConvert.DeserializeObject<Update>(data?.ToString() ?? string.Empty);
+    if (update is null)
+    {
+        app.Logger.LogWarning(string.Format("Unknown message: {0}", data?.ToString() ?? "-"));
+        return;
+    }
 
-    //await client.HandleUpdateAsync(update);
+    await client.HandleUpdateAsync(update);
 });
 
 if (!app.Environment.IsDevelopment()) app.Urls.Add("http://*:" + configuration.Server.Port);
