@@ -28,14 +28,21 @@ var configuration = app.Services.GetService<IBotWebHookConfiguration>()!;
 
 app.MapPost($"bot{configuration.Clients.Telegram.Token}", async (object? data) =>
 {
-    var update = JsonConvert.DeserializeObject<Update>(data?.ToString() ?? string.Empty);
-    if (update is null)
+    try
     {
-        app.Logger.LogWarning(string.Format("Unknown message: {0}", data?.ToString() ?? "-"));
-        return;
-    }
+        var update = JsonConvert.DeserializeObject<Update>(data?.ToString() ?? string.Empty);
+        if (update is null)
+        {
+            app.Logger.LogWarning(string.Format("Unknown message: {0}", data?.ToString() ?? "-"));
+            return;
+        }
 
-    await client.HandleUpdateAsync(update);
+        await client.HandleUpdateAsync(update);
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex.ToString());
+    }
 });
 
 if (!app.Environment.IsDevelopment()) app.Urls.Add("http://*:" + configuration.Server.Port);
