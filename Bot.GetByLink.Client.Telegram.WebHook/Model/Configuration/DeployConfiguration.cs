@@ -1,10 +1,10 @@
-﻿using Bot.GetByLink.Client.Telegram.WebHook.Interfaces.Configuration;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using Bot.GetByLink.Client.Telegram.WebHook.Interfaces.Configuration;
 
 namespace Bot.GetByLink.Client.Telegram.WebHook.Model.Configuration;
 
 /// <summary>
-/// Heroku hosting settings.
+///     Heroku hosting settings.
 /// </summary>
 public sealed class DeployConfiguration : IDeployConfiguration
 {

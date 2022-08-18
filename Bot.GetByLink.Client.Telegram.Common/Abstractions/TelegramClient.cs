@@ -1,11 +1,11 @@
-﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Model.Regexs;
 using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -18,36 +18,6 @@ namespace Bot.GetByLink.Client.Telegram.Common.Abstractions;
 /// </summary>
 public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDisposable
 {
-    /// <summary>
-    /// Gets logging service.
-    /// </summary>
-    protected ILogger Logger { get; }
-
-    /// <summary>
-    /// Gets the Telegram client.
-    /// </summary>
-    protected ITelegramBotClient Client { get; }
-
-    /// <summary>
-    /// Gets the Command Executor.
-    /// </summary>
-    protected ICommandInvoker<CommandName> CommandInvoker { get; }
-
-    /// <summary>
-    /// Gets the Project Name.
-    /// </summary>
-    protected string ProjectName { get; }
-
-    /// <summary>
-    /// Gets the Receiver Options.
-    /// </summary>
-    protected ReceiverOptions ReceiverOptions { get; }
-
-    /// <summary>
-    /// Gets the Regex Wrappers.
-    /// </summary>
-    protected IEnumerable<IRegexWrapper> RegexWrappers { get; }
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="TelegramClient" /> class.
     /// </summary>
@@ -79,7 +49,46 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
     }
 
     /// <summary>
-    /// Processing messages from the client.
+    ///     Gets logging service.
+    /// </summary>
+    protected ILogger Logger { get; }
+
+    /// <summary>
+    ///     Gets the Telegram client.
+    /// </summary>
+    protected ITelegramBotClient Client { get; }
+
+    /// <summary>
+    ///     Gets the Command Executor.
+    /// </summary>
+    protected ICommandInvoker<CommandName> CommandInvoker { get; }
+
+    /// <summary>
+    ///     Gets the Project Name.
+    /// </summary>
+    protected string ProjectName { get; }
+
+    /// <summary>
+    ///     Gets the Receiver Options.
+    /// </summary>
+    protected ReceiverOptions ReceiverOptions { get; }
+
+    /// <summary>
+    ///     Gets the Regex Wrappers.
+    /// </summary>
+    protected IEnumerable<IRegexWrapper> RegexWrappers { get; }
+
+    /// <summary>
+    ///     Token Cancellation.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    ///     Processing messages from the client.
     /// </summary>
     /// <param name="update">This object represents an incoming update.</param>
     /// <returns>Empty Task.</returns>
@@ -102,15 +111,6 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
     }
 
     /// <summary>
-    ///     Token Cancellation.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
     ///     Client stop.
     /// </summary>
     /// <returns>Execution result.</returns>
@@ -122,14 +122,13 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
     }
 
     /// <summary>
-    /// Returns the text name of the command in the enum key.
+    ///     Returns the text name of the command in the enum key.
     /// </summary>
     /// <param name="input">Text command.</param>
     /// <returns>Enum key or null.</returns>
     protected CommandName? GetCommandNameByString(string input)
     {
         foreach (var regex in RegexWrappers)
-        {
             switch (regex)
             {
                 case UrlRegexWrapper urlRegex:
@@ -142,13 +141,12 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
                     if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return null;
                     return Enum.Parse<CommandName>(commandNameText, true);
             }
-        }
 
         return null;
     }
 
     /// <summary>
-    /// Releases all resources used by the current instance TelegramClient.
+    ///     Releases all resources used by the current instance TelegramClient.
     /// </summary>
     /// <param name="disposing">Whether to free resources.</param>
     protected virtual void Dispose(bool disposing)

@@ -1,7 +1,7 @@
 ﻿namespace Bot.GetByLink.Client.Telegram.WebHook.Interfaces.Configuration;
 
 /// <summary>
-/// Deployment settings.
+///     Deployment settings.
 /// </summary>
 public interface IDeployConfiguration
 {

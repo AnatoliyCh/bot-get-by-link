@@ -1,4 +1,7 @@
-﻿using Bot.GetByLink.Common.Abstractions.Proxy;
+﻿using System.Net.Http.Headers;
+using System.Text;
+using System.Text.RegularExpressions;
+using Bot.GetByLink.Common.Abstractions.Proxy;
 using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Infrastructure.Proxy;
 using Bot.GetByLink.Common.Infrastructure.Regexs;
@@ -10,9 +13,6 @@ using Bot.GetByLink.Proxy.Reddit.Regexs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Reddit;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Bot.GetByLink.Proxy.Reddit;
 

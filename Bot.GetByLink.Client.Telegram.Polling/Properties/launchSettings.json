@@ -1,10 +1,10 @@
 {
-  "profiles": {
-    "Bot.GetByLink.Client.Telegram.Polling": {
-      "commandName": "Project",
-        "environmentVariables": {
-            "ASPNETCORE_ENVIRONMENT": "Development"
+    "profiles": {
+        "Bot.GetByLink.Client.Telegram.Polling": {
+            "commandName": "Project",
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
         }
     }
-  }
 }

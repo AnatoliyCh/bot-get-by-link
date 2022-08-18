@@ -19,7 +19,7 @@ internal sealed class ClientPolling : TelegramClient
     private CancellationTokenSource? cts;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ClientPolling"/> class.
+    ///     Initializes a new instance of the <see cref="ClientPolling" /> class.
     /// </summary>
     /// <param name="logger">Interface for logging.</param>
     /// <param name="config">Bot configuration.</param>
@@ -62,7 +62,7 @@ internal sealed class ClientPolling : TelegramClient
     }
 
     /// <summary>
-    /// Releases all resources used by the current instance TelegramClient.
+    ///     Releases all resources used by the current instance TelegramClient.
     /// </summary>
     /// <param name="disposing">Whether to free resources.</param>
     protected override void Dispose(bool disposing)

@@ -15,8 +15,9 @@ namespace Bot.GetByLink.Client.Telegram.WebHook;
 internal sealed class ClientWebHook : TelegramClient
 {
     private readonly string url;
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="ClientWebHook"/> class.
+    ///     Initializes a new instance of the <see cref="ClientWebHook" /> class.
     /// </summary>
     /// <param name="logger">Interface for logging.</param>
     /// <param name="config">Bot configuration.</param>

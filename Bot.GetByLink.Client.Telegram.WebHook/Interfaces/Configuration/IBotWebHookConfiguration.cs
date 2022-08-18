@@ -8,7 +8,7 @@ namespace Bot.GetByLink.Client.Telegram.WebHook.Interfaces.Configuration;
 public interface IBotWebHookConfiguration : IBotConfiguration
 {
     /// <summary>
-    ///    Gets hosting settings.
+    ///     Gets hosting settings.
     /// </summary>
     public IDeployConfiguration Server { get; init; }
 }

@@ -90,11 +90,10 @@ public sealed class WellApi
 
         // TODO: сделать обработку видео?
         var capacity = post.Attachments.Count;
-        MediaInfo[] urlPicture = new MediaInfo[capacity];
-        Task[] tasks = new Task[capacity];
+        var urlPicture = new MediaInfo[capacity];
+        var tasks = new Task[capacity];
 
         for (var i = 0; i < capacity; i++)
-        {
             if (post.Attachments[i].Instance is Photo photo)
             {
                 var position = i; // i is needed to arrange the artifacts in order.
@@ -109,7 +108,6 @@ public sealed class WellApi
             {
                 tasks[i] = Task.CompletedTask;
             }
-        }
 
         if (tasks.Length > 0) await Task.WhenAll(tasks);
 

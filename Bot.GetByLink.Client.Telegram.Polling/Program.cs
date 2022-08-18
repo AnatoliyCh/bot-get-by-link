@@ -1,4 +1,5 @@
-﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+﻿using System.Reflection;
+using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Model.Commands;
 using Bot.GetByLink.Client.Telegram.Common.Model.Logging;
 using Bot.GetByLink.Client.Telegram.Common.Model.Regexs;
@@ -13,7 +14,6 @@ using Bot.GetByLink.Proxy.Vk;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
 using Telegram.Bot;
 
 var serviceProvider = ConfigureServices();
@@ -98,8 +98,8 @@ static ITelegramBotClient GetTelegramClient(IBotConfiguration configuration)
 
 static void AddLogging(IServiceCollection services, IConfigurationRoot configuration)
 {
-    LogLevel minLevel = LogLevel.Information;
-    string defaultLevel = configuration["Logging:LogLevel:Default"] ?? string.Empty;
+    var minLevel = LogLevel.Information;
+    var defaultLevel = configuration["Logging:LogLevel:Default"] ?? string.Empty;
     if (Enum.IsDefined(typeof(LogLevel), defaultLevel))
         minLevel = Enum.Parse<LogLevel>(defaultLevel, true);
 
