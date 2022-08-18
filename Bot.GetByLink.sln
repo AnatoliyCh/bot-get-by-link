@@ -32,7 +32,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Abstra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Enums", "Bot.GetByLink.Common.Enums\Bot.GetByLink.Common.Enums.csproj", "{AB3C5212-57CA-41F1-8F25-A6EF7FEFC0F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot.GetByLink.Client.Telegram.WebHook", "Bot.GetByLink.Client.Telegram.WebHook\Bot.GetByLink.Client.Telegram.WebHook.csproj", "{F752B274-1C04-4BCE-AFEC-BABA8A82AD0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Client.Telegram.WebHook", "Bot.GetByLink.Client.Telegram.WebHook\Bot.GetByLink.Client.Telegram.WebHook.csproj", "{F752B274-1C04-4BCE-AFEC-BABA8A82AD0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
