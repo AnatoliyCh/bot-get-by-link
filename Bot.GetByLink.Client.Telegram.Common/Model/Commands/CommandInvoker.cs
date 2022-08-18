@@ -1,5 +1,4 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
-using Bot.GetByLink.Client.Telegram.Common.Model;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Configuration;
@@ -7,12 +6,12 @@ using Bot.GetByLink.Common.Interfaces.Proxy;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 
-namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
+namespace Bot.GetByLink.Client.Telegram.Common.Model.Commands;
 
 /// <summary>
 ///     Executes the specified command.
 /// </summary>
-internal sealed class CommandInvoker : ICommandInvoker<CommandName>
+public sealed class CommandInvoker : ICommandInvoker<CommandName>
 {
     private readonly IDictionary<CommandName, ICommand<CommandName>> commands;
     private readonly ILogger logger;

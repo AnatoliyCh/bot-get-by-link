@@ -6,7 +6,7 @@ namespace Bot.GetByLink.Common.Infrastructure.Configuration;
 /// <summary>
 ///     Bot сonfiguration class.
 /// </summary>
-public sealed class BotConfiguration : IBotConfiguration
+public class BotConfiguration : IBotConfiguration
 {
     /// <summary>
     ///     Gets name of the project being launched.

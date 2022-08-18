@@ -1,7 +1,7 @@
 ﻿using Bot.GetByLink.Common.Abstractions.Proxy;
 using Bot.GetByLink.Common.Interfaces.Configuration;
 using Bot.GetByLink.Common.Interfaces.Proxy;
-using Bot.GetByLink.Proxy.Vk.Regex;
+using Bot.GetByLink.Proxy.Vk.Regexs;
 using Microsoft.Extensions.Logging;
 using VkNet;
 using VkNet.Model;

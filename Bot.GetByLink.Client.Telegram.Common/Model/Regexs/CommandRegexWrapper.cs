@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Bot.GetByLink.Common.Abstractions;
 
-namespace Bot.GetByLink.Client.Telegram.Common.Model;
+namespace Bot.GetByLink.Client.Telegram.Common.Model.Regexs;
 
 /// <summary>
 ///     Regular expression for Command.

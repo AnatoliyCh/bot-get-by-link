@@ -1,6 +1,6 @@
 ﻿using Bot.GetByLink.Common.Abstractions;
 
-namespace Bot.GetByLink.Common.Infrastructure.Regex;
+namespace Bot.GetByLink.Common.Infrastructure.Regexs;
 
 /// <summary>
 ///     Regular expression for picture.
