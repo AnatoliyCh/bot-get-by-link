@@ -12,7 +12,6 @@ using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Reddit;
 using Bot.GetByLink.Proxy.Vk;
 using Newtonsoft.Json;
-using System.Reflection;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -53,9 +52,8 @@ await client.StartAsync();
 
 static void ConfigureServices(WebApplicationBuilder builder)
 {
-    var configuration = GetConfiguration(builder.Configuration);
+    var configuration = GetConfiguration(builder);
     var client = GetTelegramClient(configuration);
-
     builder.Services.AddSingleton(client);
     builder.Services.AddSingleton((IBotConfiguration)configuration);
     builder.Services.AddSingleton(configuration);
@@ -69,23 +67,23 @@ static void ConfigureServices(WebApplicationBuilder builder)
     AddRegexWrapper(builder.Services);
 }
 
-static IBotWebHookConfiguration GetConfiguration(ConfigurationManager configuration)
+static IBotWebHookConfiguration GetConfiguration(WebApplicationBuilder builder)
 {
     var botConfiguration = new BotWebHookConfiguration();
     var sharedConfiguration = new ConfigurationBuilder()
-        .AddJsonFile("appsettings.json", true, true)
+        .AddJsonFile("appsettings.json", false, true)
+        .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
         .AddEnvironmentVariables().Build();
 
     // get project name
-    var projectName = Assembly.GetExecutingAssembly().GetName().Name;
-    configuration["ProjectName"] = projectName;
+    builder.Configuration["ProjectName"] = builder.Environment.ApplicationName;
 
     // get server url and port
-    configuration["Server:Url"] = sharedConfiguration["URL"];
-    configuration["Server:Port"] = sharedConfiguration["PORT"];
+    builder.Configuration["Server:Url"] = sharedConfiguration["URL"];
+    builder.Configuration["Server:Port"] = sharedConfiguration["PORT"];
 
-    configuration.AddConfiguration(sharedConfiguration);
-    configuration.Bind(botConfiguration);
+    builder.Configuration.AddConfiguration(sharedConfiguration);
+    builder.Configuration.Bind(botConfiguration);
 
     return botConfiguration;
 }
