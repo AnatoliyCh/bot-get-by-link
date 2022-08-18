@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Bot.GetByLink.Common.Infrastructure\Bot.GetByLink.Common.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

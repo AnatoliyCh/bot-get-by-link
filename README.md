@@ -1,15 +1,13 @@
-Starting point for bot development
+## English
 
-# Getting Started
+The bot returns the content in a "clean" form at the specified link to the post.
 
-1. Download this Repository;
-2. Use `dotnet tool restore` in CLI;
-3. Rebuild Solution;
+-   [Readme](https://github.com/AnatoliyCh/bot-get-by-link/blob/dev/Documentation/README.en.md);
+-   [Naming Convention](https://github.com/AnatoliyCh/bot-get-by-link/blob/dev/Documentation/NamingConvention/README.en.md).
 
-Use [ReSharper command line tools][1] for inspect and cleanup code:
+## Русский
 
-```PowerShell
-dotnet jb inspectcode|cleanupcode Bot.GetByLink.sln
-```
+Бот возвращает контент в «чистом» виде по указанной ссылке на пост.
 
-[1]: https://www.jetbrains.com/help/resharper/ReSharper_Command_Line_Tools.html#run-resharper-command-line-tools
+-   [Описание](https://github.com/AnatoliyCh/bot-get-by-link/blob/dev/Documentation/README.ru.md);
+-   [Соглашения об именах](https://github.com/AnatoliyCh/bot-get-by-link/blob/dev/Documentation/NamingConvention/README.ru.md).
