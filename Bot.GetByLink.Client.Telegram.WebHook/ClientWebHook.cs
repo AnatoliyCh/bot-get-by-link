@@ -12,7 +12,7 @@ namespace Bot.GetByLink.Client.Telegram.WebHook;
 ///     Telegram client.
 ///     Connection Type: WebHook.
 /// </summary>
-internal sealed class ClientWebHook : TelegramClient
+public sealed class ClientWebHook : TelegramClient
 {
     private readonly string url;
 
