@@ -2,22 +2,32 @@ name: dotnet-build
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "dev", "master" ]
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "dev", "master" ]
 
-jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+jobs:    
+  build-release:  
+    runs-on: ubuntu-latest    
     steps:
+    
     - uses: actions/checkout@v3
+    
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 6.0.x      
+    
     - name: Restore dependencies
       run: dotnet restore
+    
+    - name: Setup ReSharper command line tools
+      uses: goit/setup-resharper@v2
+      with:
+        version: '2021.2'
+    
+    - name: InspectCode
+      run: InspectCode Bot.GetByLink.sln
+    
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --configuration Release --no-restore
