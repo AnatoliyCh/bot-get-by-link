@@ -22,6 +22,8 @@ jobs:
 
             - name: Setup ReSharper Command Line Tools
               uses: goit/setup-resharper@v2.0.1
+              with:
+                  version: "2021.2"
 
             - name: InspectCode
               run: InspectCode Bot.GetByLink.sln
