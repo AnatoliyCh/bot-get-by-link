@@ -24,10 +24,11 @@ jobs:
               uses: goit/setup-resharper@v2.0.1
               with:
                   version: "2021.2"
-              run: dotnet tool restore
 
             - name: InspectCode
-              run: dotnet jb inspectcode Bot.GetByLink.sln
+              run: |
+                  dotnet tool restore
+                  dotnet jb inspectcode Bot.GetByLink.sln
 
             - name: Build
               run: dotnet build --configuration Release --no-restore
