@@ -11,16 +11,16 @@ public interface ICommandInvoker<in TCommandName>
     /// </summary>
     /// <param name="command">Given command.</param>
     /// <param name="ctx">Context command.</param>
-    /// <returns>Empty Task.</returns>
-    public Task TryExecuteCommandAsync(ICommand<TCommandName>? command, object? ctx);
+    /// <returns>IsSuccessfully.</returns>
+    public Task<bool> TryExecuteCommandAsync(ICommand<TCommandName>? command, object? ctx);
 
     /// <summary>
     ///     Calls the given command.
     /// </summary>
     /// <param name="commandName">Command name.</param>
     /// <param name="ctx">Context command.</param>
-    /// <returns>Empty Task.</returns>
-    public Task TryExecuteCommandAsync(TCommandName commandName, object? ctx);
+    /// <returns>IsSuccessfully.</returns>
+    public Task<bool> TryExecuteCommandAsync(TCommandName commandName, object? ctx);
 
     /// <summary>
     ///     Returns a command of the given type.
