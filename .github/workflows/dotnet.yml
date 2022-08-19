@@ -26,9 +26,7 @@ jobs:
                   version: "2021.2"
 
             - name: InspectCode
-              run: |
-                  dotnet tool restore
-                  dotnet jb inspectcode Bot.GetByLink.sln
+              run: dotnet inspectcode Bot.GetByLink.sln
 
             - name: Build
               run: dotnet build --configuration Release --no-restore
