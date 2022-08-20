@@ -5,6 +5,10 @@ namespace Bot.GetByLink.Common.Infrastructure.Regexs;
 /// <summary>
 ///     Regular expression for gif.
 /// </summary>
+/// *.gif
+/// *.GIF
+/// *.gifv
+/// *.GIFv
 public class GifRegexWrapper : RegexWrapper
 {
     /// <summary>
