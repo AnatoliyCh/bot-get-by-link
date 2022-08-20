@@ -133,8 +133,8 @@
 -   **Простые элементы** иногда лучше оборачивать в класс-обертку. Как пример, вместо `string` использовать `Enum`, так получается более типизировано и проще в поддержке.
 
 [1]: https://docs.microsoft.com/ru-ru/dotnet/standard/design-guidelines/naming-guidelines
-[2]: https://github.com/AnatoliyCh/bot-get-by-link/blob/change-documentation/Documentation/NamingConvention/README.ru.md#папки-и-директории
-[3]: https://github.com/AnatoliyCh/bot-get-by-link/blob/change-documentation/Documentation/NamingConvention/README.ru.md#элементы-языка
-[4]: https://github.com/AnatoliyCh/bot-get-by-link/blob/change-documentation/Documentation/NamingConvention/README.ru.md#советы-по-коду
+[2]: https://github.com/AnatoliyCh/bot-get-by-link/blob/dev/docs/NamingConvention/README.ru.md#папки-и-директории
+[3]: https://github.com/AnatoliyCh/bot-get-by-link/blob/dev/docs/NamingConvention/README.ru.md#элементы-языка
+[4]: https://github.com/AnatoliyCh/bot-get-by-link/blob/dev/docs/NamingConvention/README.ru.md#советы-по-коду
 
 [← Назад](https://github.com/AnatoliyCh/bot-get-by-link)
