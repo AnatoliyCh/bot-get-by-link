@@ -47,6 +47,6 @@ public sealed class TelegramConfiguration : ITelegramConfiguration
     /// <summary>
     ///     Gets max text lenght for message.
     /// </summary>
-    [JsonPropertyName("MaxColMediaImMessage")]
-    public int MaxColMediaImMessage { get; init; } = 0;
+    [JsonPropertyName("MaxColMediaInMessage")]
+    public int MaxColMediaInMessage { get; init; } = 0;
 }

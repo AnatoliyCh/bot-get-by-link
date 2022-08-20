@@ -1,10 +1,7 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
-using Bot.GetByLink.Common.Enums;
-using Bot.GetByLink.Common.Infrastructure.Model;
 using Bot.GetByLink.Common.Infrastructure.Proxy;
 using Bot.GetByLink.Common.Interfaces.Configuration.Clients;
 using Bot.GetByLink.Common.Interfaces.Proxy;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model;
@@ -15,24 +12,26 @@ namespace Bot.GetByLink.Client.Telegram.Common.Model;
 public sealed class BuilderMessage : IBuilderMessage
 {
     /// <summary>
-    ///     Content for which the message is built.
-    /// </summary>
-    private IProxyContent proxyContent;
-
-    /// <summary>
     ///     Initializes a new instance of the <see cref="BuilderMessage" /> class.
     /// </summary>
     /// <param name="configuration">Config for builder messages.</param>
     public BuilderMessage(ITelegramConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
-        MaxSizeMbPhoto = configuration.MaxSizeMbPhoto;
-        MaxSizeMbVideo = configuration.MaxSizeMbVideo;
-        MaxTextLenghtFirstMedia = configuration.MaxTextLenghtFirstMedia;
-        MaxTextLenghtMessage = configuration.MaxTextLenghtMessage;
-        MaxColMediaInMessage = configuration.MaxColMediaImMessage;
+        Configuration = configuration;
+        FormatterContent = new ProxyResponseFormatter();
         SetDefaultParametersBuilder();
     }
+
+    /// <summary>
+    ///     Gets or sets content for which the message is built.
+    /// </summary>
+    private IProxyContent ProxyContent { get; set; }
+
+    /// <summary>
+    ///     Gets object for formating content for messages telegram.
+    /// </summary>
+    private IFormatterContent FormatterContent { get; }
 
     /// <summary>
     ///     Gets or sets url where the content get from.
@@ -50,29 +49,9 @@ public sealed class BuilderMessage : IBuilderMessage
     private ParseMode ParseMode { get; set; }
 
     /// <summary>
-    ///     Gets max size in mb photo for telegram bot.
+    ///     Gets parse mode for right parsing content.
     /// </summary>
-    private double MaxSizeMbPhoto { get; }
-
-    /// <summary>
-    ///     Gets max size in mb vide telegram bot.
-    /// </summary>
-    private double MaxSizeMbVideo { get; }
-
-    /// <summary>
-    ///     Gets max text length first media.
-    /// </summary>
-    private int MaxTextLenghtFirstMedia { get; }
-
-    /// <summary>
-    ///     Gets max text length in message.
-    /// </summary>
-    private int MaxTextLenghtMessage { get; }
-
-    /// <summary>
-    ///     Gets max col media in message.
-    /// </summary>
-    private int MaxColMediaInMessage { get; }
+    private ITelegramConfiguration Configuration { get; }
 
     /// <summary>
     ///     Gets or sets a value indicating whether header in text message.
@@ -86,7 +65,7 @@ public sealed class BuilderMessage : IBuilderMessage
     /// <returns>This builder.</returns>
     public IBuilderMessage From(IProxyContent proxyContent)
     {
-        this.proxyContent = proxyContent;
+        ProxyContent = proxyContent;
         return this;
     }
 
@@ -139,7 +118,7 @@ public sealed class BuilderMessage : IBuilderMessage
     /// <returns>Ready messages.</returns>
     public IMessageContext Build()
     {
-        var (messages, artifacts) = GetFormattedContent();
+        var (messages, artifacts) = FormatterContent.GetListMessages(ProxyContent, SetHeader, Url, Configuration);
         var message = new Message(ChatId, messages, artifacts, ParseMode);
         SetDefaultParametersBuilder();
         return message;
@@ -154,106 +133,6 @@ public sealed class BuilderMessage : IBuilderMessage
         ChatId = -1;
         ParseMode = ParseMode.MarkdownV2;
         SetHeader = false;
-        proxyContent = new ProxyResponseContent(string.Empty);
-    }
-
-    /// <summary>
-    ///     Function for set content.
-    /// </summary>
-    /// <returns>Formatted content.</returns>
-    private (IEnumerable<string> Messages, IEnumerable<IEnumerable<IAlbumInputMedia>> Artifacts) GetFormattedContent()
-    {
-        var (textUrl, urlPictures, urlVideo) =
-            GetTextUrlAndValidUrl(proxyContent.UrlPicture, proxyContent.UrlVideo);
-        var textContent = $"{Url}\n{textUrl}\n{(SetHeader ? proxyContent.Header : string.Empty)}\n{proxyContent.Text}";
-        var listTextMessages = GetListTextMessages(textContent, urlPictures.Count() + urlVideo.Count());
-        var listInputMedia = GetListInputMedia(urlPictures.Concat(urlVideo), listTextMessages);
-        return (listTextMessages.Skip(urlPictures.Count() + urlVideo.Count()), listInputMedia);
-    }
-
-    /// <summary>
-    ///     Get list input media for messages.
-    /// </summary>
-    /// <param name="listMedia">List media.</param>
-    /// <param name="textMessages">Text for media.</param>
-    /// <returns>List input media for messages.</returns>
-    private IEnumerable<IEnumerable<IAlbumInputMedia>> GetListInputMedia(IEnumerable<IMediaInfo> listMedia,
-        IEnumerable<string> textMessages)
-    {
-        var listFormatedMedias = listMedia.Select<IMediaInfo, InputMediaBase>((media, index) =>
-        {
-            return media.Type == MediaType.Photo ? new InputMediaPhoto(media.Url) : new InputMediaVideo(media.Url);
-        });
-
-        var groupListFormatedMedias = listFormatedMedias.Split(MaxColMediaInMessage).Select(x => x.ToList()).ToList();
-
-        for (var i = 0; i < groupListFormatedMedias.Count; i++)
-        {
-            var itemMedias = groupListFormatedMedias[i];
-            var firstItemMedia = itemMedias[0];
-            if (firstItemMedia != null) firstItemMedia.Caption = textMessages.Skip(i).Take(1).FirstOrDefault();
-        }
-
-        return groupListFormatedMedias.Select(x => x.Select(y => y as IAlbumInputMedia));
-    }
-
-    /// <summary>
-    ///     Get list text for messages.
-    /// </summary>
-    /// <param name="allText">Text in content.</param>
-    /// <param name="countMediaMessage">Count media in content.</param>
-    /// <returns>List text for messages.</returns>
-    private IEnumerable<string> GetListTextMessages(string allText, int countMediaMessage)
-    {
-        if ((countMediaMessage == 0 && allText.Length < MaxTextLenghtMessage) ||
-            (countMediaMessage > 0 && allText.Length < MaxTextLenghtFirstMedia)) return new List<string> { allText };
-        var finderTextMessage = allText;
-        var messageText = new List<string>();
-        while (finderTextMessage.Length > 0)
-        {
-            var maxSizeMessage = messageText.Count < countMediaMessage ? MaxTextLenghtFirstMedia : MaxTextLenghtMessage;
-            var sizeCurrentMessage =
-                finderTextMessage.Length > maxSizeMessage ? maxSizeMessage : finderTextMessage.Length;
-            var textMessage = finderTextMessage[..sizeCurrentMessage];
-            var intedDot = textMessage.LastIndexOf(". ");
-            var intedParagraphEndSentecis = textMessage.LastIndexOf(".\n");
-            var intedParagraph = intedParagraphEndSentecis == -1
-                ? textMessage.LastIndexOf("\n")
-                : intedParagraphEndSentecis;
-            var intedCut = (intedParagraph == -1 ? intedDot : intedParagraph) + 1;
-            if (maxSizeMessage > finderTextMessage.Length) intedCut = finderTextMessage.Length;
-            messageText.Add(finderTextMessage[..intedCut]);
-            finderTextMessage = finderTextMessage[intedCut..];
-        }
-
-        return messageText;
-    }
-
-    /// <summary>
-    ///     Function get text url that much max size (5mb pic and 20 video) and valid url.
-    /// </summary>
-    /// <param name="mediaPicture">Array media info pictures.</param>
-    /// <param name="mediaVideo">Array media info viedos.</param>
-    /// <returns>Text with url and array valid url.</returns>
-    private (string MutableUrlText, IEnumerable<IMediaInfo> MutableUrlPicture, IEnumerable<IMediaInfo> MutableUrlVideo)
-        GetTextUrlAndValidUrl(IEnumerable<IMediaInfo>? mediaPicture, IEnumerable<IMediaInfo>? mediaVideo)
-    {
-        var urlText = string.Empty;
-        var mutableUrlPicture = new List<IMediaInfo>();
-        var mutableUrlVideo = new List<IMediaInfo>();
-
-        if (mediaPicture?.Any() ?? false)
-            foreach (var inputMediaPhoto in mediaPicture)
-                if (inputMediaPhoto.Size < 0 || inputMediaPhoto.Size > MaxSizeMbPhoto)
-                    urlText = $"{inputMediaPhoto.Url}\n{urlText}";
-                else mutableUrlPicture.Add(inputMediaPhoto);
-
-        if (mediaVideo?.Any() ?? false)
-            foreach (var inputMediaVideo in mediaVideo)
-                if (inputMediaVideo.Size < 0 || inputMediaVideo.Size > MaxSizeMbVideo)
-                    urlText = $"{inputMediaVideo.Url}\n{urlText}";
-                else mutableUrlVideo.Add(inputMediaVideo);
-
-        return (urlText, mutableUrlPicture, mutableUrlVideo);
+        ProxyContent = new ProxyResponseContent(string.Empty);
     }
 }
