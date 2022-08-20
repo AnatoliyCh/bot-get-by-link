@@ -30,6 +30,13 @@ Navigation:
 For all **objects** of the language _(class, structure, record, interface and etc.)_ **necessary EXPLICITLY specify the access modifier** for fields, methods/function, properties and etc.  
 All `public` elements (fields, methods/function, properties and etc.) mast be declared: `/// <summary> Comment </summary>`.
 
+General sorting of elements:
+
+1. fields;
+2. constructor (any access modifier);
+3. properties;
+4. methods;
+
 #### Language objects
 
 Generic template parameter names are of the form `T` or `TPascalCase`: `public abstract class AsyncCommand<TName>`, `public interface IMessageContext<TChatId, TText, TArtifact>`.  
@@ -51,15 +58,18 @@ To resolve a `null-value` use `?`: `private CancellationTokenSource? cts;`.
 
 Tuple unfolding: `var (first, second) = PascalCase()`;
 
-| Object                                 | Recommendation                        | Example                              |
-| -------------------------------------- | ------------------------------------- | ------------------------------------ |
-| Field `private`                        | private Type camelCase                | private CancellationTokenSource? cts |
-| Field `private readonly`               | private readonly Type camelCase       | private readonly ILogger logger      |
-| Field `public`                         | public Type PascalCase                | public ILogger Logger                |
-| Field `protected`                      | protected Type camelCase              | protected ILogger logger             |
-| Propertie `public`                     | public Type PascalCase { get; set; }  | public string Url { get; set; }      |
-| Propertie `public` with initialization | public Type PascalCase { get; init; } | public string Url { get; init; }     |
-| Propertie `public readonly`            | public Type PascalCase { get; }       | public Status State { get; }         |
+| Object                                    | Recommendation                           | Example                              |
+| ----------------------------------------- | ---------------------------------------- | ------------------------------------ |
+| Field `private`                           | private Type camelCase                   | private CancellationTokenSource? cts |
+| Field `private readonly`                  | private readonly Type camelCase          | private readonly ILogger logger      |
+| Field `public`                            | public Type PascalCase                   | public ILogger Logger                |
+| Field `protected`                         | protected Type camelCase                 | protected ILogger logger             |
+| Propertie `public`                        | public Type PascalCase { get; set; }     | public string Url { get; set; }      |
+| Propertie `public` with initialization    | public Type PascalCase { get; init; }    | public string Url { get; init; }     |
+| Propertie `public readonly`               | public Type PascalCase { get; }          | public Status State { get; }         |
+| Propertie `protected`                     | protected Type PascalCase { get; set; }  | protected string Url { get; set; }   |
+| Propertie `protected` with initialization | protected Type PascalCase { get; init; } | protected string Url { get; init; }  |
+| Propertie `protected readonly`            | protected Type PascalCase { get; }       | protected Status State { get; }      |
 
 #### Functions / methods
 

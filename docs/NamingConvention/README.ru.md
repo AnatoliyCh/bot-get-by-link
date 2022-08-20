@@ -30,6 +30,13 @@
 У всех **объектов** языка _(класс, структура, запись, интерфейс и т.д.)_ **необходимо ЯВНО указывать модификатор доступа** у полей, методов/функций, свойств и т.д.  
 Все `public` элементы (поля, методы/функции, свойства и т.д.) должны быть описаны: `/// <summary> Comment </summary>`.
 
+Общая сортировка элементов:
+
+1. поля;
+2. конструктор (любой модификатор доступа) ;
+3. свойства;
+4. методы;
+
 #### Объекты языка
 
 Названия параметров универсальных шаблонов имеют вид `T` или `TPascalCase`: `public abstract class AsyncCommand<TName>`, `public interface IMessageContext<TChatId, TText, TArtifact>`.  
@@ -51,15 +58,18 @@
 
 Раскладывание кортежа: `var (first, second) = PascalCase()`;
 
-| Объект                                       | Рекомендация                          | Пример                               |
-| -------------------------------------------- | ------------------------------------- | ------------------------------------ |
-| Поле `private`                               | private Type camelCase                | private CancellationTokenSource? cts |
-| Поле `private readonly`                      | private readonly Type camelCase       | private readonly ILogger logger      |
-| Поле `public`                                | public Type PascalCase                | public ILogger Logger                |
-| Поле `protected`                             | protected Type camelCase              | protected ILogger logger             |
-| Свойство `public`                            | public Type PascalCase { get; set; }  | public string Url { get; set; }      |
-| Свойство `public` c начальной инициализацией | public Type PascalCase { get; init; } | public string Url { get; init; }     |
-| Свойство `public readonly`                   | public Type PascalCase { get; }       | public Status State { get; }         |
+| Объект                                          | Рекомендация                             | Пример                               |
+| ----------------------------------------------- | ---------------------------------------- | ------------------------------------ |
+| Поле `private`                                  | private Type camelCase                   | private CancellationTokenSource? cts |
+| Поле `private readonly`                         | private readonly Type camelCase          | private readonly ILogger logger      |
+| Поле `public`                                   | public Type PascalCase                   | public ILogger Logger                |
+| Поле `protected`                                | protected Type camelCase                 | protected ILogger logger             |
+| Свойство `public`                               | public Type PascalCase { get; set; }     | public string Url { get; set; }      |
+| Свойство `public` c начальной инициализацией    | public Type PascalCase { get; init; }    | public string Url { get; init; }     |
+| Свойство `public readonly`                      | public Type PascalCase { get; }          | public Status State { get; }         |
+| Свойство `protected`                            | protected Type PascalCase { get; set; }  | protected string Url { get; set; }   |
+| Свойство `protected` c начальной инициализацией | protected Type PascalCase { get; init; } | protected string Url { get; init; }  |
+| Свойство `protected readonly`                   | protected Type PascalCase { get; }       | protected Status State { get; }      |
 
 #### Функции / Методы
 
