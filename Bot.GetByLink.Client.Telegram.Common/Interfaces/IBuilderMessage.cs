@@ -1,37 +1,30 @@
 ﻿using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace Bot.GetByLink.Client.Telegram.Common.Interfaces
+namespace Bot.GetByLink.Client.Telegram.Common.Interfaces;
+
+/// <summary>
+///     The interface of an object that build messages for telegram.
+/// </summary>
+public interface IBuilderMessage : IBuilderMessage<IProxyContent, IBuilderMessage, IMessageContext>
 {
     /// <summary>
-    ///     The interface of an object that build messages for telegram.
+    ///     Set header in builder.
     /// </summary>
-    public interface IBuilderMessage : IBuilderMessage<IProxyContent, IBuilderMessage, IMessageContext>
-    {
-        /// <summary>
-        ///     Set header in builder.
-        /// </summary>
-        /// <returns>This builder.</returns>
-        public IBuilderMessage SetHeaders();
+    /// <returns>This builder.</returns>
+    public IBuilderMessage SetHeaders();
 
-        /// <summary>
-        ///     Add chat id in builder.
-        /// </summary>
-        /// <param name="chatId">Chat id.</param>
-        /// <returns>This builder.</returns>
-        public IBuilderMessage AddChatId(long chatId);
+    /// <summary>
+    ///     Add chat id in builder.
+    /// </summary>
+    /// <param name="chatId">Chat id.</param>
+    /// <returns>This builder.</returns>
+    public IBuilderMessage AddChatId(long chatId);
 
-        /// <summary>
-        ///     Set parse mode id in builder.
-        /// </summary>
-        /// <param name="parseMode">Parse mode.</param>
-        /// <returns>This builder.</returns>
-        public IBuilderMessage SetParseMode(ParseMode parseMode);
-    }
+    /// <summary>
+    ///     Set parse mode id in builder.
+    /// </summary>
+    /// <param name="parseMode">Parse mode.</param>
+    /// <returns>This builder.</returns>
+    public IBuilderMessage SetParseMode(ParseMode parseMode);
 }

@@ -5,7 +5,6 @@ using Bot.GetByLink.Common.Infrastructure.Abstractions;
 using Bot.GetByLink.Common.Infrastructure.Interfaces;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Message = Bot.GetByLink.Client.Telegram.Common.Model.Message;
 
 namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 

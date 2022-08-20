@@ -19,8 +19,8 @@ namespace Bot.GetByLink.Proxy.Reddit;
 public sealed class ProxyReddit : ProxyService
 {
     private readonly string appId;
-    private readonly IRegexWrapper picturesRegex;
     private readonly IRegexWrapper gifRegex;
+    private readonly IRegexWrapper picturesRegex;
     private readonly string secretId;
     private readonly string urlBase = "www.reddit.com";
     private readonly string userAgent = "bot-get-by-link-web";
@@ -70,7 +70,8 @@ public sealed class ProxyReddit : ProxyService
         if (!string.IsNullOrWhiteSpace(crossPostId)) post = redditClient.LinkPost($"{crossPostId}").Info();
         var header = post.Title;
 
-        if (post.Listing.Media == null && !post.Listing.IsVideo && !post.Listing.IsRedditMediaDomain && !gifRegex.IsMatch(post.Listing.URL.ToLower()))
+        if (post.Listing.Media == null && !post.Listing.IsVideo && !post.Listing.IsRedditMediaDomain &&
+            !gifRegex.IsMatch(post.Listing.URL.ToLower()))
             return new ProxyResponseContent(post.Listing.SelfText, header);
 
         long size;

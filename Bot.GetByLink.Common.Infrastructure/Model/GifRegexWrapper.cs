@@ -1,23 +1,17 @@
 ﻿using Bot.GetByLink.Common.Infrastructure.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Bot.GetByLink.Common.Infrastructure.Model
+namespace Bot.GetByLink.Common.Infrastructure.Model;
+
+/// <summary>
+///     Regular expression for gif.
+/// </summary>
+public class GifRegexWrapper : RegexWrapper
 {
     /// <summary>
-    ///     Regular expression for gif.
+    ///     Initializes a new instance of the <see cref="GifRegexWrapper" /> class.
     /// </summary>
-    public class GifRegexWrapper : RegexWrapper
+    public GifRegexWrapper()
+        : base(@".(GIF|gif)v?$")
     {
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="GifRegexWrapper" /> class.
-        /// </summary>
-        public GifRegexWrapper()
-            : base(@".(GIF|gif)v?$")
-        {
-        }
     }
 }
