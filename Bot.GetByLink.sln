@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Client.Telegram.Polling", "Bot.GetByLink.Client.Telegram.Polling\Bot.GetByLink.Client.Telegram.Polling.csproj", "{D5B255DD-D449-4616-8EBB-52B4B401E1A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Client.Telegram.Polling", "src\Bot.GetByLink.Client.Telegram.Polling\Bot.GetByLink.Client.Telegram.Polling.csproj", "{D5B255DD-D449-4616-8EBB-52B4B401E1A8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Proxy.Reddit", "src\Bot.GetByLink.Proxy.Reddit\Bot.GetByLink.Proxy.Reddit.csproj", "{41038BC2-FBA0-4376-BE4B-3903B40244C8}"
 EndProject
@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Infras
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bot.GetByLink.Client.Telegram", "Bot.GetByLink.Client.Telegram", "{72747E0F-72ED-492D-835B-70A0F7B4A481}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Client.Telegram.Common", "Bot.GetByLink.Client.Telegram.Common\Bot.GetByLink.Client.Telegram.Common.csproj", "{DB0F827C-FF26-483D-B610-DA4E7357303E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Client.Telegram.Common", "src\Bot.GetByLink.Client.Telegram.Common\Bot.GetByLink.Client.Telegram.Common.csproj", "{DB0F827C-FF26-483D-B610-DA4E7357303E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bot.GetByLink.Proxy", "Bot.GetByLink.Proxy", "{B54D3DBE-AF8D-4044-912C-7CD74E64B17E}"
 EndProject
@@ -32,7 +32,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Abstra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Enums", "src\Bot.GetByLink.Common.Enums\Bot.GetByLink.Common.Enums.csproj", "{AB3C5212-57CA-41F1-8F25-A6EF7FEFC0F2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Client.Telegram.WebHook", "Bot.GetByLink.Client.Telegram.WebHook\Bot.GetByLink.Client.Telegram.WebHook.csproj", "{F752B274-1C04-4BCE-AFEC-BABA8A82AD0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Client.Telegram.WebHook", "src\Bot.GetByLink.Client.Telegram.WebHook\Bot.GetByLink.Client.Telegram.WebHook.csproj", "{F752B274-1C04-4BCE-AFEC-BABA8A82AD0D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot.GetByLink.Common.Resources", "src\Bot.GetByLink.Common.Resources\Bot.GetByLink.Common.Resources.csproj", "{357E9A94-26FA-4A8C-A78D-686E1EB796FB}"
 EndProject
