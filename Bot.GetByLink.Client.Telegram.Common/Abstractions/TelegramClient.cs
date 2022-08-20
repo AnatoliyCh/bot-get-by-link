@@ -1,4 +1,5 @@
-﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Model.Regexs;
 using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces;
@@ -6,11 +7,11 @@ using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Configuration;
 using Bot.GetByLink.Common.Resources;
 using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Message = Bot.GetByLink.Client.Telegram.Common.Model.Message;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Abstractions;
 
@@ -103,8 +104,8 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
         var text = update.Message.Text;
         var context =
             RegexWrappers
-            .FirstOrDefault(wrapper => wrapper.IsMatch(text, RegexOptions.IgnoreCase | RegexOptions.Multiline))?
-            .Match(text, RegexOptions.IgnoreCase | RegexOptions.Multiline)?.Value;
+                .FirstOrDefault(wrapper => wrapper.IsMatch(text, RegexOptions.IgnoreCase | RegexOptions.Multiline))?
+                .Match(text, RegexOptions.IgnoreCase | RegexOptions.Multiline)?.Value;
 
         // only command message (/**) and URL
         if (string.IsNullOrWhiteSpace(context)) return;
@@ -115,7 +116,7 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
         {
             await CommandInvoker.TryExecuteCommandAsync(
                 CommandName.SendMessage,
-                new Model.Message(update.Message.Chat.Id, new string[] { ResourceRepository.GetClientResource("WrongCommand") }));
+                new Message(update.Message.Chat.Id, new[] { ResourceRepository.GetClientResource("WrongCommand") }));
             return;
         }
 
@@ -142,7 +143,6 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
     protected CommandName? GetCommandNameByString(string input)
     {
         foreach (var regex in RegexWrappers)
-        {
             switch (regex)
             {
                 case UrlRegexWrapper urlRegex:
@@ -155,7 +155,6 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
                     if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return null;
                     return Enum.Parse<CommandName>(commandNameText, true);
             }
-        }
 
         return null;
     }
