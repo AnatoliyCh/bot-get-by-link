@@ -71,7 +71,7 @@ public sealed class WellApi
             var (message, urlPicture, urlVideo) = await GetContentAsync(data);
             if (message is null && urlPicture is null && urlVideo is null) return null;
 
-            return new ProxyResponseContent(message ?? string.Empty, urlPicture, urlVideo);
+            return new ProxyResponseContent(message ?? string.Empty, string.Empty, urlPicture, urlVideo);
         }
         catch (Exception ex)
         {

@@ -22,6 +22,7 @@ namespace Bot.GetByLink.Proxy.Reddit;
 public sealed class ProxyReddit : ProxyService
 {
     private readonly string appId;
+    private readonly IRegexWrapper gifRegex;
     private readonly IRegexWrapper picturesRegex;
     private readonly string secretId;
     private readonly string urlBase = "www.reddit.com";
@@ -39,6 +40,7 @@ public sealed class ProxyReddit : ProxyService
         appId = configuration.Proxy.Reddit.AppId ?? string.Empty;
         secretId = configuration.Proxy.Reddit.Secret ?? string.Empty;
         picturesRegex = new PictureRegexWrapper();
+        gifRegex = new GifRegexWrapper();
     }
 
     /// <summary>
@@ -69,15 +71,17 @@ public sealed class ProxyReddit : ProxyService
         var post = redditClient.LinkPost($"t3_{postId}").Info();
         var crossPostId = await GetParentPostIdAsync($"t3_{postId}");
         if (!string.IsNullOrWhiteSpace(crossPostId)) post = redditClient.LinkPost($"{crossPostId}").Info();
-        var startText = $"https://www.reddit.com{post.Permalink}\n\n{post.Title}\n";
-        if (post.Listing.Media == null && !post.Listing.IsVideo && !post.Listing.IsRedditMediaDomain)
-            return new ProxyResponseContent($"{startText}{post.Listing.SelfText}");
+        var header = post.Title;
+
+        if (post.Listing.Media == null && !post.Listing.IsVideo && !post.Listing.IsRedditMediaDomain &&
+            !gifRegex.IsMatch(post.Listing.URL.ToLower()))
+            return new ProxyResponseContent(post.Listing.SelfText, header);
 
         long size;
         if (picturesRegex.IsMatch(post.Listing.URL, RegexOptions.IgnoreCase))
         {
             size = await ProxyHelper.GetSizeContentUrlAsync(post.Listing.URL);
-            return new ProxyResponseContent(startText,
+            return new ProxyResponseContent(string.Empty, header,
                 new[] { new MediaInfo(post.Listing.URL, size, MediaType.Photo) });
         }
 
@@ -87,13 +91,13 @@ public sealed class ProxyReddit : ProxyService
             if (!string.IsNullOrWhiteSpace(videoLink))
             {
                 size = await ProxyHelper.GetSizeContentUrlAsync(videoLink);
-                return new ProxyResponseContent(startText, null,
+                return new ProxyResponseContent(string.Empty, header, null,
                     new[] { new MediaInfo(videoLink, size, MediaType.Video) });
             }
         }
 
         size = await ProxyHelper.GetSizeContentUrlAsync(post.Listing.URL);
-        return new ProxyResponseContent(startText, null,
+        return new ProxyResponseContent(string.Empty, header, null,
             new[] { new MediaInfo(post.Listing.URL, size, MediaType.Video) });
     }
 

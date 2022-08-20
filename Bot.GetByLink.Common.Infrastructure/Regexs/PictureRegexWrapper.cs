@@ -5,6 +5,9 @@ namespace Bot.GetByLink.Common.Infrastructure.Regexs;
 /// <summary>
 ///     Regular expression for picture.
 /// </summary>
+/// https://*.jpg
+/// https://*.jpeg
+/// https://*.png
 public sealed class PictureRegexWrapper : RegexWrapper
 {
     /// <summary>

@@ -6,17 +6,22 @@
 public interface IProxyContent
 {
     /// <summary>
-    ///     Gets текст поста.
+    ///     Gets text post.
     /// </summary>
     public string Text { get; init; }
 
     /// <summary>
-    ///     Gets картики в посте.
+    ///     Gets header post.
+    /// </summary>
+    public string? Header { get; init; }
+
+    /// <summary>
+    ///     Gets picture post.
     /// </summary>
     public IEnumerable<IMediaInfo>? UrlPicture { get; init; }
 
     /// <summary>
-    ///     Gets видео в посте.
+    ///     Gets video post.
     /// </summary>
     public IEnumerable<IMediaInfo>? UrlVideo { get; init; }
 }
