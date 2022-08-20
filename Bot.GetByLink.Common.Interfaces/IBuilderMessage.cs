@@ -1,4 +1,6 @@
-﻿namespace Bot.GetByLink.Common.Infrastructure.Interfaces;
+﻿using Bot.GetByLink.Common.Interfaces.Proxy;
+
+namespace Bot.GetByLink.Common.Interfaces;
 
 /// <summary>
 ///     The interface of an object that build messages.

@@ -1,4 +1,5 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Interfaces;
+﻿using Bot.GetByLink.Common.Interfaces;
+using Bot.GetByLink.Common.Interfaces.Proxy;
 using Telegram.Bot.Types.Enums;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Interfaces;

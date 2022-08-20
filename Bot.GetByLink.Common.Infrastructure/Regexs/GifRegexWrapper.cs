@@ -1,6 +1,6 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Abstractions;
+﻿using Bot.GetByLink.Common.Abstractions;
 
-namespace Bot.GetByLink.Common.Infrastructure.Model;
+namespace Bot.GetByLink.Common.Infrastructure.Regexs;
 
 /// <summary>
 ///     Regular expression for gif.

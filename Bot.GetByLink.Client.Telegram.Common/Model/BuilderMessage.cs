@@ -1,8 +1,9 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Interfaces;
-using Bot.GetByLink.Common.Infrastructure.Enums;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
+using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Infrastructure.Model;
-using Bot.GetByLink.Common.Infrastructure.Model.Configuration.Clients;
+using Bot.GetByLink.Common.Infrastructure.Proxy;
+using Bot.GetByLink.Common.Interfaces.Configuration.Clients;
+using Bot.GetByLink.Common.Interfaces.Proxy;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -22,7 +23,7 @@ public sealed class BuilderMessage : IBuilderMessage
     ///     Initializes a new instance of the <see cref="BuilderMessage" /> class.
     /// </summary>
     /// <param name="configuration">Config for builder messages.</param>
-    public BuilderMessage(ClientConfiguration configuration)
+    public BuilderMessage(ITelegramConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         MaxSizeMbPhoto = configuration.MaxSizeMbPhoto;
