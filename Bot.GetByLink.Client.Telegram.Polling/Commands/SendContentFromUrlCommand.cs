@@ -14,7 +14,7 @@ namespace Bot.GetByLink.Client.Telegram.Polling.Commands;
 /// </summary>
 internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
 {
-    private readonly ProxyResponseFormatter formaterContent;
+    private readonly IBuilderMessage builderMessage;
     private readonly IAsyncCommand<CommandName> sendMessageCommand;
     private readonly IRegexWrapper urlRegex;
 
@@ -24,16 +24,16 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     /// <param name="sendMessageCommand">Sends a message to the client.</param>
     /// <param name="proxyServices">Proxy collection.</param>
     /// <param name="regexWrappers">Regular expressions for checks.</param>
-    /// <param name="formatterContent">Formatter content.</param>
+    /// <param name="builderMessage">Builder message.</param>
     public SendContentFromUrlCommand(
         IAsyncCommand<CommandName> sendMessageCommand,
         IEnumerable<IProxyService> proxyServices,
         IEnumerable<IRegexWrapper> regexWrappers,
-        IFormatterContent formatterContent)
+        IBuilderMessage builderMessage)
         : base(CommandName.SendContentFromUrl)
     {
         this.sendMessageCommand = sendMessageCommand ?? throw new ArgumentNullException(nameof(sendMessageCommand));
-        formaterContent = (ProxyResponseFormatter)formatterContent;
+        this.builderMessage = builderMessage;
         ProxyServices = proxyServices ?? throw new ArgumentNullException(nameof(proxyServices));
         urlRegex = GetUrlRegexWrapperByIRegexWrappers(regexWrappers) ??
                    throw new ArgumentNullException(nameof(regexWrappers));
@@ -65,8 +65,14 @@ internal sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
         var postContent = await matchProxy.GetContentUrlAsync(url);
         if (postContent is null) return;
 
-        var (messages, artifacts) = formaterContent.GetFormattedContent(postContent);
-        var message = new Message(chatId, messages, artifacts, ParseMode.MarkdownV2);
+        var message = builderMessage
+            .From(postContent)
+            .AddUrl(url)
+            .AddChatId(chatId ?? -1)
+            .SetHeaders()
+            .SetParseMode(ParseMode.MarkdownV2)
+            .Build();
+
         await sendMessageCommand.ExecuteAsync(message);
     }
 

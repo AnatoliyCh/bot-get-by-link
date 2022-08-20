@@ -21,7 +21,7 @@ public static class ProxyHelper
         var request = new HttpRequestMessage(HttpMethod.Head, string.Empty);
         var message = await client.SendAsync(request);
         if (long.TryParse(
-                message.Content.Headers.FirstOrDefault(h => h.Key.Equals("Content-Length")).Value.FirstOrDefault(),
+                message.Content.Headers.FirstOrDefault(h => h.Key.Equals("Content-Length")).Value?.FirstOrDefault(),
                 out var contentLength)) result = contentLength == 0 ? contentLength : contentLength / OneMb;
 
         return result;

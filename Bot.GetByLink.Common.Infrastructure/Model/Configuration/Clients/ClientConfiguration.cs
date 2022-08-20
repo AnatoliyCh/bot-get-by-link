@@ -42,4 +42,10 @@ public sealed class ClientConfiguration
     /// </summary>
     [JsonPropertyName("MaxTextLenghtMessage")]
     public int MaxTextLenghtMessage { get; init; } = 0;
+
+    /// <summary>
+    ///     Gets max text lenght for message.
+    /// </summary>
+    [JsonPropertyName("MaxColMediaImMessage")]
+    public int MaxColMediaImMessage { get; init; } = 0;
 }

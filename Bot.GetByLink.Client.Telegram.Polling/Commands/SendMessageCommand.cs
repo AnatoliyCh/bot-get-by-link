@@ -49,9 +49,12 @@ internal sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposabl
     private async Task SendMessageAsync(IMessageContext message)
     {
         if (cts is null || cts.IsCancellationRequested) cts = new CancellationTokenSource();
-
+        
         if (message.Artifacts?.Any() ?? false)
-            await client.SendMediaGroupAsync(message.ChatId, message.Artifacts, cancellationToken: cts.Token);
+            foreach (var artifact in message.Artifacts)
+            {
+                await client.SendMediaGroupAsync(message.ChatId, artifact, cancellationToken: cts.Token);
+            }
 
         foreach (var text in message.Text.Where(text => !string.IsNullOrWhiteSpace(text)))
             await client.SendTextMessageAsync(message.ChatId, text, cancellationToken: cts.Token);

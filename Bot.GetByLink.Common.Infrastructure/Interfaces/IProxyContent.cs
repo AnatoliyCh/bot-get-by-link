@@ -6,14 +6,14 @@
 public interface IProxyContent
 {
     /// <summary>
-    ///     Gets header post.
-    /// </summary>
-    public string Header { get; init; }
-
-    /// <summary>
     ///     Gets text post.
     /// </summary>
     public string Text { get; init; }
+
+    /// <summary>
+    ///     Gets header post.
+    /// </summary>
+    public string? Header { get; init; }
 
     /// <summary>
     ///     Gets picture post.
