@@ -5,11 +5,13 @@ using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Configuration;
+using Bot.GetByLink.Common.Resources;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Message = Bot.GetByLink.Client.Telegram.Common.Model.Message;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Abstractions;
 
@@ -94,20 +96,32 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
     /// <returns>Empty Task.</returns>
     public async Task HandleUpdateAsync(Update update)
     {
-        var text = update.Message!.Text ?? string.Empty;
+        if (update.Message is null ||
+            update.Message.Chat is null ||
+            update.Message.Text is null ||
+            update.Message.Type != MessageType.Text) return;
+
+        var text = update.Message.Text;
+        var context =
+            RegexWrappers
+                .FirstOrDefault(wrapper => wrapper.IsMatch(text, RegexOptions.IgnoreCase | RegexOptions.Multiline))?
+                .Match(text, RegexOptions.IgnoreCase | RegexOptions.Multiline)?.Value;
 
         // only command message (/**) and URL
-        if (update.Message!.Type != MessageType.Text && RegexWrappers.Any(regex => regex.IsMatch(text))) return;
-
-        var words = text.Split(" ");
-        if (words is null || words.Length == 0) return;
+        if (string.IsNullOrWhiteSpace(context)) return;
 
         // commands
-        var firstWord = words.First();
-        var commandName = GetCommandNameByString(firstWord);
-        if (commandName is null) return;
+        var commandName = GetCommandNameByString(context);
+        if (commandName is null)
+        {
+            await CommandInvoker.TryExecuteCommandAsync(
+                CommandName.SendMessage,
+                new Message(update.Message.Chat.Id, new[] { ResourceRepository.GetClientResource("WrongCommand") }));
+            return;
+        }
 
-        await CommandInvoker.TryExecuteCommandAsync((CommandName)commandName, update);
+        var isSuccessfully = await CommandInvoker.TryExecuteCommandAsync((CommandName)commandName, update);
+        if (isSuccessfully) await Client.DeleteMessageAsync(update.Message.Chat.Id, update.Message.MessageId);
     }
 
     /// <summary>

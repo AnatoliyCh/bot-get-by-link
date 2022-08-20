@@ -58,8 +58,8 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
     /// </summary>
     /// <param name="command">Given command.</param>
     /// <param name="ctx">Context command.</param>
-    /// <returns>Empty Task.</returns>
-    public async Task TryExecuteCommandAsync(ICommand<CommandName>? command, object? ctx)
+    /// <returns>IsSuccessfully.</returns>
+    public async Task<bool> TryExecuteCommandAsync(ICommand<CommandName>? command, object? ctx)
     {
         try
         {
@@ -72,11 +72,14 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
                     syncCommand.Execute(ctx);
                     break;
             }
+
+            return true;
         }
         catch (Exception ex)
         {
             var message = $"ICommand: {command?.Name.ToString()}";
             logger.LogError(ex, message);
+            return false;
         }
     }
 
@@ -85,11 +88,11 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
     /// </summary>
     /// <param name="commandName">Command name.</param>
     /// <param name="ctx">Context command.</param>
-    /// <returns>Empty Task.</returns>
-    public async Task TryExecuteCommandAsync(CommandName commandName, object? ctx)
+    /// <returns>IsSuccessfully.</returns>
+    public Task<bool> TryExecuteCommandAsync(CommandName commandName, object? ctx)
     {
         commands.TryGetValue(commandName, out var command);
-        await TryExecuteCommandAsync(command, ctx);
+        return TryExecuteCommandAsync(command, ctx);
     }
 
     /// <summary>
