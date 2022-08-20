@@ -16,7 +16,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Proxy.Reddit"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bot.GetByLink.Common", "Bot.GetByLink.Common", "{0CBE5E20-C0A6-4CAC-BD65-F4B141CD775D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Infrastructure", "Bot.GetByLink.Common.Infrastructure\Bot.GetByLink.Common.Infrastructure.csproj", "{6F74AA49-3120-4361-94D7-65E81E4FA6E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Infrastructure", "src\Bot.GetByLink.Common.Infrastructure\Bot.GetByLink.Common.Infrastructure.csproj", "{6F74AA49-3120-4361-94D7-65E81E4FA6E2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bot.GetByLink.Client.Telegram", "Bot.GetByLink.Client.Telegram", "{72747E0F-72ED-492D-835B-70A0F7B4A481}"
 EndProject
@@ -26,11 +26,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bot.GetByLink.Proxy", "Bot.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Proxy.Common", "Bot.GetByLink.Proxy.Common\Bot.GetByLink.Proxy.Common.csproj", "{B19F4C76-CB50-4308-A6D8-65F3697B0F11}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Interfaces", "Bot.GetByLink.Common.Interfaces\Bot.GetByLink.Common.Interfaces.csproj", "{8E417C29-BBED-4889-B8F9-AC86BF1A0C23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Interfaces", "src\Bot.GetByLink.Common.Interfaces\Bot.GetByLink.Common.Interfaces.csproj", "{8E417C29-BBED-4889-B8F9-AC86BF1A0C23}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Abstractions", "Bot.GetByLink.Common.Abstractions\Bot.GetByLink.Common.Abstractions.csproj", "{04F19551-9F9E-4CC7-9603-F00556DA95E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Abstractions", "src\Bot.GetByLink.Common.Abstractions\Bot.GetByLink.Common.Abstractions.csproj", "{04F19551-9F9E-4CC7-9603-F00556DA95E6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Enums", "Bot.GetByLink.Common.Enums\Bot.GetByLink.Common.Enums.csproj", "{AB3C5212-57CA-41F1-8F25-A6EF7FEFC0F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Enums", "src\Bot.GetByLink.Common.Enums\Bot.GetByLink.Common.Enums.csproj", "{AB3C5212-57CA-41F1-8F25-A6EF7FEFC0F2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Client.Telegram.WebHook", "Bot.GetByLink.Client.Telegram.WebHook\Bot.GetByLink.Client.Telegram.WebHook.csproj", "{F752B274-1C04-4BCE-AFEC-BABA8A82AD0D}"
 EndProject
