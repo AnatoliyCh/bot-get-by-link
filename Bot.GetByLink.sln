@@ -34,6 +34,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Common.Enums"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot.GetByLink.Client.Telegram.WebHook", "Bot.GetByLink.Client.Telegram.WebHook\Bot.GetByLink.Client.Telegram.WebHook.csproj", "{F752B274-1C04-4BCE-AFEC-BABA8A82AD0D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot.GetByLink.Common.Resources", "src\Bot.GetByLink.Common.Resources\Bot.GetByLink.Common.Resources.csproj", "{357E9A94-26FA-4A8C-A78D-686E1EB796FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,10 @@ Global
 		{F752B274-1C04-4BCE-AFEC-BABA8A82AD0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F752B274-1C04-4BCE-AFEC-BABA8A82AD0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F752B274-1C04-4BCE-AFEC-BABA8A82AD0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{357E9A94-26FA-4A8C-A78D-686E1EB796FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{357E9A94-26FA-4A8C-A78D-686E1EB796FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{357E9A94-26FA-4A8C-A78D-686E1EB796FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{357E9A94-26FA-4A8C-A78D-686E1EB796FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,6 +101,7 @@ Global
 		{04F19551-9F9E-4CC7-9603-F00556DA95E6} = {0CBE5E20-C0A6-4CAC-BD65-F4B141CD775D}
 		{AB3C5212-57CA-41F1-8F25-A6EF7FEFC0F2} = {0CBE5E20-C0A6-4CAC-BD65-F4B141CD775D}
 		{F752B274-1C04-4BCE-AFEC-BABA8A82AD0D} = {72747E0F-72ED-492D-835B-70A0F7B4A481}
+		{357E9A94-26FA-4A8C-A78D-686E1EB796FB} = {0CBE5E20-C0A6-4CAC-BD65-F4B141CD775D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AEFCF3E8-10F9-47A5-981C-5C0C751D7E26}
