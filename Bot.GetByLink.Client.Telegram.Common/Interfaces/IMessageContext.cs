@@ -1,4 +1,4 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Interfaces;
+﻿using Bot.GetByLink.Common.Interfaces;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 

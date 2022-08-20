@@ -1,8 +1,9 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Enums;
-using Bot.GetByLink.Common.Infrastructure.Interfaces;
-using Bot.GetByLink.Common.Infrastructure.Model;
+﻿using Bot.GetByLink.Common.Enums;
+using Bot.GetByLink.Common.Infrastructure.Proxy;
+using Bot.GetByLink.Common.Interfaces;
+using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Common;
-using Bot.GetByLink.Proxy.Vk.Regex;
+using Bot.GetByLink.Proxy.Vk.Regexs;
 using Microsoft.Extensions.Logging;
 using VkNet;
 using VkNet.Model;
@@ -103,10 +104,15 @@ public sealed class WellApi
                     urlPicture[position] = new MediaInfo(maxSize.Url.AbsoluteUri, size, MediaType.Photo);
                 });
             }
+            else
+            {
+                tasks[i] = Task.CompletedTask;
+            }
 
-        await Task.WhenAll(tasks);
+        if (tasks.Length > 0) await Task.WhenAll(tasks);
+
         urlPicture = urlPicture.Where(item => item is not null).ToArray();
 
-        return (post.Text, urlPicture, null);
+        return (post.Text, urlPicture.Length > 0 ? urlPicture : null, null);
     }
 }

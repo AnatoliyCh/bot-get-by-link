@@ -1,4 +1,5 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Interfaces;
+﻿using Bot.GetByLink.Common.Interfaces.Command;
+using Bot.GetByLink.Common.Interfaces.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model.Logging;
