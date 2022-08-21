@@ -4,10 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Bot.GetByLink.Common.Enums\Bot.GetByLink.Common.Enums.csproj" />
-  </ItemGroup>
 
 </Project>

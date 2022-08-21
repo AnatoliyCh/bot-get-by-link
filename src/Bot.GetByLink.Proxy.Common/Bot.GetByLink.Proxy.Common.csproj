@@ -4,10 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Bot.GetByLink.Common.Infrastructure\Bot.GetByLink.Common.Infrastructure.csproj" />
-  </ItemGroup>
 
 </Project>

@@ -4,14 +4,13 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <SignAssembly>False</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Bot.GetByLink.Common.Abstractions\Bot.GetByLink.Common.Abstractions.csproj" />
     <ProjectReference Include="..\Bot.GetByLink.Common.Interfaces\Bot.GetByLink.Common.Interfaces.csproj" />
-    <ProjectReference Include="..\src\Bot.GetByLink.Common.Resources\Bot.GetByLink.Common.Resources.csproj" />
+    <ProjectReference Include="..\Bot.GetByLink.Common.Resources\Bot.GetByLink.Common.Resources.csproj" />
   </ItemGroup>
 
 </Project>
