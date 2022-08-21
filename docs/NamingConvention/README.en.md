@@ -58,18 +58,18 @@ To resolve a `null-value` use `?`: `private CancellationTokenSource? cts;`.
 
 Tuple unfolding: `var (first, second) = PascalCase()`;
 
-| Object                                    | Recommendation                           | Example                              |
-| ----------------------------------------- | ---------------------------------------- | ------------------------------------ |
-| Field `private`                           | private Type camelCase                   | private CancellationTokenSource? cts |
-| Field `private readonly`                  | private readonly Type camelCase          | private readonly ILogger logger      |
-| Field `public`                            | public Type PascalCase                   | public ILogger Logger                |
-| Field `protected`                         | protected Type camelCase                 | protected ILogger logger             |
-| Propertie `public`                        | public Type PascalCase { get; set; }     | public string Url { get; set; }      |
-| Propertie `public` with initialization    | public Type PascalCase { get; init; }    | public string Url { get; init; }     |
-| Propertie `public readonly`               | public Type PascalCase { get; }          | public Status State { get; }         |
-| Propertie `protected`                     | protected Type PascalCase { get; set; }  | protected string Url { get; set; }   |
-| Propertie `protected` with initialization | protected Type PascalCase { get; init; } | protected string Url { get; init; }  |
-| Propertie `protected readonly`            | protected Type PascalCase { get; }       | protected Status State { get; }      |
+| Object                                   | Recommendation                           | Example                              |
+| ---------------------------------------- | ---------------------------------------- | ------------------------------------ |
+| Field `private`                          | private Type camelCase                   | private CancellationTokenSource? cts |
+| Field `private readonly`                 | private readonly Type camelCase          | private readonly ILogger logger      |
+| Field `public`                           | public Type PascalCase                   | public ILogger Logger                |
+| Field `protected`                        | protected Type camelCase                 | protected ILogger logger             |
+| Property `public`                        | public Type PascalCase { get; set; }     | public string Url { get; set; }      |
+| Property `public` with initialization    | public Type PascalCase { get; init; }    | public string Url { get; init; }     |
+| Property `public readonly`               | public Type PascalCase { get; }          | public Status State { get; }         |
+| Property `protected`                     | protected Type PascalCase { get; set; }  | protected string Url { get; set; }   |
+| Property `protected` with initialization | protected Type PascalCase { get; init; } | protected string Url { get; init; }  |
+| Property `protected readonly`            | protected Type PascalCase { get; }       | protected Status State { get; }      |
 
 #### Functions / methods
 
