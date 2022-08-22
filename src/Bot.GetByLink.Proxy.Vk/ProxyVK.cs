@@ -1,7 +1,9 @@
 ﻿using Bot.GetByLink.Common.Abstractions.Proxy;
 using Bot.GetByLink.Common.Interfaces.Configuration;
 using Bot.GetByLink.Common.Interfaces.Proxy;
-using Bot.GetByLink.Proxy.Vk.Regexs;
+using Bot.GetByLink.Proxy.Vk.Interfaces;
+using Bot.GetByLink.Proxy.Vk.Model;
+using Bot.GetByLink.Proxy.Vk.Model.Regexs;
 using Microsoft.Extensions.Logging;
 using VkNet;
 using VkNet.Model;
@@ -14,18 +16,18 @@ namespace Bot.GetByLink.Proxy.Vk;
 public sealed class ProxyVK : ProxyService
 {
     private readonly VkApi api = new();
-    private readonly WellApi wellApi;
+    private readonly IContentReturnStrategy photoStrategy;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyVK" /> class.
     /// </summary>
     /// <param name="configuration">Bot configuration.</param>
-    /// <param name="loggerWellApi">Interface for logging.</param>
-    public ProxyVK(IBotConfiguration? configuration, ILogger<WellApi> loggerWellApi)
-        : base(new[] { new WallRegexWrapper() })
+    /// <param name="loggerPhotoStrategy">Interface for logging.</param>
+    public ProxyVK(IBotConfiguration? configuration, ILogger<PhotoStrategy> loggerPhotoStrategy)
+        : base(new[] { PhotoStrategy.PhotoRegex })
     {
         ArgumentNullException.ThrowIfNull(configuration);
-        ArgumentNullException.ThrowIfNull(loggerWellApi);
+        ArgumentNullException.ThrowIfNull(loggerPhotoStrategy);
 
         var isParse = ulong.TryParse(configuration.Proxy.Vk.AppId, out var applicationId);
         var apiAuthParams = new ApiAuthParams
@@ -36,7 +38,8 @@ public sealed class ProxyVK : ProxyService
         if (isParse) apiAuthParams.ApplicationId = applicationId;
 
         api.Authorize(apiAuthParams);
-        wellApi = new WellApi(api, loggerWellApi);
+        var idResourceRegexWrapper = new IdResourceRegexWrapper();
+        photoStrategy = new PhotoStrategy(idResourceRegexWrapper, loggerPhotoStrategy, api);
     }
 
     /// <summary>
@@ -44,10 +47,12 @@ public sealed class ProxyVK : ProxyService
     /// </summary>
     /// <param name="url">Url to post.</param>
     /// <returns>An object with text and links to pictures and videos present in the post.</returns>
-    public override async Task<IProxyContent?> GetContentUrlAsync(string url)
+    public override Task<IProxyContent?> GetContentUrlAsync(string url)
     {
-        var id = wellApi.WallPostIdRegex.Match(url)?.Value;
-        var content = await wellApi.TryGetByIdAsync(id);
-        return content;
+        return url switch
+        {
+            var value when PhotoStrategy.PhotoRegex.IsMatch(value) => photoStrategy.TryGetByUrlAsync(value),
+            _ => Task.FromResult<IProxyContent?>(null),
+        };
     }
 }
