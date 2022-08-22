@@ -3,7 +3,7 @@
 namespace Bot.GetByLink.Proxy.Vk.Model.Regexs;
 
 /// <summary>
-///     Regular expression for photos.
+///     Regular expression for photo.
 /// </summary>
 /// https://vk.com/feed?z=photo0_000000000%2Falbum-0000000000_000000000%2Frev
 /// https://vk.com/feed?z=photo6490_000000000%2Falbum-0000000000_000000000%2Frev

@@ -17,17 +17,24 @@ public sealed class ProxyVK : ProxyService
 {
     private readonly VkApi api = new();
     private readonly IContentReturnStrategy photoStrategy;
+    private readonly IContentReturnStrategy albumStrategy;
+
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ProxyVK" /> class.
+    /// Initializes a new instance of the <see cref="ProxyVK"/> class.
     /// </summary>
     /// <param name="configuration">Bot configuration.</param>
-    /// <param name="loggerPhotoStrategy">Interface for logging.</param>
-    public ProxyVK(IBotConfiguration? configuration, ILogger<PhotoStrategy> loggerPhotoStrategy)
-        : base(new[] { PhotoStrategy.PhotoRegex })
+    /// <param name="loggerPhotoStrategy">Interface for logging PhotoStrategy.</param>
+    /// <param name="loggerAlbumStrategy">Interface for logging AlbumStrategy.</param>
+    public ProxyVK(
+        IBotConfiguration? configuration,
+        ILogger<PhotoStrategy> loggerPhotoStrategy,
+        ILogger<AlbumStrategy> loggerAlbumStrategy)
+        : base(new[] { PhotoStrategy.PhotoRegex, AlbumStrategy.AlbumRegex })
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(loggerPhotoStrategy);
+        ArgumentNullException.ThrowIfNull(loggerAlbumStrategy);
 
         var isParse = ulong.TryParse(configuration.Proxy.Vk.AppId, out var applicationId);
         var apiAuthParams = new ApiAuthParams
@@ -39,7 +46,8 @@ public sealed class ProxyVK : ProxyService
 
         api.Authorize(apiAuthParams);
         var idResourceRegexWrapper = new IdResourceRegexWrapper();
-        photoStrategy = new PhotoStrategy(idResourceRegexWrapper, loggerPhotoStrategy, api);
+        photoStrategy = new PhotoStrategy(api, idResourceRegexWrapper, loggerPhotoStrategy);
+        albumStrategy = new AlbumStrategy(api, idResourceRegexWrapper, loggerAlbumStrategy, photoStrategy);
     }
 
     /// <summary>
@@ -52,6 +60,7 @@ public sealed class ProxyVK : ProxyService
         return url switch
         {
             var value when PhotoStrategy.PhotoRegex.IsMatch(value) => photoStrategy.TryGetByUrlAsync(value),
+            var value when AlbumStrategy.AlbumRegex.IsMatch(value) => albumStrategy.TryGetByUrlAsync(value),
             _ => Task.FromResult<IProxyContent?>(null),
         };
     }
