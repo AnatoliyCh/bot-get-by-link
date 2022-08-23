@@ -1,4 +1,5 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Proxy;
+﻿using Bot.GetByLink.Common.Enums;
+using Bot.GetByLink.Common.Infrastructure.Proxy;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Vk.Abstractions;
@@ -6,6 +7,7 @@ using Bot.GetByLink.Proxy.Vk.Model.Regexs;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using VkNet;
+using VkNet.Model.Attachments;
 
 namespace Bot.GetByLink.Proxy.Vk.Model;
 
@@ -15,8 +17,6 @@ namespace Bot.GetByLink.Proxy.Vk.Model;
 /// </summary>
 public sealed class DocStrategy : ContentReturnStrategy
 {
-    private readonly StringBuilder builder;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="DocStrategy"/> class.
     /// </summary>
@@ -26,7 +26,6 @@ public sealed class DocStrategy : ContentReturnStrategy
     public DocStrategy(VkApi api, IRegexWrapper idResourceRegexWrapper, ILogger<DocStrategy> logger)
         : base(api, idResourceRegexWrapper, logger)
     {
-        builder = new StringBuilder();
     }
 
     /// <summary>
@@ -41,25 +40,24 @@ public sealed class DocStrategy : ContentReturnStrategy
     /// <returns>An object with a caption and a link to the doc.</returns>
     public override Task<IProxyContent?> TryGetByUrlAsync(string url)
     {
+        var nullTask = Task.FromResult<IProxyContent?>(null);
         try
         {
             var docUrl = Regex.Match(url)?.Value;
             var docId = IdResourceRegexWrapper.Match(docUrl)?.Value;
-            if (docId is null) return Task.FromResult<IProxyContent?>(null);
+            if (docId is null) return nullTask;
 
-            builder
-                .AppendFormat("https://vk.com/doc{0}", docId)
+            var builder =
+                new StringBuilder($"https://vk.com/doc{docId}")
                 .AppendLine()
                 .AppendLine("/help");
-            var content = new ProxyResponseContent(builder.ToString());
-            builder.Clear();
 
-            return Task.FromResult<IProxyContent?>(content);
+            return Task.FromResult<IProxyContent?>(new ProxyResponseContent(builder.ToString()));
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Proxy VK : DocStrategy : TryGetByUrlAsync");
-            return Task.FromResult<IProxyContent?>(null);
+            return nullTask;
         }
     }
 
@@ -71,6 +69,25 @@ public sealed class DocStrategy : ContentReturnStrategy
     /// <returns>A collection of information objects about attached Docs.</returns>
     public override Task<IEnumerable<IMediaInfo>?> TryGetByCollectionAsync<T>(IEnumerable<T> collection)
     {
-        throw new NotImplementedException();
+        var nullTask = Task.FromResult<IEnumerable<IMediaInfo>?>(null);
+        if (collection is not IEnumerable<Document> docs || !collection.Any()) return nullTask;
+        try
+        {
+            var medias = new List<MediaInfoExtra>(docs.Count());
+            foreach (var item in docs)
+            {
+                if (item is null) continue;
+
+                var url = $"https://vk.com/doc{item.OwnerId}_{item.Id}";
+                medias.Add(new MediaInfoExtra(url, -1, MediaType.Document, item.Title, string.Empty));
+            }
+
+            return Task.FromResult<IEnumerable<IMediaInfo>?>(medias);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Proxy VK : DocStrategy : TryGetByCollectionAsync");
+            return nullTask;
+        }
     }
 }

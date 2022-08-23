@@ -70,10 +70,9 @@ public sealed class PhotoStrategy : ContentReturnStrategy
     /// <returns>A collection of information objects about attached Photos.</returns>
     public override async Task<IEnumerable<IMediaInfo>?> TryGetByCollectionAsync<T>(IEnumerable<T> collection)
     {
+        if (collection is not IEnumerable<Photo> photos || !collection.Any()) return null;
         try
         {
-            if (collection is not IEnumerable<Photo> photos || !collection.Any()) return null;
-
             var capacity = photos.Count();
             var photoUrls = new MediaInfo[capacity];
             var tasks = new Task[capacity];

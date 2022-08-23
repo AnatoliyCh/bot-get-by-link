@@ -1,4 +1,5 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Proxy;
+﻿using Bot.GetByLink.Common.Enums;
+using Bot.GetByLink.Common.Infrastructure.Proxy;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Vk.Abstractions;
@@ -6,6 +7,7 @@ using Bot.GetByLink.Proxy.Vk.Model.Regexs;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using VkNet;
+using VkNet.Model.Attachments;
 
 namespace Bot.GetByLink.Proxy.Vk.Model;
 
@@ -15,8 +17,6 @@ namespace Bot.GetByLink.Proxy.Vk.Model;
 /// </summary>
 public sealed class VideoStrategy : ContentReturnStrategy
 {
-    private readonly StringBuilder builder;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="VideoStrategy"/> class.
     /// </summary>
@@ -26,7 +26,6 @@ public sealed class VideoStrategy : ContentReturnStrategy
     public VideoStrategy(VkApi api, IRegexWrapper idResourceRegexWrapper, ILogger<VideoStrategy> logger)
         : base(api, idResourceRegexWrapper, logger)
     {
-        builder = new StringBuilder();
     }
 
     /// <summary>
@@ -41,25 +40,24 @@ public sealed class VideoStrategy : ContentReturnStrategy
     /// <returns>An object with a caption and a link to the video.</returns>
     public override Task<IProxyContent?> TryGetByUrlAsync(string url)
     {
+        var nullTask = Task.FromResult<IProxyContent?>(null);
         try
         {
             var videoUrl = Regex.Match(url)?.Value;
             var videoId = IdResourceRegexWrapper.Match(videoUrl)?.Value;
-            if (videoId is null) return Task.FromResult<IProxyContent?>(null);
+            if (videoId is null) return nullTask;
 
-            builder
-                .AppendFormat("https://vk.com/video{0}", videoId)
+            var builder =
+                new StringBuilder($"https://vk.com/video{videoId}")
                 .AppendLine()
                 .AppendLine("/help");
-            var content = new ProxyResponseContent(builder.ToString());
-            builder.Clear();
 
-            return Task.FromResult<IProxyContent?>(content);
+            return Task.FromResult<IProxyContent?>(new ProxyResponseContent(builder.ToString()));
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Proxy VK : VideoStrategy : TryGetByUrlAsync");
-            return Task.FromResult<IProxyContent?>(null);
+            return nullTask;
         }
     }
 
@@ -71,6 +69,25 @@ public sealed class VideoStrategy : ContentReturnStrategy
     /// <returns>A collection of information objects about attached Videos.</returns>
     public override Task<IEnumerable<IMediaInfo>?> TryGetByCollectionAsync<T>(IEnumerable<T> collection)
     {
-        throw new NotImplementedException();
+        var nullTask = Task.FromResult<IEnumerable<IMediaInfo>?>(null);
+        if (collection is not IEnumerable<Video> videos || !collection.Any()) return nullTask;
+        try
+        {
+            var medias = new List<MediaInfoExtra>(videos.Count());
+            foreach (var item in videos)
+            {
+                if (item is null) continue;
+
+                var url = $"https://vk.com/video{item.OwnerId}_{item.Id}";
+                medias.Add(new MediaInfoExtra(url, -1, MediaType.Video, item.Title, item.Description));
+            }
+
+            return Task.FromResult<IEnumerable<IMediaInfo>?>(medias);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Proxy VK : VideoStrategy : TryGetByCollectionAsync");
+            return nullTask;
+        }
     }
 }

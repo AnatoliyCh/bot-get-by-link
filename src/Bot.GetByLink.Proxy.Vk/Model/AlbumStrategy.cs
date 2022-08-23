@@ -74,10 +74,9 @@ public sealed class AlbumStrategy : ContentReturnStrategy
     /// <returns>A collection of information objects about attached Photos.</returns>
     public override async Task<IEnumerable<IMediaInfo>?> TryGetByCollectionAsync<T>(IEnumerable<T> collection)
     {
+        if (collection is not IEnumerable<Album> albums || !collection.Any()) return null;
         try
         {
-            if (collection is not IEnumerable<Album> albums || !collection.Any()) return null;
-
             IEnumerable<IMediaInfo> medias = new List<MediaInfo>((int)step);
             var mediasAsList = medias.ToList();
             foreach (var album in albums)
