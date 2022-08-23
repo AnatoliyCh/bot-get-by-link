@@ -21,7 +21,7 @@ public enum MediaType
     Video,
 
     /// <summary>
-    /// Document (.txt, .rar, .7z, etc.)
+    ///     Document (.txt, .rar, .7z, etc.)
     /// </summary>
     Document
 }

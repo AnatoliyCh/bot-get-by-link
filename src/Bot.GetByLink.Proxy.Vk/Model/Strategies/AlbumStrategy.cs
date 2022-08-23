@@ -13,7 +13,7 @@ using VkNet.Model.RequestParams;
 namespace Bot.GetByLink.Proxy.Vk.Model.Strategies;
 
 /// <summary>
-/// Provides an API for VK Albums.
+///     Provides an API for VK Albums.
 /// </summary>
 public sealed class AlbumStrategy : ContentReturnStrategy
 {
@@ -21,7 +21,7 @@ public sealed class AlbumStrategy : ContentReturnStrategy
     private readonly ulong stepObjectsInAlbum;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AlbumStrategy"/> class.
+    ///     Initializes a new instance of the <see cref="AlbumStrategy" /> class.
     /// </summary>
     /// <param name="api">API for interaction with VK.</param>
     /// <param name="idResourceRegexWrapper"> Regular expression for VK resource Id.</param>
@@ -31,7 +31,7 @@ public sealed class AlbumStrategy : ContentReturnStrategy
     public AlbumStrategy(
         VkApi api,
         IRegexWrapper
-        idResourceRegexWrapper,
+            idResourceRegexWrapper,
         ILogger<AlbumStrategy> logger,
         IContentReturnStrategy photoStrategy,
         int stepObjectsInAlbum)
@@ -75,7 +75,7 @@ public sealed class AlbumStrategy : ContentReturnStrategy
     }
 
     /// <summary>
-    /// Return content from a photo collection.
+    ///     Return content from a photo collection.
     /// </summary>
     /// <typeparam name="T">Collection Item Type.</typeparam>
     /// <param name="collection">Photo collection.</param>
@@ -116,10 +116,10 @@ public sealed class AlbumStrategy : ContentReturnStrategy
 
     private async Task<string> GetInfobyAlbum(long ownerId, long albumId)
     {
-        var photoGetAlbumsParams = new PhotoGetAlbumsParams()
+        var photoGetAlbumsParams = new PhotoGetAlbumsParams
         {
             OwnerId = ownerId,
-            AlbumIds = new List<long>() { albumId }
+            AlbumIds = new List<long> { albumId }
         };
         var album = (await Api.Photo.GetAlbumsAsync(photoGetAlbumsParams)).FirstOrDefault();
         if (album is null) return string.Empty;
@@ -131,13 +131,13 @@ public sealed class AlbumStrategy : ContentReturnStrategy
     {
         var photos = new List<Photo>((int)stepObjectsInAlbum);
         var offset = 0ul;
-        var photoGetParams = new PhotoGetParams()
+        var photoGetParams = new PhotoGetParams
         {
             OwnerId = ownerId,
             AlbumId = PhotoAlbumType.Id(albumId),
             Reversed = true,
             Count = stepObjectsInAlbum,
-            Offset = offset,
+            Offset = offset
         };
         do
         {
@@ -146,8 +146,7 @@ public sealed class AlbumStrategy : ContentReturnStrategy
 
             photoGetParams.Offset += stepObjectsInAlbum;
             photos.AddRange(album);
-        }
-        while (true);
+        } while (true);
 
         return await photoStrategy.TryGetByCollectionAsync(photos);
     }

@@ -11,4 +11,5 @@ namespace Bot.GetByLink.Proxy.Vk.Model;
 /// <param name="Type">Type media.</param>
 /// <param name="Title">Title media.</param>
 /// <param name="Description">Description media.</param>
-public sealed record MediaInfoExtra(string Url, double Size, MediaType Type, string Title, string Description) : IMediaInfo;
+public sealed record MediaInfoExtra
+    (string Url, double Size, MediaType Type, string Title, string Description) : IMediaInfo;

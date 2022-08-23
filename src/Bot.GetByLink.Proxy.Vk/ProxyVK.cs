@@ -15,15 +15,15 @@ namespace Bot.GetByLink.Proxy.Vk;
 /// </summary>
 public sealed class ProxyVK : ProxyService
 {
-    private readonly VkApi api = new();
-    private readonly IContentReturnStrategy photoStrategy;
     private readonly IContentReturnStrategy albumStrategy;
+    private readonly VkApi api = new();
     private readonly IContentReturnStrategy docStrategy;
+    private readonly IContentReturnStrategy photoStrategy;
     private readonly IContentReturnStrategy videoStrategy;
     private readonly IContentReturnStrategy wallStrategy;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ProxyVK"/> class.
+    ///     Initializes a new instance of the <see cref="ProxyVK" /> class.
     /// </summary>
     /// <param name="configuration">Bot configuration.</param>
     /// <param name="loggerPhotoStrategy">Interface for logging PhotoStrategy.</param>
@@ -38,7 +38,8 @@ public sealed class ProxyVK : ProxyService
         ILogger<DocStrategy> loggerDocStrategy,
         ILogger<VideoStrategy> loggerVideoStrategy,
         ILogger<WallStrategy> loggerWallStrategy)
-        : base(new[] { PhotoStrategy.Regex, AlbumStrategy.Regex, DocStrategy.Regex, VideoStrategy.Regex, WallStrategy.Regex })
+        : base(new[]
+            { PhotoStrategy.Regex, AlbumStrategy.Regex, DocStrategy.Regex, VideoStrategy.Regex, WallStrategy.Regex })
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(loggerPhotoStrategy);
@@ -56,7 +57,8 @@ public sealed class ProxyVK : ProxyService
         var idResourceRegexWrapper = new IdResourceRegexWrapper();
         var stepObjectsInAlbum = configuration.Proxy.Vk.StepObjectsInAlbum;
         photoStrategy = new PhotoStrategy(api, idResourceRegexWrapper, loggerPhotoStrategy);
-        albumStrategy = new AlbumStrategy(api, idResourceRegexWrapper, loggerAlbumStrategy, photoStrategy, stepObjectsInAlbum);
+        albumStrategy = new AlbumStrategy(api, idResourceRegexWrapper, loggerAlbumStrategy, photoStrategy,
+            stepObjectsInAlbum);
         docStrategy = new DocStrategy(api, idResourceRegexWrapper, loggerDocStrategy);
         videoStrategy = new VideoStrategy(api, idResourceRegexWrapper, loggerVideoStrategy);
         wallStrategy =
@@ -79,12 +81,12 @@ public sealed class ProxyVK : ProxyService
     {
         return url switch
         {
-            var photo when PhotoStrategy.Regex.IsMatch(photo) => photoStrategy.TryGetByUrlAsync(url: photo),
-            var album when AlbumStrategy.Regex.IsMatch(album) => albumStrategy.TryGetByUrlAsync(url: album),
+            var photo when PhotoStrategy.Regex.IsMatch(photo) => photoStrategy.TryGetByUrlAsync(photo),
+            var album when AlbumStrategy.Regex.IsMatch(album) => albumStrategy.TryGetByUrlAsync(album),
             var doc when DocStrategy.Regex.IsMatch(doc) => docStrategy.TryGetByUrlAsync(doc),
             var video when VideoStrategy.Regex.IsMatch(video) => videoStrategy.TryGetByUrlAsync(video),
             var wall when WallStrategy.Regex.IsMatch(wall) => wallStrategy.TryGetByUrlAsync(wall),
-            _ => Task.FromResult<IProxyContent?>(null),
+            _ => Task.FromResult<IProxyContent?>(null)
         };
     }
 }

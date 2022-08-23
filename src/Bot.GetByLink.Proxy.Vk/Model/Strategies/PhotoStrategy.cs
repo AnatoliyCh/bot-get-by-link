@@ -18,7 +18,7 @@ namespace Bot.GetByLink.Proxy.Vk.Model.Strategies;
 public sealed class PhotoStrategy : ContentReturnStrategy
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="PhotoStrategy"/> class.
+    ///     Initializes a new instance of the <see cref="PhotoStrategy" /> class.
     /// </summary>
     /// <param name="api">API for interaction with VK.</param>
     /// <param name="idResourceRegexWrapper"> Regular expression for VK resource Id.</param>
@@ -63,7 +63,7 @@ public sealed class PhotoStrategy : ContentReturnStrategy
     }
 
     /// <summary>
-    /// Return content from a Photo collection.
+    ///     Return content from a Photo collection.
     /// </summary>
     /// <typeparam name="T">Collection Item Type.</typeparam>
     /// <param name="collection">Photo collection.</param>

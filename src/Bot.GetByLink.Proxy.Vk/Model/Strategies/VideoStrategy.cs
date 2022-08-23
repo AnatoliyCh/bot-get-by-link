@@ -1,24 +1,24 @@
-﻿using Bot.GetByLink.Common.Enums;
+﻿using System.Text;
+using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Infrastructure.Proxy;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Vk.Abstractions;
 using Bot.GetByLink.Proxy.Vk.Model.Regexs;
 using Microsoft.Extensions.Logging;
-using System.Text;
 using VkNet;
 using VkNet.Model.Attachments;
 
 namespace Bot.GetByLink.Proxy.Vk.Model.Strategies;
 
 /// <summary>
-/// Provides Api for VK Videos.
-/// No access.
+///     Provides Api for VK Videos.
+///     No access.
 /// </summary>
 public sealed class VideoStrategy : ContentReturnStrategy
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="VideoStrategy"/> class.
+    ///     Initializes a new instance of the <see cref="VideoStrategy" /> class.
     /// </summary>
     /// <param name="api">API for interaction with VK.</param>
     /// <param name="idResourceRegexWrapper"> Regular expression for VK resource Id.</param>
@@ -49,8 +49,8 @@ public sealed class VideoStrategy : ContentReturnStrategy
 
             var builder =
                 new StringBuilder($"https://vk.com/video{videoId}")
-                .AppendLine()
-                .AppendLine("/help");
+                    .AppendLine()
+                    .AppendLine("/help");
 
             return Task.FromResult<IProxyContent?>(new ProxyResponseContent(builder.ToString()));
         }
@@ -62,7 +62,7 @@ public sealed class VideoStrategy : ContentReturnStrategy
     }
 
     /// <summary>
-    /// Return content from a Videos collection.
+    ///     Return content from a Videos collection.
     /// </summary>
     /// <typeparam name="T">Collection Item Type.</typeparam>
     /// <param name="collection">Video collection.</param>

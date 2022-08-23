@@ -1,28 +1,28 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Proxy;
+﻿using System.Text;
+using Bot.GetByLink.Common.Infrastructure.Proxy;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Vk.Abstractions;
 using Bot.GetByLink.Proxy.Vk.Interfaces;
 using Bot.GetByLink.Proxy.Vk.Model.Regexs;
 using Microsoft.Extensions.Logging;
-using System.Text;
 using VkNet;
 using VkNet.Model.Attachments;
 
 namespace Bot.GetByLink.Proxy.Vk.Model.Strategies;
 
 /// <summary>
-/// Provides an API for VK Wall.
+///     Provides an API for VK Wall.
 /// </summary>
 public sealed class WallStrategy : ContentReturnStrategy
 {
-    private readonly IContentReturnStrategy photoStrategy;
     private readonly IContentReturnStrategy albumStrategy;
     private readonly IContentReturnStrategy docStrategy;
+    private readonly IContentReturnStrategy photoStrategy;
     private readonly IContentReturnStrategy videoStrategy;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="WallStrategy"/> class.
+    ///     Initializes a new instance of the <see cref="WallStrategy" /> class.
     /// </summary>
     /// <param name="api">API for interaction with VK.</param>
     /// <param name="idResourceRegexWrapper"> Regular expression for VK resource Id.</param>
@@ -68,7 +68,7 @@ public sealed class WallStrategy : ContentReturnStrategy
         if (post is null) return null;
 
         var proxyResponseContent = new ProxyResponseContent[2];
-        var tasks = new List<Task>()
+        var tasks = new List<Task>
         {
             Task.Run(async () =>
             {
@@ -101,8 +101,8 @@ public sealed class WallStrategy : ContentReturnStrategy
     }
 
     /// <summary>
-    /// Return content from a Wall collection.
-    /// !! Not implemented.
+    ///     Return content from a Wall collection.
+    ///     !! Not implemented.
     /// </summary>
     /// <typeparam name="T">Collection Item Type.</typeparam>
     /// <param name="collection">Wall collection.</param>
@@ -155,7 +155,6 @@ public sealed class WallStrategy : ContentReturnStrategy
 
         // docs
         if (mediaDocs is not null && mediaDocs.Any())
-        {
             foreach (var item in mediaDocs)
             {
                 if (item is not MediaInfoExtra doc) continue;
@@ -165,10 +164,8 @@ public sealed class WallStrategy : ContentReturnStrategy
                     .AppendLine(doc.Title)
                     .AppendLine(doc.Url);
             }
-        }
 
         if (mediaVideos is not null && mediaVideos.Any())
-        {
             foreach (var item in mediaVideos)
             {
                 if (item is not MediaInfoExtra video) continue;
@@ -178,7 +175,6 @@ public sealed class WallStrategy : ContentReturnStrategy
                     .AppendLine(video.Title)
                     .AppendLine(video.Url);
             }
-        }
 
         return new ProxyResponseContent(builder.ToString(), UrlPicture: pictures);
     }

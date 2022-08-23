@@ -16,7 +16,7 @@ public interface IContentReturnStrategy
     public Task<IProxyContent?> TryGetByUrlAsync(string url);
 
     /// <summary>
-    /// Returning Content from the Attachment Collection.
+    ///     Returning Content from the Attachment Collection.
     /// </summary>
     /// <typeparam name="T">Collection Item Type.</typeparam>
     /// <param name="collection">Collection of elements.</param>
