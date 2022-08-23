@@ -18,7 +18,7 @@ public sealed class ProxyVK : ProxyService
     private readonly VkApi api = new();
     private readonly IContentReturnStrategy photoStrategy;
     private readonly IContentReturnStrategy albumStrategy;
-
+    private readonly IContentReturnStrategy docStrategy;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyVK"/> class.
@@ -26,11 +26,13 @@ public sealed class ProxyVK : ProxyService
     /// <param name="configuration">Bot configuration.</param>
     /// <param name="loggerPhotoStrategy">Interface for logging PhotoStrategy.</param>
     /// <param name="loggerAlbumStrategy">Interface for logging AlbumStrategy.</param>
+    /// <param name="loggerDocStrategy">Interface for logging DocStrategy.</param>
     public ProxyVK(
         IBotConfiguration? configuration,
         ILogger<PhotoStrategy> loggerPhotoStrategy,
-        ILogger<AlbumStrategy> loggerAlbumStrategy)
-        : base(new[] { PhotoStrategy.PhotoRegex, AlbumStrategy.AlbumRegex })
+        ILogger<AlbumStrategy> loggerAlbumStrategy,
+        ILogger<DocStrategy> loggerDocStrategy)
+        : base(new[] { PhotoStrategy.PhotoRegex, AlbumStrategy.AlbumRegex, DocStrategy.DocRegex })
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(loggerPhotoStrategy);
@@ -48,6 +50,7 @@ public sealed class ProxyVK : ProxyService
         var idResourceRegexWrapper = new IdResourceRegexWrapper();
         photoStrategy = new PhotoStrategy(api, idResourceRegexWrapper, loggerPhotoStrategy);
         albumStrategy = new AlbumStrategy(api, idResourceRegexWrapper, loggerAlbumStrategy, photoStrategy);
+        docStrategy = new DocStrategy(api, idResourceRegexWrapper, loggerDocStrategy);
     }
 
     /// <summary>
@@ -61,6 +64,7 @@ public sealed class ProxyVK : ProxyService
         {
             var value when PhotoStrategy.PhotoRegex.IsMatch(value) => photoStrategy.TryGetByUrlAsync(value),
             var value when AlbumStrategy.AlbumRegex.IsMatch(value) => albumStrategy.TryGetByUrlAsync(value),
+            var value when DocStrategy.DocRegex.IsMatch(value) => docStrategy.TryGetByUrlAsync(value),
             _ => Task.FromResult<IProxyContent?>(null),
         };
     }
