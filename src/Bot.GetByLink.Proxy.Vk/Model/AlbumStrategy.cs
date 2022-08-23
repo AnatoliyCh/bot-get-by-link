@@ -18,7 +18,7 @@ namespace Bot.GetByLink.Proxy.Vk.Model;
 public sealed class AlbumStrategy : ContentReturnStrategy
 {
     private readonly IContentReturnStrategy photoStrategy;
-    private readonly ulong step = 50; //TODO: в конфиг
+    private readonly ulong stepObjectsInAlbum;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AlbumStrategy"/> class.
@@ -27,10 +27,18 @@ public sealed class AlbumStrategy : ContentReturnStrategy
     /// <param name="idResourceRegexWrapper"> Regular expression for VK resource Id.</param>
     /// <param name="logger">Interface for logging.</param>
     /// <param name="photoStrategy">Provides Api for VK photos.</param>
-    public AlbumStrategy(VkApi api, IRegexWrapper idResourceRegexWrapper, ILogger<AlbumStrategy> logger, IContentReturnStrategy photoStrategy)
+    /// <param name="stepObjectsInAlbum">The number of objects from the album per step.</param>
+    public AlbumStrategy(
+        VkApi api,
+        IRegexWrapper
+        idResourceRegexWrapper,
+        ILogger<AlbumStrategy> logger,
+        IContentReturnStrategy photoStrategy,
+        int stepObjectsInAlbum)
         : base(api, idResourceRegexWrapper, logger)
     {
         this.photoStrategy = photoStrategy ?? throw new ArgumentNullException(nameof(photoStrategy));
+        this.stepObjectsInAlbum = (ulong)stepObjectsInAlbum;
     }
 
     /// <summary>
@@ -77,7 +85,7 @@ public sealed class AlbumStrategy : ContentReturnStrategy
         if (collection is not IEnumerable<Album> albums || !collection.Any()) return null;
         try
         {
-            IEnumerable<IMediaInfo> medias = new List<MediaInfo>((int)step);
+            IEnumerable<IMediaInfo> medias = new List<MediaInfo>((int)stepObjectsInAlbum);
             var mediasAsList = medias.ToList();
             foreach (var album in albums)
             {
@@ -121,14 +129,14 @@ public sealed class AlbumStrategy : ContentReturnStrategy
 
     private async Task<IEnumerable<IMediaInfo>?> GetAlbum(long ownerId, long albumId)
     {
-        var photos = new List<Photo>((int)step);
+        var photos = new List<Photo>((int)stepObjectsInAlbum);
         var offset = 0ul;
         var photoGetParams = new PhotoGetParams()
         {
             OwnerId = ownerId,
             AlbumId = PhotoAlbumType.Id(albumId),
             Reversed = true,
-            Count = step,
+            Count = stepObjectsInAlbum,
             Offset = offset,
         };
         do
@@ -136,7 +144,7 @@ public sealed class AlbumStrategy : ContentReturnStrategy
             var album = await Api.Photo.GetAsync(photoGetParams);
             if (album is null || album.Count == 0) break;
 
-            photoGetParams.Offset += step;
+            photoGetParams.Offset += stepObjectsInAlbum;
             photos.AddRange(album);
         }
         while (true);
