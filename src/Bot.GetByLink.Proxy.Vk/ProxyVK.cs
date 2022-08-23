@@ -19,6 +19,7 @@ public sealed class ProxyVK : ProxyService
     private readonly IContentReturnStrategy photoStrategy;
     private readonly IContentReturnStrategy albumStrategy;
     private readonly IContentReturnStrategy docStrategy;
+    private readonly IContentReturnStrategy videoStrategy;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyVK"/> class.
@@ -27,12 +28,14 @@ public sealed class ProxyVK : ProxyService
     /// <param name="loggerPhotoStrategy">Interface for logging PhotoStrategy.</param>
     /// <param name="loggerAlbumStrategy">Interface for logging AlbumStrategy.</param>
     /// <param name="loggerDocStrategy">Interface for logging DocStrategy.</param>
+    /// <param name="loggerVideoStrategy">Interface for logging VideoStrategy.</param>
     public ProxyVK(
         IBotConfiguration? configuration,
         ILogger<PhotoStrategy> loggerPhotoStrategy,
         ILogger<AlbumStrategy> loggerAlbumStrategy,
-        ILogger<DocStrategy> loggerDocStrategy)
-        : base(new[] { PhotoStrategy.PhotoRegex, AlbumStrategy.AlbumRegex, DocStrategy.DocRegex })
+        ILogger<DocStrategy> loggerDocStrategy,
+        ILogger<VideoStrategy> loggerVideoStrategy)
+        : base(new[] { PhotoStrategy.PhotoRegex, AlbumStrategy.AlbumRegex, DocStrategy.DocRegex, VideoStrategy.Regex })
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(loggerPhotoStrategy);
@@ -51,6 +54,7 @@ public sealed class ProxyVK : ProxyService
         photoStrategy = new PhotoStrategy(api, idResourceRegexWrapper, loggerPhotoStrategy);
         albumStrategy = new AlbumStrategy(api, idResourceRegexWrapper, loggerAlbumStrategy, photoStrategy);
         docStrategy = new DocStrategy(api, idResourceRegexWrapper, loggerDocStrategy);
+        videoStrategy = new VideoStrategy(api, idResourceRegexWrapper, loggerVideoStrategy);
     }
 
     /// <summary>
@@ -62,9 +66,10 @@ public sealed class ProxyVK : ProxyService
     {
         return url switch
         {
-            var value when PhotoStrategy.PhotoRegex.IsMatch(value) => photoStrategy.TryGetByUrlAsync(value),
-            var value when AlbumStrategy.AlbumRegex.IsMatch(value) => albumStrategy.TryGetByUrlAsync(value),
-            var value when DocStrategy.DocRegex.IsMatch(value) => docStrategy.TryGetByUrlAsync(value),
+            var photo when PhotoStrategy.PhotoRegex.IsMatch(photo) => photoStrategy.TryGetByUrlAsync(url: photo),
+            var album when AlbumStrategy.AlbumRegex.IsMatch(album) => albumStrategy.TryGetByUrlAsync(url: album),
+            var doc when DocStrategy.DocRegex.IsMatch(doc) => docStrategy.TryGetByUrlAsync(doc),
+            var video when VideoStrategy.Regex.IsMatch(video) => videoStrategy.TryGetByUrlAsync(video),
             _ => Task.FromResult<IProxyContent?>(null),
         };
     }
