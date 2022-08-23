@@ -20,6 +20,7 @@ public sealed class ProxyVK : ProxyService
     private readonly IContentReturnStrategy albumStrategy;
     private readonly IContentReturnStrategy docStrategy;
     private readonly IContentReturnStrategy videoStrategy;
+    private readonly IContentReturnStrategy wallStrategy;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyVK"/> class.
@@ -29,13 +30,15 @@ public sealed class ProxyVK : ProxyService
     /// <param name="loggerAlbumStrategy">Interface for logging AlbumStrategy.</param>
     /// <param name="loggerDocStrategy">Interface for logging DocStrategy.</param>
     /// <param name="loggerVideoStrategy">Interface for logging VideoStrategy.</param>
+    /// <param name="loggerWallStrategy">Interface for logging WallStrategy.</param>
     public ProxyVK(
         IBotConfiguration? configuration,
         ILogger<PhotoStrategy> loggerPhotoStrategy,
         ILogger<AlbumStrategy> loggerAlbumStrategy,
         ILogger<DocStrategy> loggerDocStrategy,
-        ILogger<VideoStrategy> loggerVideoStrategy)
-        : base(new[] { PhotoStrategy.Regex, AlbumStrategy.Regex, DocStrategy.Regex, VideoStrategy.Regex })
+        ILogger<VideoStrategy> loggerVideoStrategy,
+        ILogger<WallStrategy> loggerWallStrategy)
+        : base(new[] { PhotoStrategy.Regex, AlbumStrategy.Regex, DocStrategy.Regex, VideoStrategy.Regex, WallStrategy.Regex })
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(loggerPhotoStrategy);
@@ -55,6 +58,15 @@ public sealed class ProxyVK : ProxyService
         albumStrategy = new AlbumStrategy(api, idResourceRegexWrapper, loggerAlbumStrategy, photoStrategy);
         docStrategy = new DocStrategy(api, idResourceRegexWrapper, loggerDocStrategy);
         videoStrategy = new VideoStrategy(api, idResourceRegexWrapper, loggerVideoStrategy);
+        wallStrategy =
+            new WallStrategy(
+                api,
+                idResourceRegexWrapper,
+                loggerWallStrategy,
+                photoStrategy,
+                albumStrategy,
+                docStrategy,
+                videoStrategy);
     }
 
     /// <summary>
@@ -70,6 +82,7 @@ public sealed class ProxyVK : ProxyService
             var album when AlbumStrategy.Regex.IsMatch(album) => albumStrategy.TryGetByUrlAsync(url: album),
             var doc when DocStrategy.Regex.IsMatch(doc) => docStrategy.TryGetByUrlAsync(doc),
             var video when VideoStrategy.Regex.IsMatch(video) => videoStrategy.TryGetByUrlAsync(video),
+            var wall when WallStrategy.Regex.IsMatch(wall) => wallStrategy.TryGetByUrlAsync(wall),
             _ => Task.FromResult<IProxyContent?>(null),
         };
     }
