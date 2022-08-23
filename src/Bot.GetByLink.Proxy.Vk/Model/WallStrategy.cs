@@ -53,28 +53,75 @@ public sealed class WallStrategy : ContentReturnStrategy
     public static IRegexWrapper Regex { get; } = new UrlWallRegexWrapper();
 
     /// <summary>
-    ///     Gets a wall by url.
+    ///     Gets a post by url.
     /// </summary>
-    /// <param name="url">Url wall.</param>
-    /// <returns>An object with a caption and a link to the wall.</returns>
-
+    /// <param name="url">Url post.</param>
+    /// <returns>An object with a caption and a link to the post.</returns>
     public override async Task<IProxyContent?> TryGetByUrlAsync(string url)
     {
-        var photoUrl = Regex.Match(url)?.Value;
-        var photoId = IdResourceRegexWrapper.Match(photoUrl)?.Value;
-        if (photoId is null) return null;
+        var wallUrl = Regex.Match(url)?.Value;
+        var wallId = IdResourceRegexWrapper.Match(wallUrl)?.Value;
+        if (wallId is null) return null;
 
+        var post = (await Api.Wall.GetByIdAsync(new[] { wallId })).WallPosts.FirstOrDefault();
+        var repost = post?.CopyHistory.FirstOrDefault();
+        if (post is null) return null;
+
+        var proxyResponseContent = new ProxyResponseContent[2];
+        var tasks = new List<Task>()
+        {
+            Task.Run(async () =>
+            {
+                var content = await GetContentByPost(post);
+                if (content is not null) proxyResponseContent[0] = (ProxyResponseContent)content;
+            }),
+            Task.Run(async () =>
+            {
+                if (repost is null) return;
+
+                var content = await GetContentByPost(repost);
+                if (content is not null) proxyResponseContent[1] = (ProxyResponseContent)content;
+            })
+        };
+
+        if (tasks.Count > 0) await Task.WhenAll(tasks);
+        if (!proxyResponseContent.Any(item => item is not null)) return null;
+
+        var builder = new StringBuilder();
+        IEnumerable<IMediaInfo> pictures = new List<IMediaInfo>();
+        foreach (var content in proxyResponseContent)
+        {
+            if (content is null) continue;
+
+            builder.AppendLine(content.Text);
+            if (content.UrlPicture is not null) pictures = pictures.Concat(content.UrlPicture);
+        }
+
+        return new ProxyResponseContent(builder.ToString(), UrlPicture: pictures);
+    }
+
+    /// <summary>
+    /// Return content from a Wall collection.
+    /// !! Not implemented.
+    /// </summary>
+    /// <typeparam name="T">Collection Item Type.</typeparam>
+    /// <param name="collection">Wall collection.</param>
+    /// <returns>A collection of information objects about attached Walls.</returns>
+    /// <exception cref="NotImplementedException">Not implemented.</exception>
+    public override Task<IEnumerable<IMediaInfo>?> TryGetByCollectionAsync<T>(IEnumerable<T> collection)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task<IProxyContent?> GetContentByPost(Post post)
+    {
         var photos = new List<Photo>();
         var albums = new List<Album>();
         var documents = new List<Document>();
         var videos = new List<Video>();
         var builder = new StringBuilder();
 
-        var wall = (await Api.Wall.GetByIdAsync(new[] { photoId })).WallPosts.FirstOrDefault();
-        var wallRepost = wall?.CopyHistory.FirstOrDefault();
-        if (wall is null) return null;
-
-        foreach (var item in wall.Attachments)
+        foreach (var item in post.Attachments)
         {
             if (item is null) continue;
 
@@ -95,7 +142,7 @@ public sealed class WallStrategy : ContentReturnStrategy
             }
         }
 
-        builder.AppendLine(wall.Text ?? string.Empty);
+        builder.AppendLine(post.Text ?? string.Empty);
         var mediaPhotos = await photoStrategy.TryGetByCollectionAsync(photos);
         var mediaAlbums = await albumStrategy.TryGetByCollectionAsync(albums);
         var mediaDocs = await docStrategy.TryGetByCollectionAsync(documents);
@@ -120,7 +167,6 @@ public sealed class WallStrategy : ContentReturnStrategy
             }
         }
 
-        // videos
         if (mediaVideos is not null && mediaVideos.Any())
         {
             foreach (var item in mediaVideos)
@@ -135,18 +181,5 @@ public sealed class WallStrategy : ContentReturnStrategy
         }
 
         return new ProxyResponseContent(builder.ToString(), UrlPicture: pictures);
-    }
-
-    /// <summary>
-    /// Return content from a Wall collection.
-    /// !! Not implemented.
-    /// </summary>
-    /// <typeparam name="T">Collection Item Type.</typeparam>
-    /// <param name="collection">Wall collection.</param>
-    /// <returns>A collection of information objects about attached Walls.</returns>
-    /// <exception cref="NotImplementedException">Not implemented.</exception>
-    public override Task<IEnumerable<IMediaInfo>?> TryGetByCollectionAsync<T>(IEnumerable<T> collection)
-    {
-        throw new NotImplementedException();
     }
 }
