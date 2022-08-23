@@ -3,7 +3,7 @@ using Bot.GetByLink.Common.Infrastructure.Proxy;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Common;
-using Bot.GetByLink.Proxy.Vk.Interfaces;
+using Bot.GetByLink.Proxy.Vk.Abstractions;
 using Bot.GetByLink.Proxy.Vk.Model.Regexs;
 using Microsoft.Extensions.Logging;
 using VkNet;
@@ -12,15 +12,11 @@ using VkNet.Model.Attachments;
 namespace Bot.GetByLink.Proxy.Vk.Model;
 
 /// <summary>
-///     Provides api for VK photos.
+///     Provides Api for VK Photos.
 ///     Not albums!.
 /// </summary>
-public sealed class PhotoStrategy : IContentReturnStrategy
+public sealed class PhotoStrategy : ContentReturnStrategy
 {
-    private readonly VkApi api;
-    private readonly IRegexWrapper idResourceRegexWrapper;
-    private readonly ILogger logger;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="PhotoStrategy"/> class.
     /// </summary>
@@ -28,31 +24,29 @@ public sealed class PhotoStrategy : IContentReturnStrategy
     /// <param name="idResourceRegexWrapper"> Regular expression for VK resource Id.</param>
     /// <param name="logger">Interface for logging.</param>
     public PhotoStrategy(VkApi api, IRegexWrapper idResourceRegexWrapper, ILogger<PhotoStrategy> logger)
+        : base(api, idResourceRegexWrapper, logger)
     {
-        this.api = api ?? throw new ArgumentNullException(nameof(api));
-        this.idResourceRegexWrapper = idResourceRegexWrapper ?? throw new ArgumentNullException(nameof(idResourceRegexWrapper));
-        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <summary>
-    ///     Gets regular expression for photo.
+    ///     Gets regular expression for Photo.
     /// </summary>
-    public static IRegexWrapper PhotoRegex { get; } = new UrlPhotoRegexWrapper();
+    public static IRegexWrapper Regex { get; } = new UrlPhotoRegexWrapper();
 
     /// <summary>
     ///     Gets a photo by url.
     /// </summary>
     /// <param name="url">Url photo.</param>
     /// <returns>An object with a caption and a link to the photo.</returns>
-    public async Task<IProxyContent?> TryGetByUrlAsync(string url)
+    public override async Task<IProxyContent?> TryGetByUrlAsync(string url)
     {
         try
         {
-            var photoUrl = PhotoRegex.Match(url)?.Value;
-            var photoId = idResourceRegexWrapper.Match(photoUrl)?.Value;
+            var photoUrl = Regex.Match(url)?.Value;
+            var photoId = IdResourceRegexWrapper.Match(photoUrl)?.Value;
             if (photoId is null) return null;
 
-            var photo = (await api.Photo.GetByIdAsync(new[] { photoId })).FirstOrDefault();
+            var photo = (await Api.Photo.GetByIdAsync(new[] { photoId })).FirstOrDefault();
             if (photo is null) return null;
 
             var maxSize = photo.Sizes.Aggregate((a, b) => a.Height + a.Width > b.Height + b.Width ? a : b);
@@ -63,19 +57,18 @@ public sealed class PhotoStrategy : IContentReturnStrategy
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Proxy VK : PhotoStrategy : TryGetByUrlAsync");
+            Logger.LogError(ex, "Proxy VK : PhotoStrategy : TryGetByUrlAsync");
             return null;
         }
     }
 
     /// <summary>
-    /// Return content from a photo collection.
+    /// Return content from a Photo collection.
     /// </summary>
     /// <typeparam name="T">Collection Item Type.</typeparam>
     /// <param name="collection">Photo collection.</param>
-    /// <returns>A collection of information objects about attached photos.</returns>
-    public async Task<IEnumerable<IMediaInfo>?> TryGetByCollectionAsync<T>(IEnumerable<T> collection)
-        where T : MediaAttachment
+    /// <returns>A collection of information objects about attached Photos.</returns>
+    public override async Task<IEnumerable<IMediaInfo>?> TryGetByCollectionAsync<T>(IEnumerable<T> collection)
     {
         try
         {
@@ -109,7 +102,7 @@ public sealed class PhotoStrategy : IContentReturnStrategy
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Proxy VK : PhotoStrategy : TryGetByCollectionAsync");
+            Logger.LogError(ex, "Proxy VK : PhotoStrategy : TryGetByCollectionAsync");
             return null;
         }
     }

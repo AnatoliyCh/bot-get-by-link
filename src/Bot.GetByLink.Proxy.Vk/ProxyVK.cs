@@ -35,7 +35,7 @@ public sealed class ProxyVK : ProxyService
         ILogger<AlbumStrategy> loggerAlbumStrategy,
         ILogger<DocStrategy> loggerDocStrategy,
         ILogger<VideoStrategy> loggerVideoStrategy)
-        : base(new[] { PhotoStrategy.PhotoRegex, AlbumStrategy.AlbumRegex, DocStrategy.DocRegex, VideoStrategy.Regex })
+        : base(new[] { PhotoStrategy.Regex, AlbumStrategy.Regex, DocStrategy.Regex, VideoStrategy.Regex })
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(loggerPhotoStrategy);
@@ -66,9 +66,9 @@ public sealed class ProxyVK : ProxyService
     {
         return url switch
         {
-            var photo when PhotoStrategy.PhotoRegex.IsMatch(photo) => photoStrategy.TryGetByUrlAsync(url: photo),
-            var album when AlbumStrategy.AlbumRegex.IsMatch(album) => albumStrategy.TryGetByUrlAsync(url: album),
-            var doc when DocStrategy.DocRegex.IsMatch(doc) => docStrategy.TryGetByUrlAsync(doc),
+            var photo when PhotoStrategy.Regex.IsMatch(photo) => photoStrategy.TryGetByUrlAsync(url: photo),
+            var album when AlbumStrategy.Regex.IsMatch(album) => albumStrategy.TryGetByUrlAsync(url: album),
+            var doc when DocStrategy.Regex.IsMatch(doc) => docStrategy.TryGetByUrlAsync(doc),
             var video when VideoStrategy.Regex.IsMatch(video) => videoStrategy.TryGetByUrlAsync(video),
             _ => Task.FromResult<IProxyContent?>(null),
         };
