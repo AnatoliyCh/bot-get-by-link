@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using VkNet;
 using VkNet.Model.Attachments;
 
-namespace Bot.GetByLink.Proxy.Vk.Model;
+namespace Bot.GetByLink.Proxy.Vk.Model.Strategies;
 
 /// <summary>
 ///     Provides Api for VK Photos.

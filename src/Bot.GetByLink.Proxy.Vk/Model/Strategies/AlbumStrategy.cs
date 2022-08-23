@@ -10,7 +10,7 @@ using VkNet.Enums.SafetyEnums;
 using VkNet.Model.Attachments;
 using VkNet.Model.RequestParams;
 
-namespace Bot.GetByLink.Proxy.Vk.Model;
+namespace Bot.GetByLink.Proxy.Vk.Model.Strategies;
 
 /// <summary>
 /// Provides an API for VK Albums.
