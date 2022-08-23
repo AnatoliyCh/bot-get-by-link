@@ -16,6 +16,11 @@ public interface ITelegramConfiguration
     public string ChatIdLog { get; init; }
 
     /// <summary>
+    ///     Gets mediaGroup send delay in milliseconds.
+    /// </summary>
+    public int DelaySendingMediaGroupMilliseconds { get; init; }
+
+    /// <summary>
     ///     Gets max size in mb for one photo in message.
     /// </summary>
     public double MaxSizeMbPhoto { get; init; }
