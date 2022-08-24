@@ -1,6 +1,7 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Interfaces;
 using Bot.GetByLink.Common.Abstractions.Command;
+using Bot.GetByLink.Common.Interfaces.Configuration;
 using Telegram.Bot;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model.Commands;
@@ -11,17 +12,21 @@ namespace Bot.GetByLink.Client.Telegram.Common.Model.Commands;
 public sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposable
 {
     private readonly ITelegramBotClient client;
+    private readonly int delaySendingMediaGroupMilliseconds;
     private CancellationTokenSource? cts;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="SendMessageCommand" /> class.
     /// </summary>
     /// <param name="client">Telegram Client.</param>
-    public SendMessageCommand(ITelegramBotClient client)
+    /// <param name="config">Bot configuration.</param>
+    public SendMessageCommand(ITelegramBotClient client, IBotConfiguration config)
         : base(CommandName.SendMessage)
     {
         this.client = client ?? throw new ArgumentNullException(nameof(client));
+
         cts = new CancellationTokenSource();
+        delaySendingMediaGroupMilliseconds = config.Clients.Telegram.DelaySendingMediaGroupMilliseconds;
     }
 
     /// <summary>
@@ -52,7 +57,10 @@ public sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposable
 
         if (message.Artifacts?.Any() ?? false)
             foreach (var artifact in message.Artifacts)
+            {
                 await client.SendMediaGroupAsync(message.ChatId, artifact, cancellationToken: cts.Token);
+                await Task.Delay(delaySendingMediaGroupMilliseconds);
+            }
 
         foreach (var text in message.Text.Where(text => !string.IsNullOrWhiteSpace(text)))
             await client.SendTextMessageAsync(message.ChatId, text, cancellationToken: cts.Token);

@@ -18,5 +18,10 @@ public enum MediaType
     /// <summary>
     ///     Video(gif, mp4, etc.).
     /// </summary>
-    Video
+    Video,
+
+    /// <summary>
+    ///     Document (.txt, .rar, .7z, etc.)
+    /// </summary>
+    Document
 }

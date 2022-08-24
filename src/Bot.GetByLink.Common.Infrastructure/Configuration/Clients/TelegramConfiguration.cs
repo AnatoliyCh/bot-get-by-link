@@ -21,6 +21,12 @@ public sealed class TelegramConfiguration : ITelegramConfiguration
     public string ChatIdLog { get; init; } = string.Empty;
 
     /// <summary>
+    ///     Gets mediaGroup send delay in milliseconds.
+    /// </summary>
+    [JsonPropertyName("DelaySendingMediaGroupMilliseconds")]
+    public int DelaySendingMediaGroupMilliseconds { get; init; } = 60000;
+
+    /// <summary>
     ///     Gets max size in mb for one photo in message.
     /// </summary>
     [JsonPropertyName("MaxSizeMbPhoto")]
@@ -45,7 +51,7 @@ public sealed class TelegramConfiguration : ITelegramConfiguration
     public int MaxTextLenghtMessage { get; init; } = 0;
 
     /// <summary>
-    ///     Gets max text lenght for message.
+    ///     Gets max MediaGroup lenght for message.
     /// </summary>
     [JsonPropertyName("MaxColMediaInMessage")]
     public int MaxColMediaInMessage { get; init; } = 0;

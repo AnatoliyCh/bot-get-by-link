@@ -19,4 +19,9 @@ public interface IVkConfiguration : IProxyConfiguration
     ///     Gets service access key.
     /// </summary>
     public string ServiceAccessKey { get; init; }
+
+    /// <summary>
+    ///     Gets the number of objects from the album per step.
+    /// </summary>
+    public int StepObjectsInAlbum { get; init; }
 }
