@@ -53,6 +53,7 @@ public sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     public override async Task ExecuteAsync(object? ctx)
     {
         if (ctx is not Update update) return;
+
         var chatId = update.Message?.Chat.Id;
         var text = update.Message?.Text;
         if (chatId is null || string.IsNullOrWhiteSpace(text)) return;
@@ -80,6 +81,7 @@ public sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     private static UrlRegexWrapper? GetUrlRegexWrapperByIRegexWrappers(IEnumerable<IRegexWrapper>? regexWrappers)
     {
         if (regexWrappers is null || !regexWrappers.Any()) return null;
+
         foreach (var regex in regexWrappers)
             if (regex is UrlRegexWrapper urlRegex)
                 return urlRegex;

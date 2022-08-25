@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Bot.GetByLink.Common.Enums;
+﻿using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Infrastructure.Proxy;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Proxy;
@@ -47,12 +46,7 @@ public sealed class VideoStrategy : ContentReturnStrategy
             var videoId = IdResourceRegexWrapper.Match(videoUrl)?.Value;
             if (videoId is null) return nullTask;
 
-            var builder =
-                new StringBuilder($"https://vk.com/video{videoId}")
-                    .AppendLine()
-                    .AppendLine("/help");
-
-            return Task.FromResult<IProxyContent?>(new ProxyResponseContent(builder.ToString()));
+            return Task.FromResult<IProxyContent?>(new ProxyResponseContent("/help"));
         }
         catch (Exception ex)
         {
@@ -79,7 +73,7 @@ public sealed class VideoStrategy : ContentReturnStrategy
                 if (item is null) continue;
 
                 var url = $"https://vk.com/video{item.OwnerId}_{item.Id}";
-                medias.Add(new MediaInfoExtra(url, -1, MediaType.Video, item.Title, item.Description));
+                medias.Add(new MediaInfoExtra(url, -1, MediaType.Video, item.Title));
             }
 
             return Task.FromResult<IEnumerable<IMediaInfo>?>(medias);

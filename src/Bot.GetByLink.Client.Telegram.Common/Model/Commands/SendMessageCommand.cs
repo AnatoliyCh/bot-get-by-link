@@ -56,11 +56,14 @@ public sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposable
         if (cts is null || cts.IsCancellationRequested) cts = new CancellationTokenSource();
 
         if (message.Artifacts?.Any() ?? false)
+        {
+            var isDelay = message.Artifacts.Count() > 1;
             foreach (var artifact in message.Artifacts)
             {
                 await client.SendMediaGroupAsync(message.ChatId, artifact, cancellationToken: cts.Token);
-                await Task.Delay(delaySendingMediaGroupMilliseconds);
+                if (isDelay) await Task.Delay(delaySendingMediaGroupMilliseconds);
             }
+        }
 
         foreach (var text in message.Text.Where(text => !string.IsNullOrWhiteSpace(text)))
             await client.SendTextMessageAsync(message.ChatId, text, cancellationToken: cts.Token);

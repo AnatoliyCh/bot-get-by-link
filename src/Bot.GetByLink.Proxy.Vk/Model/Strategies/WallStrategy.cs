@@ -88,16 +88,18 @@ public sealed class WallStrategy : ContentReturnStrategy
         if (!proxyResponseContent.Any(item => item is not null)) return null;
 
         var builder = new StringBuilder();
-        IEnumerable<IMediaInfo> pictures = new List<IMediaInfo>();
+        IEnumerable<IMediaInfo> urlPicture = new List<IMediaInfo>();
+        IEnumerable<IMediaInfo> urlVideo = new List<IMediaInfo>();
         foreach (var content in proxyResponseContent)
         {
             if (content is null) continue;
 
             builder.AppendLine(content.Text);
-            if (content.UrlPicture is not null) pictures = pictures.Concat(content.UrlPicture);
+            if (content.UrlPicture is not null) urlPicture = urlPicture.Concat(content.UrlPicture);
+            if (content.UrlVideo is not null) urlVideo = urlVideo.Concat(content.UrlVideo);
         }
 
-        return new ProxyResponseContent(builder.ToString(), UrlPicture: pictures);
+        return new ProxyResponseContent(builder.ToString(), UrlPicture: urlPicture, UrlVideo: urlVideo);
     }
 
     /// <summary>
@@ -143,21 +145,34 @@ public sealed class WallStrategy : ContentReturnStrategy
         }
 
         builder.AppendLine(post.Text ?? string.Empty);
-        var mediaPhotos = await photoStrategy.TryGetByCollectionAsync(photos);
-        var mediaAlbums = await albumStrategy.TryGetByCollectionAsync(albums);
-        var mediaDocs = await docStrategy.TryGetByCollectionAsync(documents);
-        var mediaVideos = await videoStrategy.TryGetByCollectionAsync(videos);
+        var results = await Task.WhenAll(
+            photoStrategy.TryGetByCollectionAsync(photos),
+            albumStrategy.TryGetByCollectionAsync(albums),
+            docStrategy.TryGetByCollectionAsync(documents),
+            videoStrategy.TryGetByCollectionAsync(videos));
+        var mediaPhotos = results[0] ?? null;
+        var mediaAlbums = results[1] ?? null;
+        var mediaDocs = results[2] ?? null;
+        var mediaVideos = results[3] ?? null;
 
         // pictures
-        IEnumerable<IMediaInfo> pictures = new List<IMediaInfo>();
-        if (mediaPhotos is not null) pictures = pictures.Concat(mediaPhotos);
-        if (mediaAlbums is not null) pictures = pictures.Concat(mediaAlbums);
+        IEnumerable<IMediaInfo> urlPicture = new List<IMediaInfo>();
+        if (mediaPhotos is not null) urlPicture = urlPicture.Concat(mediaPhotos);
+        if (mediaAlbums is not null) urlPicture = urlPicture.Concat(mediaAlbums);
+
+        var urlVideo = new List<IMediaInfo>();
 
         // docs
         if (mediaDocs is not null && mediaDocs.Any())
             foreach (var item in mediaDocs)
             {
                 if (item is not MediaInfoExtra doc) continue;
+
+                if (doc.IsArtifact)
+                {
+                    urlVideo.Add(doc);
+                    continue;
+                }
 
                 builder
                     .AppendLine()
@@ -176,6 +191,6 @@ public sealed class WallStrategy : ContentReturnStrategy
                     .AppendLine(video.Url);
             }
 
-        return new ProxyResponseContent(builder.ToString(), UrlPicture: pictures);
+        return new ProxyResponseContent(builder.ToString(), UrlPicture: urlPicture, UrlVideo: urlVideo);
     }
 }

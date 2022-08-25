@@ -24,7 +24,7 @@ public sealed class TelegramConfiguration : ITelegramConfiguration
     ///     Gets mediaGroup send delay in milliseconds.
     /// </summary>
     [JsonPropertyName("DelaySendingMediaGroupMilliseconds")]
-    public int DelaySendingMediaGroupMilliseconds { get; init; } = 60000;
+    public int DelaySendingMediaGroupMilliseconds { get; init; } = 30000;
 
     /// <summary>
     ///     Gets max size in mb for one photo in message.
