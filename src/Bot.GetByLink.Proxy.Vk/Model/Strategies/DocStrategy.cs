@@ -1,11 +1,13 @@
-﻿using System.Text;
-using Bot.GetByLink.Common.Enums;
+﻿using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Infrastructure.Proxy;
+using Bot.GetByLink.Common.Infrastructure.Regexs;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Proxy;
+using Bot.GetByLink.Proxy.Common;
 using Bot.GetByLink.Proxy.Vk.Abstractions;
 using Bot.GetByLink.Proxy.Vk.Model.Regexs;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 using VkNet;
 using VkNet.Model.Attachments;
 
@@ -17,6 +19,8 @@ namespace Bot.GetByLink.Proxy.Vk.Model.Strategies;
 /// </summary>
 public sealed class DocStrategy : ContentReturnStrategy
 {
+    private readonly IRegexWrapper gifRegexWrapper;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="DocStrategy" /> class.
     /// </summary>
@@ -26,6 +30,7 @@ public sealed class DocStrategy : ContentReturnStrategy
     public DocStrategy(VkApi api, IRegexWrapper idResourceRegexWrapper, ILogger<DocStrategy> logger)
         : base(api, idResourceRegexWrapper, logger)
     {
+        gifRegexWrapper = new GifRegexWrapper();
     }
 
     /// <summary>
@@ -47,12 +52,7 @@ public sealed class DocStrategy : ContentReturnStrategy
             var docId = IdResourceRegexWrapper.Match(docUrl)?.Value;
             if (docId is null) return nullTask;
 
-            var builder =
-                new StringBuilder($"https://vk.com/doc{docId}")
-                    .AppendLine()
-                    .AppendLine("/help");
-
-            return Task.FromResult<IProxyContent?>(new ProxyResponseContent(builder.ToString()));
+            return Task.FromResult<IProxyContent?>(new ProxyResponseContent("/help"));
         }
         catch (Exception ex)
         {
@@ -67,27 +67,37 @@ public sealed class DocStrategy : ContentReturnStrategy
     /// <typeparam name="T">Collection Item Type.</typeparam>
     /// <param name="collection">Doc collection.</param>
     /// <returns>A collection of information objects about attached Docs.</returns>
-    public override Task<IEnumerable<IMediaInfo>?> TryGetByCollectionAsync<T>(IEnumerable<T> collection)
+    public override async Task<IEnumerable<IMediaInfo>?> TryGetByCollectionAsync<T>(IEnumerable<T> collection)
     {
-        var nullTask = Task.FromResult<IEnumerable<IMediaInfo>?>(null);
-        if (collection is not IEnumerable<Document> docs || !collection.Any()) return nullTask;
+        if (collection is not IEnumerable<Document> docs || !collection.Any()) return null;
         try
         {
             var medias = new List<MediaInfoExtra>(docs.Count());
             foreach (var item in docs)
             {
                 if (item is null) continue;
+                if (IsGif(item))
+                {
+                    var size = await ProxyHelper.GetSizeContentUrlAsync(item.Uri);
+                    medias.Add(new MediaInfoExtra(item.Uri, size, MediaType.Gif, IsArtifact: true));
+                    continue;
+                }
 
                 var url = $"https://vk.com/doc{item.OwnerId}_{item.Id}";
-                medias.Add(new MediaInfoExtra(url, -1, MediaType.Document, item.Title, string.Empty));
+                medias.Add(new MediaInfoExtra(url, -1, MediaType.Document, item.Title, IsArtifact: false));
             }
 
-            return Task.FromResult<IEnumerable<IMediaInfo>?>(medias);
+            return medias;
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Proxy VK : DocStrategy : TryGetByCollectionAsync");
-            return nullTask;
+            return null;
         }
+    }
+
+    private bool IsGif(Document doc)
+    {
+        return doc.Ext == "gif" && gifRegexWrapper.IsMatch(doc.Title, RegexOptions.IgnoreCase);
     }
 }

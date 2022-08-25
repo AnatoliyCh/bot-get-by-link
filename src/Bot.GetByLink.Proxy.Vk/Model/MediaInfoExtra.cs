@@ -11,5 +11,6 @@ namespace Bot.GetByLink.Proxy.Vk.Model;
 /// <param name="Type">Type media.</param>
 /// <param name="Title">Title media.</param>
 /// <param name="Description">Description media.</param>
+/// <param name="IsArtifact">Whether to add to the media group.</param>
 public sealed record MediaInfoExtra
-    (string Url, double Size, MediaType Type, string Title, string Description) : IMediaInfo;
+    (string Url, double Size, MediaType Type, string? Title = null, string? Description = null, bool IsArtifact = false) : IMediaInfo;
