@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using Bot.GetByLink.Common.Interfaces.Configuration.Proxy;
+﻿using Bot.GetByLink.Common.Interfaces.Configuration.Proxy;
+using System.Text.Json.Serialization;
 
 namespace Bot.GetByLink.Common.Infrastructure.Configuration.Proxy;
 
@@ -36,5 +36,5 @@ public sealed class VkConfiguration : IVkConfiguration
     ///     Gets the number of objects from the album per step.
     /// </summary>
     [JsonPropertyName("StepObjectsInAlbum")]
-    public int StepObjectsInAlbum { get; init; } = 50;
+    public int StepObjectsInAlbum { get; init; } = 100;
 }
