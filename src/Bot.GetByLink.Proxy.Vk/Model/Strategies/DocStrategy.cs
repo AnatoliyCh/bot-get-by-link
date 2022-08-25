@@ -1,4 +1,5 @@
-﻿using Bot.GetByLink.Common.Enums;
+﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Infrastructure.Proxy;
 using Bot.GetByLink.Common.Infrastructure.Regexs;
 using Bot.GetByLink.Common.Interfaces;
@@ -7,7 +8,6 @@ using Bot.GetByLink.Proxy.Common;
 using Bot.GetByLink.Proxy.Vk.Abstractions;
 using Bot.GetByLink.Proxy.Vk.Model.Regexs;
 using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
 using VkNet;
 using VkNet.Model.Attachments;
 
