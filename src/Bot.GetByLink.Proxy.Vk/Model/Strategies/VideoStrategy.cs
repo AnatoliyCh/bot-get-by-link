@@ -43,8 +43,8 @@ public sealed class VideoStrategy : ContentReturnStrategy
         try
         {
             var videoUrl = Regex.Match(url)?.Value;
-            var videoId = IdResourceRegexWrapper.Match(videoUrl)?.Value;
-            if (videoId is null) return nullTask;
+            var id = IdResourceRegexWrapper.Match(videoUrl)?.Value;
+            if (id is null) return nullTask;
 
             return Task.FromResult<IProxyContent?>(new ProxyResponseContent("/help"));
         }

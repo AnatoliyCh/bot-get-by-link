@@ -1,6 +1,5 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Common.Enums;
-using Bot.GetByLink.Common.Infrastructure.Exceptions;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Configuration;
@@ -93,10 +92,6 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
                     break;
             }
 
-            return false;
-        }
-        catch (ProxyException pe)
-        {
             return false;
         }
         catch (Exception ex)

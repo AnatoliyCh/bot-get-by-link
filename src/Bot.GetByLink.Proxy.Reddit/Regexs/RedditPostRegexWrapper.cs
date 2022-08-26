@@ -6,7 +6,7 @@ namespace Bot.GetByLink.Proxy.Reddit.Regexs;
 ///     Regular expression for Reddit main comment.
 /// </summary>
 /// https://www.reddit.com/r/*/comments/*
-internal class RedditPostRegexWrapper : RegexWrapper
+internal sealed class RedditPostRegexWrapper : RegexWrapper
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="RedditPostRegexWrapper" /> class.
