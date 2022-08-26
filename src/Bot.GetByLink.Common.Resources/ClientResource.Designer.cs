@@ -61,6 +61,16 @@ namespace Bot.GetByLink.Common.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на 🇷🇺 Не удалось получить ресурс по ссылке
+        ///🇺🇸 Failed to get resource by reference.
+        /// </summary>
+        internal static string FailedGetResource {
+            get {
+                return ResourceManager.GetString("FailedGetResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на 🇷🇺 Неправильная команда
         ///🇺🇸 Wrong command.
         /// </summary>
