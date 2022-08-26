@@ -15,7 +15,7 @@ public sealed class ClientException : GetByLink.Common.Infrastructure.Exceptions
     /// <param name="type">The client-side exception type.</param>
     /// <param name="message">Exception message. Sent to the client.</param>
     /// <param name="chatId">The id of the chat with the client.</param>
-    public ClientException(ClientExceptionType type = ClientExceptionType.Allowed, string? message = null, ChatId? chatId = null)
+    public ClientException(ExceptionType type = ExceptionType.Allowed, string? message = null, ChatId? chatId = null)
         : base(type, message)
     {
         ChatId = chatId;

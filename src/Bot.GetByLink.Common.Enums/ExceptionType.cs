@@ -1,9 +1,9 @@
 ﻿namespace Bot.GetByLink.Common.Enums;
 
 /// <summary>
-/// Types of client exceptions.
+/// Types of client and proxy exceptions.
 /// </summary>
-public enum ClientExceptionType
+public enum ExceptionType
 {
     /// <summary>
     /// Allowed exception.

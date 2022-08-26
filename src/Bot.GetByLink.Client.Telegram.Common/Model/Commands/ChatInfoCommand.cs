@@ -39,14 +39,14 @@ public sealed class ChatInfoCommand : AsyncCommand<CommandName>
         if (ctx is not Update update)
         {
             string messageException = string.Format("Command: {0} => ctx is not type Update", Name);
-            throw new ClientException(ClientExceptionType.Technical, messageException);
+            throw new ClientException(ExceptionType.Technical, messageException);
         }
 
         var chatId = update.Message?.Chat.Id;
         if (chatId is null)
         {
             string messageException = string.Format("Command: {0} => chatId is null: chatId: {1}", Name, chatId);
-            throw new ClientException(ClientExceptionType.Technical, messageException);
+            throw new ClientException(ExceptionType.Technical, messageException);
         }
 
         var cts = new CancellationTokenSource();

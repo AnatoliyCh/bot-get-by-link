@@ -55,27 +55,27 @@ public sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     /// <returns>Empty Task.</returns>
     public override async Task ExecuteAsync(object? ctx)
     {
-        if (ctx is not Update update) throw new ClientException(ClientExceptionType.Technical, "ctx is not Update");
+        if (ctx is not Update update) throw new ClientException(ExceptionType.Technical, "ctx is not Update");
 
         var chatId = update.Message?.Chat.Id;
         var text = update.Message?.Text;
         if (chatId is null || string.IsNullOrWhiteSpace(text))
         {
             string messageException = string.Format("Command: {0} => chatId: {1}, text: {2}", Name, chatId, text);
-            throw new ClientException(ClientExceptionType.Technical, messageException);
+            throw new ClientException(ExceptionType.Technical, messageException);
         }
 
         var url = urlRegex.Match(text)?.Value;
-        if (string.IsNullOrWhiteSpace(url)) throw new ClientException(ClientExceptionType.Allowed);
+        if (string.IsNullOrWhiteSpace(url)) throw new ClientException(ExceptionType.Allowed);
 
         var matchProxy = ProxyServices.FirstOrDefault(proxy => proxy.IsMatch(url));
-        if (matchProxy is null) throw new ClientException(ClientExceptionType.Allowed);
+        if (matchProxy is null) throw new ClientException(ExceptionType.Allowed);
 
         var postContent = await matchProxy.GetContentUrlAsync(url);
         if (postContent is null)
         {
             var messageException = ResourceRepository.GetClientResource(ClientResource.FailedGetResource);
-            throw new ClientException(ClientExceptionType.Allowed, messageException, chatId);
+            throw new ClientException(ExceptionType.Allowed, messageException, chatId);
         }
 
         var message = builderMessage

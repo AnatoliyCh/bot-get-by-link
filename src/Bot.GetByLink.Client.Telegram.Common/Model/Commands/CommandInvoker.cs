@@ -85,10 +85,10 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
 
             switch (ce.Type)
             {
-                case ClientExceptionType.Allowed when ce.Message is not null && ce.ChatId is not null:
+                case ExceptionType.Allowed when ce.Message is not null && ce.ChatId is not null:
                     await sendMessageCommand.ExecuteAsync(new Message(ce.ChatId, new string[] { ce.Message }));
                     break;
-                case ClientExceptionType.Technical when ce.Message is not null:
+                case ExceptionType.Technical when ce.Message is not null:
                     logger.LogError(ce, message);
                     break;
             }

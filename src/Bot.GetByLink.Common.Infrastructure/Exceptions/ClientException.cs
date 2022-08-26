@@ -12,14 +12,14 @@ public class ClientException : Exception
     /// <summary>
     /// Gets the client-side exception type.
     /// </summary>
-    public ClientExceptionType Type { get; }
+    public ExceptionType Type { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ClientException"/> class.
     /// </summary>
     /// <param name="type">The client-side exception type.</param>
     /// <param name="message">Exception message. Sent to the client.</param>
-    public ClientException(ClientExceptionType type = ClientExceptionType.Allowed, string? message = null)
+    public ClientException(ExceptionType type = ExceptionType.Allowed, string? message = null)
         : base(message)
     {
         Type = type;
