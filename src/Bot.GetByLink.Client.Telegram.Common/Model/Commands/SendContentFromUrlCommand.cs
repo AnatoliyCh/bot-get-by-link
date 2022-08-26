@@ -1,10 +1,13 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Interfaces;
+using Bot.GetByLink.Client.Telegram.Common.Model.Exceptions;
 using Bot.GetByLink.Client.Telegram.Common.Model.Regexs;
 using Bot.GetByLink.Common.Abstractions.Command;
+using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Proxy;
+using Bot.GetByLink.Common.Resources;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -52,20 +55,28 @@ public sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     /// <returns>Empty Task.</returns>
     public override async Task ExecuteAsync(object? ctx)
     {
-        if (ctx is not Update update) return;
+        if (ctx is not Update update) throw new ClientException(ClientExceptionType.Technical, "ctx is not Update");
 
         var chatId = update.Message?.Chat.Id;
         var text = update.Message?.Text;
-        if (chatId is null || string.IsNullOrWhiteSpace(text)) return;
+        if (chatId is null || string.IsNullOrWhiteSpace(text))
+        {
+            string messageException = string.Format("Command: {0} => chatId: {1}, text: {2}", Name, chatId, text);
+            throw new ClientException(ClientExceptionType.Technical, messageException);
+        }
 
         var url = urlRegex.Match(text)?.Value;
-        if (string.IsNullOrWhiteSpace(url)) return;
+        if (string.IsNullOrWhiteSpace(url)) throw new ClientException(ClientExceptionType.Allowed);
 
         var matchProxy = ProxyServices.FirstOrDefault(proxy => proxy.IsMatch(url));
-        if (matchProxy is null) return;
+        if (matchProxy is null) throw new ClientException(ClientExceptionType.Allowed);
 
         var postContent = await matchProxy.GetContentUrlAsync(url);
-        if (postContent is null) return;
+        if (postContent is null)
+        {
+            var messageException = ResourceRepository.GetClientResource(ClientResource.FailedGetResource);
+            throw new ClientException(ClientExceptionType.Allowed, messageException, chatId);
+        }
 
         var message = builderMessage
             .From(postContent)

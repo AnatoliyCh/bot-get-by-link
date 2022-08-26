@@ -1,4 +1,6 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Common.Enums;
+using Bot.GetByLink.Common.Infrastructure.Exceptions;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Configuration;
@@ -61,6 +63,7 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
     /// <returns>IsSuccessfully.</returns>
     public async Task<bool> TryExecuteCommandAsync(ICommand<CommandName>? command, object? ctx)
     {
+        var message = $"ICommand: {command?.Name.ToString()}";
         try
         {
             switch (command)
@@ -75,9 +78,29 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
 
             return true;
         }
+        catch (Exceptions.ClientException ce)
+        {
+            var sendMessageCommand = GetCommand<SendMessageCommand>();
+            if (sendMessageCommand is null) return false;
+
+            switch (ce.Type)
+            {
+                case ClientExceptionType.Allowed when ce.Message is not null && ce.ChatId is not null:
+                    await sendMessageCommand.ExecuteAsync(new Message(ce.ChatId, new string[] { ce.Message }));
+                    break;
+                case ClientExceptionType.Technical when ce.Message is not null:
+                    logger.LogError(ce, message);
+                    break;
+            }
+
+            return false;
+        }
+        catch (ProxyException pe)
+        {
+            return false;
+        }
         catch (Exception ex)
         {
-            var message = $"ICommand: {command?.Name.ToString()}";
             logger.LogError(ex, message);
             return false;
         }
