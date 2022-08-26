@@ -1,4 +1,5 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Model.Exceptions;
 using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
@@ -77,7 +78,7 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
 
             return true;
         }
-        catch (Exceptions.ClientException ce)
+        catch (ClientException ce)
         {
             var sendMessageCommand = GetCommand<SendMessageCommand>();
             if (sendMessageCommand is null) return false;
@@ -85,7 +86,7 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
             switch (ce.Type)
             {
                 case ExceptionType.Allowed when ce.Message is not null && ce.ChatId is not null:
-                    await sendMessageCommand.ExecuteAsync(new Message(ce.ChatId, new string[] { ce.Message }));
+                    await sendMessageCommand.ExecuteAsync(new Message(ce.ChatId, new[] { ce.Message }));
                     break;
                 case ExceptionType.Technical when ce.Message is not null:
                     logger.LogError(ce, message);

@@ -112,11 +112,12 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="mediaVideo">Array media info viedos.</param>
     /// <param name="configuration">Configuration telegram.</param>
     /// <returns>Text with url and array valid url.</returns>
-    private static (string MutableUrlText, IEnumerable<IMediaInfo> MutableUrlPicture, IEnumerable<IMediaInfo> MutableUrlVideo)
+    private static (string MutableUrlText, IEnumerable<IMediaInfo> MutableUrlPicture, IEnumerable<IMediaInfo>
+        MutableUrlVideo)
         GetTextUrlAndValidUrl(
-        IEnumerable<IMediaInfo>? mediaPicture,
-        IEnumerable<IMediaInfo>? mediaVideo,
-        ITelegramConfiguration configuration)
+            IEnumerable<IMediaInfo>? mediaPicture,
+            IEnumerable<IMediaInfo>? mediaVideo,
+            ITelegramConfiguration configuration)
     {
         var urlText = string.Empty;
         var mutableUrlPicture = new List<IMediaInfo>();

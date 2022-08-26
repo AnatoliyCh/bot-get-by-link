@@ -57,7 +57,8 @@ public sealed class ProxyVK : ProxyService
         var idResourceRegexWrapper = new IdResourceRegexWrapper();
         var stepObjectsInAlbum = configuration.Proxy.Vk.StepObjectsInAlbum;
         photoStrategy = new PhotoStrategy(api, idResourceRegexWrapper, loggerPhotoStrategy);
-        albumStrategy = new AlbumStrategy(api, idResourceRegexWrapper, loggerAlbumStrategy, photoStrategy, stepObjectsInAlbum);
+        albumStrategy = new AlbumStrategy(api, idResourceRegexWrapper, loggerAlbumStrategy, photoStrategy,
+            stepObjectsInAlbum);
         docStrategy = new DocStrategy(api, idResourceRegexWrapper, loggerDocStrategy);
         videoStrategy = new VideoStrategy(api, idResourceRegexWrapper, loggerVideoStrategy);
         wallStrategy =

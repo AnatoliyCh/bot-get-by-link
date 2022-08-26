@@ -1,11 +1,11 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Proxy;
+﻿using System.Text;
+using Bot.GetByLink.Common.Infrastructure.Proxy;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Vk.Abstractions;
 using Bot.GetByLink.Proxy.Vk.Interfaces;
 using Bot.GetByLink.Proxy.Vk.Model.Regexs;
 using Microsoft.Extensions.Logging;
-using System.Text;
 using VkNet;
 using VkNet.Model.Attachments;
 
@@ -172,7 +172,6 @@ public sealed class WallStrategy : ContentReturnStrategy
 
         // docs
         if (mediaDocs is not null && mediaDocs.Any())
-        {
             foreach (var item in mediaDocs)
             {
                 if (item is not MediaInfoExtra doc) continue;
@@ -188,11 +187,9 @@ public sealed class WallStrategy : ContentReturnStrategy
                     .AppendLine(doc.Title)
                     .AppendLine(doc.Url);
             }
-        }
 
         // other video
         if (mediaVideos is not null && mediaVideos.Any())
-        {
             foreach (var item in mediaVideos)
             {
                 if (item is not MediaInfoExtra video) continue;
@@ -202,7 +199,6 @@ public sealed class WallStrategy : ContentReturnStrategy
                     .AppendLine(video.Title)
                     .AppendLine(video.Url);
             }
-        }
 
         return new ProxyResponseContent(builder.ToString(), UrlPicture: urlPicture, UrlVideo: urlVideo);
     }

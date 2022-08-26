@@ -55,7 +55,7 @@ public sealed class BuilderMessage : IBuilderMessage
     /// <summary>
     ///     Gets or sets a value indicating whether header in text message.
     /// </summary>
-    private bool SetHeader { get; set; } = false;
+    private bool SetHeader { get; set; }
 
     /// <summary>
     ///     From conter build message.

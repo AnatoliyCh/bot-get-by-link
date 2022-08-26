@@ -61,15 +61,15 @@ public sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
         var text = update.Message?.Text;
         if (chatId is null || string.IsNullOrWhiteSpace(text))
         {
-            string messageException = string.Format("Command: {0} => chatId: {1}, text: {2}", Name, chatId, text);
+            var messageException = string.Format("Command: {0} => chatId: {1}, text: {2}", Name, chatId, text);
             throw new ClientException(ExceptionType.Technical, messageException);
         }
 
         var url = urlRegex.Match(text)?.Value;
-        if (string.IsNullOrWhiteSpace(url)) throw new ClientException(ExceptionType.Allowed);
+        if (string.IsNullOrWhiteSpace(url)) throw new ClientException();
 
         var matchProxy = ProxyServices.FirstOrDefault(proxy => proxy.IsMatch(url));
-        if (matchProxy is null) throw new ClientException(ExceptionType.Allowed);
+        if (matchProxy is null) throw new ClientException();
 
         var postContent = await matchProxy.GetContentUrlAsync(url);
         if (postContent is null)
