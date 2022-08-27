@@ -1,11 +1,11 @@
-﻿using Bot.GetByLink.Common.Infrastructure.Proxy;
+﻿using System.Text;
+using Bot.GetByLink.Common.Infrastructure.Proxy;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Vk.Abstractions;
 using Bot.GetByLink.Proxy.Vk.Interfaces;
 using Bot.GetByLink.Proxy.Vk.Model.Regexs;
 using Microsoft.Extensions.Logging;
-using System.Text;
 using VkNet;
 using VkNet.Model.Attachments;
 
@@ -59,47 +59,55 @@ public sealed class WallStrategy : ContentReturnStrategy
     /// <returns>An object with a caption and a link to the post.</returns>
     public override async Task<IProxyContent?> TryGetByUrlAsync(string url)
     {
-        var wallUrl = Regex.Match(url)?.Value;
-        var wallId = IdResourceRegexWrapper.Match(wallUrl)?.Value;
-        if (wallId is null) return null;
-
-        var post = (await Api.Wall.GetByIdAsync(new[] { wallId })).WallPosts.FirstOrDefault();
-        var repost = post?.CopyHistory.FirstOrDefault();
-        if (post is null) return null;
-
-        var proxyResponseContent = new ProxyResponseContent[2];
-        var tasks = new List<Task>
+        try
         {
-            Task.Run(async () =>
+            var wallUrl = Regex.Match(url)?.Value;
+            var wallId = IdResourceRegexWrapper.Match(wallUrl)?.Value;
+            if (wallId is null) return null;
+
+            var post = (await Api.Wall.GetByIdAsync(new[] { wallId })).WallPosts.FirstOrDefault();
+            var repost = post?.CopyHistory.FirstOrDefault();
+            if (post is null) return null;
+
+            var proxyResponseContent = new ProxyResponseContent[2];
+            var tasks = new List<Task>
             {
-                var content = await GetContentByPost(post);
-                if (content is not null) proxyResponseContent[0] = (ProxyResponseContent)content;
-            }),
-            Task.Run(async () =>
+                Task.Run(async () =>
+                {
+                    var content = await GetContentByPost(post);
+                    if (content is not null) proxyResponseContent[0] = (ProxyResponseContent)content;
+                }),
+                Task.Run(async () =>
+                {
+                    if (repost is null) return;
+
+                    var content = await GetContentByPost(repost);
+                    if (content is not null) proxyResponseContent[1] = (ProxyResponseContent)content;
+                })
+            };
+
+            if (tasks.Count > 0) await Task.WhenAll(tasks);
+            if (!proxyResponseContent.Any(item => item is not null)) return null;
+
+            var builder = new StringBuilder();
+            IEnumerable<IMediaInfo> urlPicture = new List<IMediaInfo>();
+            IEnumerable<IMediaInfo> urlVideo = new List<IMediaInfo>();
+            foreach (var content in proxyResponseContent)
             {
-                if (repost is null) return;
+                if (content is null) continue;
 
-                var content = await GetContentByPost(repost);
-                if (content is not null) proxyResponseContent[1] = (ProxyResponseContent)content;
-            })
-        };
+                builder.AppendLine(content.Text);
+                if (content.UrlPicture is not null) urlPicture = urlPicture.Concat(content.UrlPicture);
+                if (content.UrlVideo is not null) urlVideo = urlVideo.Concat(content.UrlVideo);
+            }
 
-        if (tasks.Count > 0) await Task.WhenAll(tasks);
-        if (!proxyResponseContent.Any(item => item is not null)) return null;
-
-        var builder = new StringBuilder();
-        IEnumerable<IMediaInfo> urlPicture = new List<IMediaInfo>();
-        IEnumerable<IMediaInfo> urlVideo = new List<IMediaInfo>();
-        foreach (var content in proxyResponseContent)
-        {
-            if (content is null) continue;
-
-            builder.AppendLine(content.Text);
-            if (content.UrlPicture is not null) urlPicture = urlPicture.Concat(content.UrlPicture);
-            if (content.UrlVideo is not null) urlVideo = urlVideo.Concat(content.UrlVideo);
+            return new ProxyResponseContent(builder.ToString(), UrlPicture: urlPicture, UrlVideo: urlVideo);
         }
-
-        return new ProxyResponseContent(builder.ToString(), UrlPicture: urlPicture, UrlVideo: urlVideo);
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Proxy VK : WallStrategy : TryGetByUrlAsync");
+            return null;
+        }
     }
 
     /// <summary>
@@ -164,7 +172,6 @@ public sealed class WallStrategy : ContentReturnStrategy
 
         // docs
         if (mediaDocs is not null && mediaDocs.Any())
-        {
             foreach (var item in mediaDocs)
             {
                 if (item is not MediaInfoExtra doc) continue;
@@ -180,10 +187,9 @@ public sealed class WallStrategy : ContentReturnStrategy
                     .AppendLine(doc.Title)
                     .AppendLine(doc.Url);
             }
-        }
 
+        // other video
         if (mediaVideos is not null && mediaVideos.Any())
-        {
             foreach (var item in mediaVideos)
             {
                 if (item is not MediaInfoExtra video) continue;
@@ -193,7 +199,6 @@ public sealed class WallStrategy : ContentReturnStrategy
                     .AppendLine(video.Title)
                     .AppendLine(video.Url);
             }
-        }
 
         return new ProxyResponseContent(builder.ToString(), UrlPicture: urlPicture, UrlVideo: urlVideo);
     }

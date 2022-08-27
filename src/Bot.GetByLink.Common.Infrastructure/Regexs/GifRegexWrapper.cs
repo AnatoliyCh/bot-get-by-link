@@ -7,15 +7,13 @@ namespace Bot.GetByLink.Common.Infrastructure.Regexs;
 /// </summary>
 /// *.gif
 /// *.GIF
-/// *.gifv
-/// *.GIFv
-public class GifRegexWrapper : RegexWrapper
+public sealed class GifRegexWrapper : RegexWrapper
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="GifRegexWrapper" /> class.
     /// </summary>
     public GifRegexWrapper()
-        : base(@".(GIF|gif)v?$")
+        : base(@".(GIF|gif)$")
     {
     }
 }

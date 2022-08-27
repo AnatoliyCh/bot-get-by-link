@@ -41,16 +41,20 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="textMessages">Text for media.</param>
     /// <param name="configuration">Configuration telegram.</param>
     /// <returns>List input media for messages.</returns>
-    private IEnumerable<IEnumerable<IAlbumInputMedia>> GetListInputMedia(IEnumerable<IMediaInfo> listMedia,
-        IEnumerable<string> textMessages, ITelegramConfiguration configuration)
+    private static IEnumerable<IEnumerable<IAlbumInputMedia>> GetListInputMedia(
+        IEnumerable<IMediaInfo> listMedia,
+        IEnumerable<string> textMessages,
+        ITelegramConfiguration configuration)
     {
         var listFormatedMedias = listMedia.Select<IMediaInfo, InputMediaBase>((media, index) =>
         {
             return media.Type == MediaType.Photo ? new InputMediaPhoto(media.Url) : new InputMediaVideo(media.Url);
         });
 
-        var groupListFormatedMedias = listFormatedMedias.Split(configuration.MaxColMediaInMessage)
-            .Select(x => x.ToList()).ToList();
+        var groupListFormatedMedias = listFormatedMedias
+            .Split(configuration.MaxColMediaInMessage)
+            .Select(x => x.ToList())
+            .ToList();
 
         for (var i = 0; i < groupListFormatedMedias.Count; i++)
         {
@@ -69,7 +73,9 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="countMediaMessage">Count media in content.</param>
     /// <param name="configuration">Configuration telegram.</param>
     /// <returns>List text for messages.</returns>
-    private IEnumerable<string> GetListTextMessages(string allText, int countMediaMessage,
+    private static IEnumerable<string> GetListTextMessages(
+        string allText,
+        int countMediaMessage,
         ITelegramConfiguration configuration)
     {
         if ((countMediaMessage == 0 && allText.Length < configuration.MaxTextLenghtMessage) ||
@@ -106,8 +112,11 @@ public class ProxyResponseFormatter : IFormatterContent
     /// <param name="mediaVideo">Array media info viedos.</param>
     /// <param name="configuration">Configuration telegram.</param>
     /// <returns>Text with url and array valid url.</returns>
-    private (string MutableUrlText, IEnumerable<IMediaInfo> MutableUrlPicture, IEnumerable<IMediaInfo> MutableUrlVideo)
-        GetTextUrlAndValidUrl(IEnumerable<IMediaInfo>? mediaPicture, IEnumerable<IMediaInfo>? mediaVideo,
+    private static (string MutableUrlText, IEnumerable<IMediaInfo> MutableUrlPicture, IEnumerable<IMediaInfo>
+        MutableUrlVideo)
+        GetTextUrlAndValidUrl(
+            IEnumerable<IMediaInfo>? mediaPicture,
+            IEnumerable<IMediaInfo>? mediaVideo,
             ITelegramConfiguration configuration)
     {
         var urlText = string.Empty;

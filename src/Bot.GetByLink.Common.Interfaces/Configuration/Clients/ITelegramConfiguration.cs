@@ -16,6 +16,11 @@ public interface ITelegramConfiguration
     public string ChatIdLog { get; init; }
 
     /// <summary>
+    ///     Gets a value indicating whether specifies whether to discard all pending updates before polling starts.
+    /// </summary>
+    public bool ThrowPendingUpdates { get; init; }
+
+    /// <summary>
     ///     Gets mediaGroup send delay in milliseconds.
     /// </summary>
     public int DelaySendingMediaGroupMilliseconds { get; init; }

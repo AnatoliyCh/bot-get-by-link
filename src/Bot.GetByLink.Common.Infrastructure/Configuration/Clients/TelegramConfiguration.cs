@@ -1,5 +1,5 @@
-﻿using Bot.GetByLink.Common.Interfaces.Configuration.Clients;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using Bot.GetByLink.Common.Interfaces.Configuration.Clients;
 
 namespace Bot.GetByLink.Common.Infrastructure.Configuration.Clients;
 
@@ -19,6 +19,12 @@ public sealed class TelegramConfiguration : ITelegramConfiguration
     /// </summary>
     [JsonPropertyName("ChatIdLog")]
     public string ChatIdLog { get; init; } = string.Empty;
+
+    /// <summary>
+    ///     Gets a value indicating whether specifies whether to discard all pending updates before polling starts.
+    /// </summary>
+    [JsonPropertyName("ThrowPendingUpdates")]
+    public bool ThrowPendingUpdates { get; init; } = false;
 
     /// <summary>
     ///     Gets mediaGroup send delay in milliseconds.
@@ -54,5 +60,5 @@ public sealed class TelegramConfiguration : ITelegramConfiguration
     ///     Gets max MediaGroup lenght for message.
     /// </summary>
     [JsonPropertyName("MaxColMediaInMessage")]
-    public int MaxColMediaInMessage { get; init; } = 0;
+    public int MaxColMediaInMessage { get; init; } = 1;
 }

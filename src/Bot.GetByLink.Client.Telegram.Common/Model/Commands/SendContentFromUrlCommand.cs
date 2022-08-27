@@ -1,12 +1,14 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Interfaces;
+using Bot.GetByLink.Client.Telegram.Common.Model.Exceptions;
 using Bot.GetByLink.Client.Telegram.Common.Model.Regexs;
 using Bot.GetByLink.Common.Abstractions.Command;
+using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Proxy;
+using Bot.GetByLink.Common.Resources;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model.Commands;
 
@@ -52,27 +54,34 @@ public sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     /// <returns>Empty Task.</returns>
     public override async Task ExecuteAsync(object? ctx)
     {
-        if (ctx is not Update update) return;
+        if (ctx is not Update update) throw new ClientException(ExceptionType.Technical, "ctx is not Update");
 
         var chatId = update.Message?.Chat.Id;
         var text = update.Message?.Text;
-        if (chatId is null || string.IsNullOrWhiteSpace(text)) return;
+        if (chatId is null || string.IsNullOrWhiteSpace(text))
+        {
+            var messageException = string.Format("Command: {0} => chatId: {1}, text: {2}", Name, chatId, text);
+            throw new ClientException(ExceptionType.Technical, messageException);
+        }
 
         var url = urlRegex.Match(text)?.Value;
-        if (string.IsNullOrWhiteSpace(url)) return;
+        if (string.IsNullOrWhiteSpace(url)) throw new ClientException();
 
         var matchProxy = ProxyServices.FirstOrDefault(proxy => proxy.IsMatch(url));
-        if (matchProxy is null) return;
+        if (matchProxy is null) throw new ClientException();
 
         var postContent = await matchProxy.GetContentUrlAsync(url);
-        if (postContent is null) return;
+        if (postContent is null)
+        {
+            var messageException = ResourceRepository.GetClientResource(ClientResource.FailedGetResource);
+            throw new ClientException(ExceptionType.Allowed, messageException, chatId);
+        }
 
         var message = builderMessage
             .From(postContent)
             .AddUrl(url)
             .AddChatId(chatId ?? -1)
             .SetHeaders()
-            .SetParseMode(ParseMode.MarkdownV2)
             .Build();
 
         await sendMessageCommand.ExecuteAsync(message);

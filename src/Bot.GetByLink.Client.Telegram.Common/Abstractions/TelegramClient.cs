@@ -47,7 +47,11 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
 
         RegexWrappers = regexWrappers;
 
-        ReceiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
+        ReceiverOptions = new ReceiverOptions
+        {
+            AllowedUpdates = new[] { UpdateType.Message },
+            ThrowPendingUpdates = config.Clients.Telegram.ThrowPendingUpdates
+        };
     }
 
     /// <summary>
@@ -116,7 +120,8 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
         {
             await CommandInvoker.TryExecuteCommandAsync(
                 CommandName.SendMessage,
-                new Message(update.Message.Chat.Id, new[] { ResourceRepository.GetClientResource("WrongCommand") }));
+                new Message(update.Message.Chat.Id,
+                    new[] { ResourceRepository.GetClientResource(ClientResource.WrongCommand) }));
             return;
         }
 

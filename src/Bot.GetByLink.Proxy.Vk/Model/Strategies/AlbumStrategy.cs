@@ -56,10 +56,10 @@ public sealed class AlbumStrategy : ContentReturnStrategy
         try
         {
             var albumUrl = Regex.Match(url)?.Value;
-            var fullId = IdResourceRegexWrapper.Match(albumUrl)?.Value;
-            if (fullId is null) return null;
+            var id = IdResourceRegexWrapper.Match(albumUrl)?.Value;
+            if (id is null) return null;
 
-            var (ownerId, albumId) = GetAlbumIds(fullId);
+            var (ownerId, albumId) = GetAlbumIds(id);
             if (ownerId is null || albumId is null) return null;
 
             var info = await GetInfobyAlbum((long)ownerId, (long)albumId);

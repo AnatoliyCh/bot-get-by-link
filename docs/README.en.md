@@ -5,13 +5,50 @@
 Project developed for educational purposes, is a bot that return content a "pure" form at the specified link.
 
 Service links supported:
+  
+- [`Reddit`](https://www.reddit.com/)  
 
--   `Reggit` (limitation: video without sound) (**specify a list of link templates**);
--   `Vkontakte/Vk` (only posts from the wall) (**specify a list of link templates**);
+Supports link: https://www.reddit.com/r/*/comments/*  
+  
+Supports forwarding from the Reddit mobile app.  
+  
+Some restrictions:   
+1. Video without sound (planned to implement with sound).  
 
+-   [`Vkontakte/Vk`](https://vk.com)  
+  
+Supports links:
+1. Posts on the wall including album/photo/video/document:  
+	1.1. https://vk.com/feed?w=wall-000000000_0;  
+	1.2. https://vk.com/wall-000000000_0;  
+	1.3. https://vk.com/wall-000000000_000?z=album-000000000_000000000;  
+	1.4. https://vk.com/feed?z=photo0_000000000%2Falbum-0000000000_000000000%2Frev;  
+	1.5. https://vk.com/wall-000000000_000?z=album-000000000_000000000.  
+2. Documents:  
+	2.1. https://vk.com/doc000000000_000000000. 
+3. Video:  
+	3.1. https://vk.com/video-000000000_000000000?list=000000000.  
+4. Photo:  
+	4.1. https://vk.com/feed?z=photo0_000000000%2Falbum-0000000000_000000000%2Frev.  
+
+Supports forwarding from the VK mobile application.
+
+Some restrictions:
+1. Video and document is added as a link in the text.    
+  
 Supported Clients
 
--   [`Telegram`][1] (**link to bot**);
+-   [`Telegram`][1] (**link to bot**);  
+  
+General features:  
+1. If there is a lot of content in the post (example: a post with a large text), the bot will send it in parts and with an interval specified in the config;  
+2. Does not store or collect data and statistics;  
+3. If the post contains links to third-party resources (example: gif from [gfycat](https://gfycat.com/)), then the content can be inserted as a link to this content.  
+There are plans to return content even from third-party resources (partially implemented for Reddit).  
+  
+Command List:  
+ + /help - help and description of the bot;  
+ + /chatInfo - information about the chat in which the command was entered.  
 
 ## Getting started with the bot
 

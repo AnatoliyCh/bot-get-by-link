@@ -1,4 +1,6 @@
 ﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Model.Exceptions;
+using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Configuration;
@@ -42,13 +44,15 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
             (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ??
             throw new NullReferenceException("Command: SendMessage is null");
 
+        var helpCommand =
+            new HelpCommand(sendMessageCommand, config.Clients.Telegram.DelaySendingMediaGroupMilliseconds);
         var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
         var builderMessage = new BuilderMessage(config.Clients.Telegram);
         var sendContentFromUrl =
             new SendContentFromUrlCommand(sendMessageCommand, proxyServices, regexWrappers, builderMessage);
 
         commands = serviceCommands
-            .Concat(new List<ICommand<CommandName>> { chatInfoCommand, sendContentFromUrl })
+            .Concat(new List<ICommand<CommandName>> { helpCommand, chatInfoCommand, sendContentFromUrl })
             .DistinctBy(command => command.Name)
             .ToDictionary(command => command.Name, command => command);
     }
@@ -61,6 +65,7 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
     /// <returns>IsSuccessfully.</returns>
     public async Task<bool> TryExecuteCommandAsync(ICommand<CommandName>? command, object? ctx)
     {
+        var message = $"ICommand: {command?.Name.ToString()}";
         try
         {
             switch (command)
@@ -75,9 +80,25 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
 
             return true;
         }
+        catch (ClientException ce)
+        {
+            var sendMessageCommand = GetCommand<SendMessageCommand>();
+            if (sendMessageCommand is null) return false;
+
+            switch (ce.Type)
+            {
+                case ExceptionType.Allowed when ce.Message is not null && ce.ChatId is not null:
+                    await sendMessageCommand.ExecuteAsync(new Message(ce.ChatId, new[] { ce.Message }));
+                    break;
+                case ExceptionType.Technical when ce.Message is not null:
+                    logger.LogError(ce, message);
+                    break;
+            }
+
+            return false;
+        }
         catch (Exception ex)
         {
-            var message = $"ICommand: {command?.Name.ToString()}";
             logger.LogError(ex, message);
             return false;
         }

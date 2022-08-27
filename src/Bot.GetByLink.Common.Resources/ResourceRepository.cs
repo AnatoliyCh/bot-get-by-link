@@ -10,12 +10,16 @@ public static class ResourceRepository
     /// </summary>
     /// <param name="key">Resource key.</param>
     /// <returns>Text resource.</returns>
-    public static string GetClientResource(string key)
+    public static string GetClientResource(Enums.ClientResource key)
     {
         switch (key)
         {
-            case "WrongCommand":
+            case Enums.ClientResource.WrongCommand:
                 return ClientResource.WrongCommand;
+            case Enums.ClientResource.HelpCommand:
+                return ClientResource.HelpCommand;
+            case Enums.ClientResource.FailedGetResource:
+                return ClientResource.FailedGetResource;
             default:
                 return "-resource empty-";
         }
