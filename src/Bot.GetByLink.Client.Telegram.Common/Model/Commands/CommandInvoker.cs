@@ -44,7 +44,7 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
             (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ??
             throw new NullReferenceException("Command: SendMessage is null");
 
-        var helpCommand = new HelpCommand(client, sendMessageCommand);
+        var helpCommand = new HelpCommand(sendMessageCommand);
         var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
         var builderMessage = new BuilderMessage(config.Clients.Telegram);
         var sendContentFromUrl =

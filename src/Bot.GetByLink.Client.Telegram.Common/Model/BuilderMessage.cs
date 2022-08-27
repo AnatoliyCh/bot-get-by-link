@@ -46,6 +46,7 @@ public sealed class BuilderMessage : IBuilderMessage
     ///     Gets or sets parse mode for right parsing content.
     /// </summary>
     private ParseMode? ParseMode { get; set; }
+
     /// <summary>
     ///     Gets parse mode for right parsing content.
     /// </summary>
