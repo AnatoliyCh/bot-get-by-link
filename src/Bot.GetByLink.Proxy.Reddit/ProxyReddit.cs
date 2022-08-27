@@ -96,15 +96,14 @@ public sealed class ProxyReddit : ProxyService
             }
         }
 
-        if(gifRegex.IsMatch(post.Listing.URL.ToLower()))
+        if (gifRegex.IsMatch(post.Listing.URL.ToLower()))
         {
             size = await ProxyHelper.GetSizeContentUrlAsync(post.Listing.URL);
             return new ProxyResponseContent(string.Empty, header, null,
                 new[] { new MediaInfo(post.Listing.URL, size, MediaType.Video) });
         }
 
-        return new ProxyResponseContent(post.Listing.URL, header, null,
-            null );
+        return new ProxyResponseContent(post.Listing.URL, header);
     }
 
     /// <summary>
