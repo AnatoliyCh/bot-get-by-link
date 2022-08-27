@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Bot.GetByLink.Client.Telegram.Common.Enums;
+﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Model.Regexs;
 using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces;
@@ -7,6 +6,7 @@ using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Configuration;
 using Bot.GetByLink.Common.Resources;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -47,7 +47,7 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
 
         RegexWrappers = regexWrappers;
 
-        ReceiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
+        ReceiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message } };
     }
 
     /// <summary>
