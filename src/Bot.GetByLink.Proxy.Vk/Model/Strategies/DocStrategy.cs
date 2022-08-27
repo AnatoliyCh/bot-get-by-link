@@ -49,8 +49,8 @@ public sealed class DocStrategy : ContentReturnStrategy
         try
         {
             var docUrl = Regex.Match(url)?.Value;
-            var docId = IdResourceRegexWrapper.Match(docUrl)?.Value;
-            if (docId is null) return nullTask;
+            var id = IdResourceRegexWrapper.Match(docUrl)?.Value;
+            if (id is null) return nullTask;
 
             return Task.FromResult<IProxyContent?>(new ProxyResponseContent("/help"));
         }
@@ -83,8 +83,7 @@ public sealed class DocStrategy : ContentReturnStrategy
                     continue;
                 }
 
-                var url = $"https://vk.com/doc{item.OwnerId}_{item.Id}";
-                medias.Add(new MediaInfoExtra(url, -1, MediaType.Document, item.Title, IsArtifact: false));
+                medias.Add(new MediaInfoExtra(item.Uri, -1, MediaType.Document, item.Title, IsArtifact: false));
             }
 
             return medias;

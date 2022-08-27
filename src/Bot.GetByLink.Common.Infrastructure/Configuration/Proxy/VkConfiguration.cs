@@ -1,5 +1,5 @@
-﻿using Bot.GetByLink.Common.Interfaces.Configuration.Proxy;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using Bot.GetByLink.Common.Interfaces.Configuration.Proxy;
 
 namespace Bot.GetByLink.Common.Infrastructure.Configuration.Proxy;
 

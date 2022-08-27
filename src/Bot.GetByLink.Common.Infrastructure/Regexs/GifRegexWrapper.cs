@@ -9,7 +9,7 @@ namespace Bot.GetByLink.Common.Infrastructure.Regexs;
 /// *.GIF
 /// *.gifv
 /// *.GIFv
-public class GifRegexWrapper : RegexWrapper
+public sealed class GifRegexWrapper : RegexWrapper
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="GifRegexWrapper" /> class.

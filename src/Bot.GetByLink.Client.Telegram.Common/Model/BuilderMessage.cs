@@ -20,13 +20,12 @@ public sealed class BuilderMessage : IBuilderMessage
         ArgumentNullException.ThrowIfNull(configuration);
         Configuration = configuration;
         FormatterContent = new ProxyResponseFormatter();
-        SetDefaultParametersBuilder();
     }
 
     /// <summary>
     ///     Gets or sets content for which the message is built.
     /// </summary>
-    private IProxyContent ProxyContent { get; set; }
+    private IProxyContent ProxyContent { get; set; } = new ProxyResponseContent(string.Empty);
 
     /// <summary>
     ///     Gets object for formating content for messages telegram.
@@ -36,17 +35,17 @@ public sealed class BuilderMessage : IBuilderMessage
     /// <summary>
     ///     Gets or sets url where the content get from.
     /// </summary>
-    private string Url { get; set; }
+    private string Url { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets chat ID where messages will be sent.
     /// </summary>
-    private long ChatId { get; set; }
+    private long ChatId { get; set; } = -1;
 
     /// <summary>
     ///     Gets or sets parse mode for right parsing content.
     /// </summary>
-    private ParseMode ParseMode { get; set; }
+    private ParseMode ParseMode { get; set; } = ParseMode.MarkdownV2;
 
     /// <summary>
     ///     Gets parse mode for right parsing content.

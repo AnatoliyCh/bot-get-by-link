@@ -116,7 +116,8 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
         {
             await CommandInvoker.TryExecuteCommandAsync(
                 CommandName.SendMessage,
-                new Message(update.Message.Chat.Id, new[] { ResourceRepository.GetClientResource("WrongCommand") }));
+                new Message(update.Message.Chat.Id,
+                    new[] { ResourceRepository.GetClientResource(ClientResource.WrongCommand) }));
             return;
         }
 

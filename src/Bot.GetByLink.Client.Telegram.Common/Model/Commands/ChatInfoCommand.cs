@@ -1,6 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using Bot.GetByLink.Client.Telegram.Common.Enums;
+using Bot.GetByLink.Client.Telegram.Common.Model.Exceptions;
 using Bot.GetByLink.Common.Abstractions.Command;
+using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces.Command;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -34,9 +36,18 @@ public sealed class ChatInfoCommand : AsyncCommand<CommandName>
     /// <returns>Empty Task.</returns>
     public override async Task ExecuteAsync(object? ctx)
     {
-        if (ctx is not Update update) return;
+        if (ctx is not Update update)
+        {
+            var messageException = string.Format("Command: {0} => ctx is not type Update", Name);
+            throw new ClientException(ExceptionType.Technical, messageException);
+        }
+
         var chatId = update.Message?.Chat.Id;
-        if (chatId is null) return;
+        if (chatId is null)
+        {
+            var messageException = string.Format("Command: {0} => chatId is null: chatId: {1}", Name, chatId);
+            throw new ClientException(ExceptionType.Technical, messageException);
+        }
 
         var cts = new CancellationTokenSource();
         var chat = await client.GetChatAsync(chatId, cts.Token);
