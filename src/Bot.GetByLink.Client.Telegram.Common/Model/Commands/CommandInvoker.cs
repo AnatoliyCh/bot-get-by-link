@@ -42,13 +42,14 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
             (SendMessageCommand)serviceCommands.First(command => command.Name == CommandName.SendMessage) ??
             throw new NullReferenceException("Command: SendMessage is null");
 
+        var helpCommand = new HelpCommand(client, sendMessageCommand);
         var chatInfoCommand = new ChatInfoCommand(client, sendMessageCommand);
         var builderMessage = new BuilderMessage(config.Clients.Telegram);
         var sendContentFromUrl =
             new SendContentFromUrlCommand(sendMessageCommand, proxyServices, regexWrappers, builderMessage);
 
         commands = serviceCommands
-            .Concat(new List<ICommand<CommandName>> { chatInfoCommand, sendContentFromUrl })
+            .Concat(new List<ICommand<CommandName>> { helpCommand, chatInfoCommand, sendContentFromUrl })
             .DistinctBy(command => command.Name)
             .ToDictionary(command => command.Name, command => command);
     }

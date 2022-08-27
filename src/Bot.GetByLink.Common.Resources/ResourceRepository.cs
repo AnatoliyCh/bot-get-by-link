@@ -16,6 +16,8 @@ public static class ResourceRepository
         {
             case "WrongCommand":
                 return ClientResource.WrongCommand;
+            case "HelpCommand":
+                return ClientResource.HelpCommand;
             default:
                 return "-resource empty-";
         }
