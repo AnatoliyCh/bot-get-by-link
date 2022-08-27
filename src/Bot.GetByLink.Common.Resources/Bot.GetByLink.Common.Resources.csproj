@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bot.GetByLink.Common.Enums\Bot.GetByLink.Common.Enums.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="ClientResource.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

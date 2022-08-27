@@ -11,15 +11,15 @@ public interface IMessageContext<TChatId, TText, TArtifact>
     /// <summary>
     ///     Gets chat ID to send the message.
     /// </summary>
-    TChatId ChatId { get; init; }
+    public TChatId ChatId { get; init; }
 
     /// <summary>
     ///     Gets message text.
     /// </summary>
-    TText Text { get; init; }
+    public TText Text { get; init; }
 
     /// <summary>
     ///     Gets collection of Attached Artifacts.
     /// </summary>
-    IEnumerable<TArtifact>? Artifacts { get; init; }
+    public IEnumerable<TArtifact>? Artifacts { get; init; }
 }

@@ -43,10 +43,10 @@ public sealed class PhotoStrategy : ContentReturnStrategy
         try
         {
             var photoUrl = Regex.Match(url)?.Value;
-            var photoId = IdResourceRegexWrapper.Match(photoUrl)?.Value;
-            if (photoId is null) return null;
+            var id = IdResourceRegexWrapper.Match(photoUrl)?.Value;
+            if (id is null) return null;
 
-            var photo = (await Api.Photo.GetByIdAsync(new[] { photoId })).FirstOrDefault();
+            var photo = (await Api.Photo.GetByIdAsync(new[] { id })).FirstOrDefault();
             if (photo is null) return null;
 
             var maxSize = photo.Sizes.Aggregate((a, b) => a.Height + a.Width > b.Height + b.Width ? a : b);

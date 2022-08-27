@@ -150,6 +150,10 @@ Currently, the bot works with posts [VK](https://vk.com) and [Reddit](https://ww
  2. If a reddit post contains links to third-party resources (example: gif from [gfycat](https://gfycat.com/)), then the content can be inserted as a link to this content.
  _In plans_ to return content even from third-party resources (partially implemented)</value>
   </data>
+  <data name="FailedGetResource" xml:space="preserve">
+    <value>🇷🇺 Не удалось получить ресурс по ссылке
+🇺🇸 Failed to get resource by reference</value>
+  </data>
   <data name="WrongCommand" xml:space="preserve">
     <value>🇷🇺 Неправильная команда
 🇺🇸 Wrong command</value>
