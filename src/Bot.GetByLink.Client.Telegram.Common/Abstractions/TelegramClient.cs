@@ -1,4 +1,5 @@
-﻿using Bot.GetByLink.Client.Telegram.Common.Enums;
+﻿using System.Text.RegularExpressions;
+using Bot.GetByLink.Client.Telegram.Common.Enums;
 using Bot.GetByLink.Client.Telegram.Common.Model.Regexs;
 using Bot.GetByLink.Common.Enums;
 using Bot.GetByLink.Common.Interfaces;
@@ -6,7 +7,6 @@ using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Configuration;
 using Bot.GetByLink.Common.Resources;
 using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;

@@ -13,8 +13,8 @@ namespace Bot.GetByLink.Client.Telegram.Common.Model.Commands;
 /// </summary>
 public sealed class HelpCommand : AsyncCommand<CommandName>
 {
-    private readonly IAsyncCommand<CommandName> sendMessageCommand;
     private readonly int delaySendingMediaGroupSeconds;
+    private readonly IAsyncCommand<CommandName> sendMessageCommand;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="HelpCommand" /> class.
@@ -26,11 +26,12 @@ public sealed class HelpCommand : AsyncCommand<CommandName>
         : base(CommandName.Help)
     {
         this.sendMessageCommand = sendMessageCommand ?? throw new ArgumentNullException(nameof(sendMessageCommand));
-        delaySendingMediaGroupSeconds = delaySendingMediaGroupMilliseconds > 0 ? delaySendingMediaGroupMilliseconds / 1000 : 0;
+        delaySendingMediaGroupSeconds =
+            delaySendingMediaGroupMilliseconds > 0 ? delaySendingMediaGroupMilliseconds / 1000 : 0;
     }
 
     /// <summary>
-    ///    Send help info.
+    ///     Send help info.
     /// </summary>
     /// <param name="ctx">Update client.</param>
     /// <returns>Empty Task.</returns>
@@ -41,7 +42,12 @@ public sealed class HelpCommand : AsyncCommand<CommandName>
         var chatId = update.Message?.Chat.Id;
         if (chatId is null) return;
 
-        var message = new Message(chatId, new[] { string.Format(ResourceRepository.GetClientResource(ClientResource.HelpCommand), delaySendingMediaGroupSeconds) },
+        var message = new Message(chatId,
+            new[]
+            {
+                string.Format(ResourceRepository.GetClientResource(ClientResource.HelpCommand),
+                    delaySendingMediaGroupSeconds)
+            },
             ParseMode: ParseMode.Markdown);
         await sendMessageCommand.ExecuteAsync(message);
     }
