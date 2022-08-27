@@ -21,6 +21,12 @@ public sealed class TelegramConfiguration : ITelegramConfiguration
     public string ChatIdLog { get; init; } = string.Empty;
 
     /// <summary>
+    ///     Gets a value indicating whether specifies whether to discard all pending updates before polling starts.
+    /// </summary>
+    [JsonPropertyName("ThrowPendingUpdates")]
+    public bool ThrowPendingUpdates { get; init; } = false;
+
+    /// <summary>
     ///     Gets mediaGroup send delay in milliseconds.
     /// </summary>
     [JsonPropertyName("DelaySendingMediaGroupMilliseconds")]
