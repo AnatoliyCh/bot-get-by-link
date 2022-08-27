@@ -72,7 +72,6 @@ public sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
             .AddUrl(url)
             .AddChatId(chatId ?? -1)
             .SetHeaders()
-            .SetParseMode(ParseMode.MarkdownV2)
             .Build();
 
         await sendMessageCommand.ExecuteAsync(message);

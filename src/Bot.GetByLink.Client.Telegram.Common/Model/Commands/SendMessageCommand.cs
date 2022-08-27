@@ -66,6 +66,6 @@ public sealed class SendMessageCommand : AsyncCommand<CommandName>, IDisposable
         }
 
         foreach (var text in message.Text.Where(text => !string.IsNullOrWhiteSpace(text)))
-            await client.SendTextMessageAsync(message.ChatId, text, cancellationToken: cts.Token);
+            await client.SendTextMessageAsync(message.ChatId, text, cancellationToken: cts.Token, parseMode: message.ParseMode);
     }
 }

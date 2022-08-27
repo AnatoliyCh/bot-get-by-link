@@ -46,7 +46,7 @@ public sealed class BuilderMessage : IBuilderMessage
     /// <summary>
     ///     Gets or sets parse mode for right parsing content.
     /// </summary>
-    private ParseMode ParseMode { get; set; }
+    private ParseMode? ParseMode { get; set; }
 
     /// <summary>
     ///     Gets parse mode for right parsing content.
@@ -131,7 +131,7 @@ public sealed class BuilderMessage : IBuilderMessage
     {
         Url = string.Empty;
         ChatId = -1;
-        ParseMode = ParseMode.MarkdownV2;
+        ParseMode = null;
         SetHeader = false;
         ProxyContent = new ProxyResponseContent(string.Empty);
     }
