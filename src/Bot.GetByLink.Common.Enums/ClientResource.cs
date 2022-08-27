@@ -11,6 +11,11 @@ public enum ClientResource
     WrongCommand,
 
     /// <summary>
+    ///     Help command.
+    /// </summary>
+    HelpCommand,
+
+    /// <summary>
     ///     Failed to get resource by reference.
     /// </summary>
     FailedGetResource

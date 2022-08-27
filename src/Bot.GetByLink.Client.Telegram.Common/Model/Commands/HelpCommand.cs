@@ -41,7 +41,7 @@ public sealed class HelpCommand : AsyncCommand<CommandName>
 
         var cts = new CancellationTokenSource();
 
-        var message = new Message(chatId, new[] { ResourceRepository.GetClientResource("HelpCommand") },
+        var message = new Message(chatId, new[] { ResourceRepository.GetClientResource(GetByLink.Common.Enums.ClientResource.HelpCommand) },
             ParseMode: ParseMode.Markdown);
         await sendMessageCommand.ExecuteAsync(message);
 
