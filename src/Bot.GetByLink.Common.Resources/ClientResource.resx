@@ -117,6 +117,39 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="HelpCommand" xml:space="preserve">
+    <value>🇷🇺 *Справка и описание бота*
+
+*Список команд:*
+/help - справка и описание бота.
+/chatInfo - информация о чате в котором ввели команду.
+
+*Описание бота:*
+Данный бот позволяет получить контент в "чистом" виде по ссылке поста.
+Ссылка на бота в гите: [bot-get-by-link](https://github.com/AnatoliyCh/bot-get-by-link)
+В текущий момент бот работает с постами [VK](https://vk.com) и [Reddit](https://www.reddit.com/).
+
+*Особенности бота:*
+ 1. Если в посте много контента (пример: альбом VK) бот будет присылать его по частям и с промежутком в 1 минуту.  
+ 2. Если посты в реддите содержит ссылки на стороние ресурсы (пример: гифка из [gfycat](https://gfycat.com/)), то контент может быть вставлен как ссылка на этот контент.  
+ _В планах_ возвращать контент даже из стороних ресурсов (частично реализовано)
+
+🇺🇸 *Help and description of the bot*
+
+*List of commands:*
+/help - help and description of the bot.
+/chatInfo - information about the chat in which the command was entered.
+
+*Description of the bot:*
+This bot allows you to get content in a "clean" form from the post link.
+Link to the bot in the git: [bot-get-by-link](https://github.com/AnatoliyCh/bot-get-by-link)
+Currently, the bot works with posts [VK](https://vk.com) and [Reddit](https://www.reddit.com/).
+
+*Features of the bot:*
+ 1. If there is a lot of content in the post (example: VK album), the bot will send it in parts and with an interval of 1 minute.
+ 2. If a reddit post contains links to third-party resources (example: gif from [gfycat](https://gfycat.com/)), then the content can be inserted as a link to this content.
+ _In plans_ to return content even from third-party resources (partially implemented)</value>
+  </data>
   <data name="FailedGetResource" xml:space="preserve">
     <value>🇷🇺 Не удалось получить ресурс по ссылке
 🇺🇸 Failed to get resource by reference</value>

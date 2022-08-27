@@ -16,6 +16,8 @@ public static class ResourceRepository
         {
             case Enums.ClientResource.WrongCommand:
                 return ClientResource.WrongCommand;
+            case Enums.ClientResource.HelpCommand:
+                return ClientResource.HelpCommand;
             case Enums.ClientResource.FailedGetResource:
                 return ClientResource.FailedGetResource;
             default:

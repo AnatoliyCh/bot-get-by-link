@@ -9,7 +9,6 @@ using Bot.GetByLink.Common.Interfaces.Command;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Common.Resources;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model.Commands;
 
@@ -83,7 +82,6 @@ public sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
             .AddUrl(url)
             .AddChatId(chatId ?? -1)
             .SetHeaders()
-            .SetParseMode(ParseMode.MarkdownV2)
             .Build();
 
         await sendMessageCommand.ExecuteAsync(message);

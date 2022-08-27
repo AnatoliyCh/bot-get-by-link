@@ -6,6 +6,11 @@
 public enum CommandName
 {
     /// <summary>
+    ///     Help info the current chat.
+    /// </summary>
+    Help,
+
+    /// <summary>
     ///     Information about the current chat.
     /// </summary>
     ChatInfo,
