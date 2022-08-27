@@ -8,7 +8,7 @@ namespace Bot.GetByLink.Proxy.Vk.Model.Regexs;
 /// </summary>
 /// https://vk.com/wall-000000000_000?z=album-000000000_000000000
 /// https://vk.com/anyWords?z=album-000000000_000000000
-// https://vk.com/wall-000000000_000?w=wall-000000000_000&z=album-000000000_000000000
+/// https://vk.com/wall-000000000_000?w=wall-000000000_000&z=album-000000000_000000000
 internal sealed class UrlAlbumRegexWrapper : RegexWrapper
 {
     /// <summary>
