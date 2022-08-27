@@ -47,7 +47,7 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
 
         RegexWrappers = regexWrappers;
 
-        ReceiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message, UpdateType.Poll } };
+        ReceiverOptions = new ReceiverOptions { AllowedUpdates = new[] { UpdateType.Message } };
     }
 
     /// <summary>
