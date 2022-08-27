@@ -61,7 +61,7 @@ internal sealed class TelegramLogger : ILogger
         Func<TState, Exception?, string> formatter)
     {
         if (formatter is null || sendMessage is null || logChatId is null) return;
-        var message = new Message(logChatId, new List<string> { exception?.ToString() ?? formatter(state, exception) });
+        var message = new Message(logChatId, new List<string> { $"{formatter(state, exception)}\n{exception?.ToString()}" });
         sendMessage?.Invoke(message);
     }
 }
