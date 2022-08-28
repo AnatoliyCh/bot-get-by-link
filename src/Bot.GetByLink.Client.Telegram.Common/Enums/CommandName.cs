@@ -6,6 +6,11 @@
 public enum CommandName
 {
     /// <summary>
+    ///     Starting a dialogue with the bot.
+    /// </summary>
+    Start,
+
+    /// <summary>
     ///     Help info the current chat.
     /// </summary>
     Help,
