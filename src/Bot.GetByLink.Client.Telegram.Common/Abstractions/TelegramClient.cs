@@ -157,8 +157,8 @@ public abstract class TelegramClient : GetByLink.Common.Abstractions.Client, IDi
                     if (!commandRegex.IsMatch(input)) return null;
                     var commandNameText = Regex.Replace(input, "/", string.Empty);
                     commandNameText = string.Concat(commandNameText[0].ToString().ToUpper(), commandNameText.AsSpan(1));
-                    if (!Enum.IsDefined(typeof(CommandName), commandNameText)) return null;
-                    return Enum.Parse<CommandName>(commandNameText, true);
+                    Enum.TryParse(typeof(CommandName), commandNameText, true, out var result);
+                    return (CommandName?)result;
             }
 
         return null;
