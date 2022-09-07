@@ -91,7 +91,7 @@ public sealed class PhotoStrategy : ContentReturnStrategy
                 {
                     var maxSize = photo.Sizes.Aggregate((a, b) => a.Height + a.Width > b.Height + b.Width ? a : b);
                     var size = await ProxyHelper.GetSizeContentUrlAsync(maxSize.Url.AbsoluteUri);
-                    photoUrls[position] = new MediaInfo(maxSize.Url.AbsoluteUri, size, MediaType.Photo);
+                    photoUrls[position] = new MediaInfo(maxSize.Url.AbsoluteUri, size,MediaType.Photo);
                 });
             }
 
