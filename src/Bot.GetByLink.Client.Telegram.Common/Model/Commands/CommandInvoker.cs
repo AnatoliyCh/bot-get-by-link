@@ -55,6 +55,9 @@ public sealed class CommandInvoker : ICommandInvoker<CommandName>
             .Concat(new List<ICommand<CommandName>> { helpCommand, chatInfoCommand, sendContentFromUrl })
             .DistinctBy(command => command.Name)
             .ToDictionary(command => command.Name, command => command);
+
+        // start command == help command
+        commands.Add(CommandName.Start, helpCommand);
     }
 
     /// <summary>
