@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
-namespace Bot.GetByLink.Proxy.Reddit.Model
+namespace Bot.GetByLink.Proxy.Reddit.Model;
+
+/// <summary>
+///     Class gallery data.
+/// </summary>
+public sealed class RedditGalleryData
 {
     /// <summary>
-    ///     Class gallery data.
+    ///     Gets item gallery.
     /// </summary>
-    public sealed class RedditGalleryData
-    {
-        /// <summary>
-        ///     Gets item gallery.
-        /// </summary>
-        [JsonPropertyName("items")]
-        public IList<RedditGalleryItem>? Items { get; init; } = null;
-    }
+    [JsonPropertyName("items")]
+    public IList<RedditGalleryItem>? Items { get; init; } = null;
 }

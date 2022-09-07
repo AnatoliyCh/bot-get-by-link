@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Bot.GetByLink.Common.Abstractions.Proxy;
 using Bot.GetByLink.Common.Enums;
@@ -11,11 +13,7 @@ using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Common;
 using Bot.GetByLink.Proxy.Reddit.Model;
 using Bot.GetByLink.Proxy.Reddit.Regexs;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using Reddit;
-using System.Linq;
-using System.Web;
 
 namespace Bot.GetByLink.Proxy.Reddit;
 
@@ -25,9 +23,9 @@ namespace Bot.GetByLink.Proxy.Reddit;
 public sealed class ProxyReddit : ProxyService
 {
     private readonly string appId;
+    private readonly IRegexWrapper galleryRegex;
     private readonly IRegexWrapper gifRegex;
     private readonly IRegexWrapper picturesRegex;
-    private readonly IRegexWrapper galleryRegex;
     private readonly string secretId;
     private readonly string urlBase = "www.reddit.com";
     private readonly string userAgent = "bot-get-by-link-web";
@@ -55,16 +53,22 @@ public sealed class ProxyReddit : ProxyService
     /// <returns>An object with text and links to pictures and videos present in the post.</returns>
     public override async Task<IProxyContent?> GetContentUrlAsync(string url)
     {
-        var stringGallery = "gallery/";
-        var indexGallery = url.IndexOf(stringGallery);
-        var stringComments = "comments/";
-        var indexComments = url.IndexOf(stringComments);
-        var indexCut = indexGallery != -1 ? indexGallery : indexComments;
-        var lenghtCut = indexGallery != -1 ? stringGallery.Length : stringComments.Length;
-        var cutUrlPost = url[(indexCut + lenghtCut)..];
-        var indexCutSlash = cutUrlPost.IndexOf("/");
-        var postId = cutUrlPost[..(indexCutSlash == -1 ? cutUrlPost.Length : indexCutSlash)];
+        var postId = galleryRegex.IsMatch(url) ? GetRedditId(url, "gallery/") : GetRedditId(url, "comments/");
         return await GetContentIdAsync(postId);
+    }
+
+    /// <summary>
+    ///     Function for get reddit id.
+    /// </summary>
+    /// <param name="url">Url reddit post or gallery.</param>
+    /// <param name="findString">gallery/ or comments/.</param>
+    /// <returns>Reddit id.</returns>
+    private string GetRedditId(string url, string findString)
+    {
+        var cutUrlPost = url[(url.IndexOf(findString) + findString.Length)..];
+        var indexCutSlash = cutUrlPost.IndexOf("/");
+        if (indexCutSlash == -1) return cutUrlPost;
+        return cutUrlPost[..indexCutSlash];
     }
 
     /// <summary>
@@ -136,7 +140,8 @@ public sealed class ProxyReddit : ProxyService
     private static string? GetVideoLink(object media)
     {
         if (media is not JsonObject mediaJsonObject) return string.Empty;
-        return mediaJsonObject?.FirstOrDefault(x => x.Key == "reddit_video").Value?.GetValue<JsonObject>().FirstOrDefault(x => x.Key == "fallback_url").Value?.GetValue<string>();
+        return mediaJsonObject?.FirstOrDefault(x => x.Key == "reddit_video").Value?.GetValue<JsonObject>()
+            .FirstOrDefault(x => x.Key == "fallback_url").Value?.GetValue<string>();
     }
 
     /// <summary>
@@ -177,7 +182,7 @@ public sealed class ProxyReddit : ProxyService
     }
 
     /// <summary>
-    ///      Function for get json post.
+    ///     Function for get json post.
     /// </summary>
     /// <param name="postId">Id post.</param>
     /// <returns>Post in json.</returns>
@@ -197,7 +202,6 @@ public sealed class ProxyReddit : ProxyService
     }
 
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="post"></param>
     /// <returns></returns>
@@ -229,7 +233,8 @@ public sealed class ProxyReddit : ProxyService
     private async Task<IEnumerable<IMediaInfo>> GetGalleryMedia(JsonObject post)
     {
         var galleryData = post?.FirstOrDefault(x => x.Key == "gallery_data").Value?.Deserialize<RedditGalleryData>();
-        var mediaData = post?.FirstOrDefault(x => x.Key == "media_metadata").Value?.Deserialize<Dictionary<string, RedditMediaMetaDataItem>>();
+        var mediaData = post?.FirstOrDefault(x => x.Key == "media_metadata").Value
+            ?.Deserialize<Dictionary<string, RedditMediaMetaDataItem>>();
         if (galleryData?.Items is null || mediaData is null) return Enumerable.Empty<IMediaInfo>();
         var tasks = new Task[mediaData.Count];
         var index = 0;
@@ -237,18 +242,26 @@ public sealed class ProxyReddit : ProxyService
         {
             var position = index; // i is needed to arrange the photos in order.
             index++;
-            if (string.IsNullOrWhiteSpace(media?.SourceElements?.Url) && string.IsNullOrWhiteSpace(media?.SourceElements?.Gif))
+            if (string.IsNullOrWhiteSpace(media?.SourceElements?.Url) &&
+                string.IsNullOrWhiteSpace(media?.SourceElements?.Gif))
             {
                 tasks[position] = Task.CompletedTask;
                 continue;
             }
+
             tasks[position] = Task.Run(async () =>
             {
-                media.SourceElements.Size = await ProxyHelper.GetSizeContentUrlAsync(media.ElementType == "Image" ? media.SourceElements.Url : media.SourceElements.Gif);
+                media.SourceElements.Size = await ProxyHelper.GetSizeContentUrlAsync(media.ElementType == "Image"
+                    ? media.SourceElements.Url
+                    : media.SourceElements.Gif);
             });
         }
 
         if (tasks.Length > 0) await Task.WhenAll(tasks);
-        return mediaData.Select(media => new MediaInfo(media.Value.ElementType == "Image" ? media.Value.SourceElements.Url : media.Value.SourceElements.Gif, media.Value.SourceElements.Size, media.Value.ElementType == "Image" ? MediaType.Photo : MediaType.Video, media.Value.SourceElements.Width ?? 0, media.Value.SourceElements.Height ?? 0));
+        return mediaData.Select(media =>
+            new MediaInfo(
+                media.Value.ElementType == "Image" ? media.Value.SourceElements.Url : media.Value.SourceElements.Gif,
+                media.Value.SourceElements.Size, media.Value.ElementType == "Image" ? MediaType.Photo : MediaType.Video,
+                media.Value.SourceElements.Width ?? 0, media.Value.SourceElements.Height ?? 0));
     }
 }

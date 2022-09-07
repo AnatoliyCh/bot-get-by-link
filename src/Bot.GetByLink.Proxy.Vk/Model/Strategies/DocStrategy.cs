@@ -79,11 +79,11 @@ public sealed class DocStrategy : ContentReturnStrategy
                 if (IsGif(item))
                 {
                     var size = await ProxyHelper.GetSizeContentUrlAsync(item.Uri);
-                    medias.Add(new MediaInfoExtra(item.Uri, size, MediaType.Gif, 0, 0, IsArtifact: true));
+                    medias.Add(new MediaInfoExtra(item.Uri, size, MediaType.Gif, IsArtifact: true));
                     continue;
                 }
 
-                medias.Add(new MediaInfoExtra(item.Uri, -1, MediaType.Document, 0, 0, item.Title, IsArtifact: false));
+                medias.Add(new MediaInfoExtra(item.Uri, -1, MediaType.Document, Title: item.Title, IsArtifact: false));
             }
 
             return medias;
