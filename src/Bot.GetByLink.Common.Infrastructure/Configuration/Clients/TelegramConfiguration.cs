@@ -61,4 +61,10 @@ public sealed class TelegramConfiguration : ITelegramConfiguration
     /// </summary>
     [JsonPropertyName("MaxColMediaInMessage")]
     public int MaxColMediaInMessage { get; init; } = 1;
+
+    /// <summary>
+    ///     Gets max media size px for message.
+    /// </summary>
+    [JsonPropertyName("MaxSizePxMedia")]
+    public int MaxSizePxMedia { get; init; } = 1;
 }
