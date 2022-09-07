@@ -83,7 +83,7 @@ public sealed class DocStrategy : ContentReturnStrategy
                     continue;
                 }
 
-                medias.Add(new MediaInfoExtra(item.Uri, -1, MediaType.Document, item.Title, IsArtifact: false));
+                medias.Add(new MediaInfoExtra(item.Uri, -1, MediaType.Document, Title: item.Title, IsArtifact: false));
             }
 
             return medias;

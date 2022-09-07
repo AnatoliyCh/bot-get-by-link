@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Bot.GetByLink.Common.Abstractions.Proxy;
 using Bot.GetByLink.Common.Enums;
@@ -9,9 +11,8 @@ using Bot.GetByLink.Common.Interfaces;
 using Bot.GetByLink.Common.Interfaces.Configuration;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Bot.GetByLink.Proxy.Common;
+using Bot.GetByLink.Proxy.Reddit.Model;
 using Bot.GetByLink.Proxy.Reddit.Regexs;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Reddit;
 
 namespace Bot.GetByLink.Proxy.Reddit;
@@ -22,6 +23,7 @@ namespace Bot.GetByLink.Proxy.Reddit;
 public sealed class ProxyReddit : ProxyService
 {
     private readonly string appId;
+    private readonly IRegexWrapper galleryRegex;
     private readonly IRegexWrapper gifRegex;
     private readonly IRegexWrapper picturesRegex;
     private readonly string secretId;
@@ -41,6 +43,7 @@ public sealed class ProxyReddit : ProxyService
         secretId = configuration.Proxy.Reddit.Secret ?? string.Empty;
         picturesRegex = new PictureRegexWrapper();
         gifRegex = new GifRegexWrapper();
+        galleryRegex = new RedditGalleryRegexWrapper();
     }
 
     /// <summary>
@@ -50,9 +53,22 @@ public sealed class ProxyReddit : ProxyService
     /// <returns>An object with text and links to pictures and videos present in the post.</returns>
     public override async Task<IProxyContent?> GetContentUrlAsync(string url)
     {
-        var cutUrlPost = url[(url.IndexOf("comments/") + "comments/".Length)..];
-        var postId = cutUrlPost[..cutUrlPost.IndexOf("/")];
+        var postId = galleryRegex.IsMatch(url) ? GetRedditId(url, "gallery/") : GetRedditId(url, "comments/");
         return await GetContentIdAsync(postId);
+    }
+
+    /// <summary>
+    ///     Function for get reddit id.
+    /// </summary>
+    /// <param name="url">Url reddit post or gallery.</param>
+    /// <param name="findString">gallery/ or comments/.</param>
+    /// <returns>Reddit id.</returns>
+    private string GetRedditId(string url, string findString)
+    {
+        var cutUrlPost = url[(url.IndexOf(findString) + findString.Length)..];
+        var indexCutSlash = cutUrlPost.IndexOf("/");
+        if (indexCutSlash == -1) return cutUrlPost;
+        return cutUrlPost[..indexCutSlash];
     }
 
     /// <summary>
@@ -68,26 +84,36 @@ public sealed class ProxyReddit : ProxyService
         var accsessToken = await GetAccessTokenAsync();
         var redditClient =
             new RedditClient(appId, appSecret: secretId, accessToken: accsessToken, userAgent: userAgent);
-        var post = redditClient.LinkPost($"t3_{postId}").Info();
-        var crossPostId = await GetParentPostIdAsync($"t3_{postId}");
-        if (!string.IsNullOrWhiteSpace(crossPostId)) post = redditClient.LinkPost($"{crossPostId}").Info();
-        var header = post.Title;
+        var postNet = redditClient.LinkPost($"t3_{postId}").Info();
+        var fullPostInfo = await GetFullPostInfo($"t3_{postId}");
+        var postData = GetPostData(fullPostInfo);
+        var crossPostId = GetParentPostIdAsync(postData);
 
-        if (post.Listing.Media == null && !post.Listing.IsVideo && !post.Listing.IsRedditMediaDomain &&
-            !gifRegex.IsMatch(post.Listing.URL.ToLower()))
-            return new ProxyResponseContent(post.Listing.SelfText, header);
+        if (!string.IsNullOrWhiteSpace(crossPostId)) postNet = redditClient.LinkPost($"{crossPostId}").Info();
+        var header = postNet.Title;
 
-        long size;
-        if (picturesRegex.IsMatch(post.Listing.URL, RegexOptions.IgnoreCase))
+        if (postData?.FirstOrDefault(x => x.Key == "gallery_data").Value is not null)
         {
-            size = await ProxyHelper.GetSizeContentUrlAsync(post.Listing.URL);
+            var galleryMedia = await GetGalleryMedia(postData);
             return new ProxyResponseContent(string.Empty, header,
-                new[] { new MediaInfo(post.Listing.URL, size, MediaType.Photo) });
+                galleryMedia);
         }
 
-        if (post.Listing.Media != null && post.Listing.IsVideo)
+        if (postNet.Listing.Media == null && !postNet.Listing.IsVideo && !postNet.Listing.IsRedditMediaDomain &&
+            !gifRegex.IsMatch(postNet.Listing.URL?.ToLower()))
+            return new ProxyResponseContent(postNet.Listing.SelfText, header);
+
+        long size;
+        if (picturesRegex.IsMatch(postNet.Listing.URL, RegexOptions.IgnoreCase))
         {
-            var videoLink = GetVideoLink(post.Listing.Media);
+            size = await ProxyHelper.GetSizeContentUrlAsync(postNet.Listing.URL);
+            return new ProxyResponseContent(string.Empty, header,
+                new[] { new MediaInfo(postNet.Listing.URL, size, MediaType.Photo) });
+        }
+
+        if (postNet.Listing.Media != null && postNet.Listing.IsVideo)
+        {
+            var videoLink = GetVideoLink(postNet.Listing.Media);
             if (!string.IsNullOrWhiteSpace(videoLink))
             {
                 size = await ProxyHelper.GetSizeContentUrlAsync(videoLink);
@@ -96,14 +122,14 @@ public sealed class ProxyReddit : ProxyService
             }
         }
 
-        if (gifRegex.IsMatch(post.Listing.URL.ToLower()))
+        if (gifRegex.IsMatch(postNet.Listing.URL.ToLower()))
         {
-            size = await ProxyHelper.GetSizeContentUrlAsync(post.Listing.URL);
+            size = await ProxyHelper.GetSizeContentUrlAsync(postNet.Listing.URL);
             return new ProxyResponseContent(string.Empty, header, null,
-                new[] { new MediaInfo(post.Listing.URL, size, MediaType.Video) });
+                new[] { new MediaInfo(postNet.Listing.URL, size, MediaType.Video) });
         }
 
-        return new ProxyResponseContent(post.Listing.URL, header);
+        return new ProxyResponseContent(postNet.Listing.URL, header);
     }
 
     /// <summary>
@@ -113,8 +139,9 @@ public sealed class ProxyReddit : ProxyService
     /// <returns>Url reddit video.</returns>
     private static string? GetVideoLink(object media)
     {
-        if (media is not JObject mediaJsonObject) return string.Empty;
-        return mediaJsonObject?.SelectToken("reddit_video")?.SelectToken("fallback_url")?.Value<string>();
+        if (media is not JsonObject mediaJsonObject) return string.Empty;
+        return mediaJsonObject?.FirstOrDefault(x => x.Key == "reddit_video").Value?.GetValue<JsonObject>()
+            .FirstOrDefault(x => x.Key == "fallback_url").Value?.GetValue<string>();
     }
 
     /// <summary>
@@ -147,20 +174,19 @@ public sealed class ProxyReddit : ProxyService
         var response = await client.SendAsync(request);
 
         response.EnsureSuccessStatusCode();
-
         var accsessTokenObject =
-            JsonConvert.DeserializeObject<AccessTokenReddit>(await response.Content.ReadAsStringAsync());
+            JsonSerializer.Deserialize<AccessTokenReddit>(await response.Content.ReadAsStringAsync());
         if (accsessTokenObject == null || string.IsNullOrWhiteSpace(accsessTokenObject.AccessToken))
             throw new HttpRequestException($"Реддит вернул ошибку: {response.Content.ReadAsStringAsync().Result}");
         return accsessTokenObject.AccessToken;
     }
 
     /// <summary>
-    ///     Function for get parent post.
+    ///     Function for get json post.
     /// </summary>
-    /// <param name="postId">Id cross post.</param>
-    /// <returns>Id parent post if there is parent post.</returns>
-    private async Task<string?> GetParentPostIdAsync(string postId)
+    /// <param name="postId">Id post.</param>
+    /// <returns>Post in json.</returns>
+    private async Task<JsonObject?> GetFullPostInfo(string postId)
     {
         var client = new HttpClient
         {
@@ -172,9 +198,70 @@ public sealed class ProxyReddit : ProxyService
 
         response.EnsureSuccessStatusCode();
         var text = await response.Content.ReadAsStringAsync();
-        var data = (JObject)JsonConvert.DeserializeObject(text);
-        var prarentPostId = data?.SelectToken("data")?.SelectToken("children")?.First["data"]
-            ?.SelectToken("crosspost_parent")?.Value<string>();
-        return prarentPostId;
+        return JsonSerializer.Deserialize<JsonObject>(text);
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <param name="post"></param>
+    /// <returns></returns>
+    private JsonObject? GetPostData(JsonObject post)
+    {
+        return post?.FirstOrDefault(x => x.Key == "data").Value?
+            .AsObject()?.FirstOrDefault(x => x.Key == "children").Value?
+            .AsArray()?.FirstOrDefault()?
+            .AsObject().FirstOrDefault(x => x.Key == "data").Value?
+            .AsObject();
+    }
+
+    /// <summary>
+    ///     Function for get parent post.
+    /// </summary>
+    /// <param name="post">Post in json.</param>
+    /// <returns>Id parent post if there is parent post.</returns>
+    private string? GetParentPostIdAsync(JsonObject post)
+    {
+        return post.FirstOrDefault(x => x.Key == "crosspost_parent").Value?
+            .GetValue<string>();
+    }
+
+    /// <summary>
+    ///     Function for get gallery media.
+    /// </summary>
+    /// <param name="post">Post in json.</param>
+    /// <returns>List media info </returns>
+    private async Task<IEnumerable<IMediaInfo>> GetGalleryMedia(JsonObject post)
+    {
+        var galleryData = post?.FirstOrDefault(x => x.Key == "gallery_data").Value?.Deserialize<RedditGalleryData>();
+        var mediaData = post?.FirstOrDefault(x => x.Key == "media_metadata").Value
+            ?.Deserialize<Dictionary<string, RedditMediaMetaDataItem>>();
+        if (galleryData?.Items is null || mediaData is null) return Enumerable.Empty<IMediaInfo>();
+        var tasks = new Task[mediaData.Count];
+        var index = 0;
+        foreach (var media in mediaData.Select(x => x.Value))
+        {
+            var position = index; // i is needed to arrange the photos in order.
+            index++;
+            if (string.IsNullOrWhiteSpace(media?.SourceElements?.Url) &&
+                string.IsNullOrWhiteSpace(media?.SourceElements?.Gif))
+            {
+                tasks[position] = Task.CompletedTask;
+                continue;
+            }
+
+            tasks[position] = Task.Run(async () =>
+            {
+                media.SourceElements.Size = await ProxyHelper.GetSizeContentUrlAsync(media.ElementType == "Image"
+                    ? media.SourceElements.Url
+                    : media.SourceElements.Gif);
+            });
+        }
+
+        if (tasks.Length > 0) await Task.WhenAll(tasks);
+        return mediaData.Select(media =>
+            new MediaInfo(
+                media.Value.ElementType == "Image" ? media.Value.SourceElements.Url : media.Value.SourceElements.Gif,
+                media.Value.SourceElements.Size, media.Value.ElementType == "Image" ? MediaType.Photo : MediaType.Video,
+                media.Value.SourceElements.Width ?? 0, media.Value.SourceElements.Height ?? 0));
     }
 }

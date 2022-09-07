@@ -9,4 +9,6 @@ namespace Bot.GetByLink.Common.Infrastructure.Proxy;
 /// <param name="Url">Url media.</param>
 /// <param name="Size">Size media.</param>
 /// <param name="Type">Type media.</param>
-public sealed record MediaInfo(string Url, double Size, MediaType Type) : IMediaInfo;
+/// <param name="Width">Width media.</param>
+/// <param name="Height">Height media.</param>
+public sealed record MediaInfo(string Url, double Size, MediaType Type, int? Width = 0, int? Height = 0) : IMediaInfo;

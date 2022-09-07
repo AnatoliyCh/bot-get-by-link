@@ -73,7 +73,7 @@ public sealed class VideoStrategy : ContentReturnStrategy
                 if (item is null) continue;
 
                 var url = $"https://vk.com/video{item.OwnerId}_{item.Id}";
-                medias.Add(new MediaInfoExtra(url, -1, MediaType.Video, item.Title));
+                medias.Add(new MediaInfoExtra(url, -1, MediaType.Video, Title: item.Title));
             }
 
             return Task.FromResult<IEnumerable<IMediaInfo>?>(medias);

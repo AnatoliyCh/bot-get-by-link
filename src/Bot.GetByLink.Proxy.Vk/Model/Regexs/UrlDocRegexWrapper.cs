@@ -7,13 +7,14 @@ namespace Bot.GetByLink.Proxy.Vk.Model.Regexs;
 /// </summary>
 /// https://vk.com/doc000000000_000000000
 /// https://vk.com/doc000000000_000000000?hash=wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+/// https://vk.com/doc-000000000_000000000
 internal sealed class UrlDocRegexWrapper : RegexWrapper
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="UrlDocRegexWrapper" /> class.
     /// </summary>
     public UrlDocRegexWrapper()
-        : base(@"https?:\/\/vk\.com\/doc?\d+_\d+")
+        : base(@"https?:\/\/vk\.com\/doc-?\d+_\d+")
     {
     }
 }
