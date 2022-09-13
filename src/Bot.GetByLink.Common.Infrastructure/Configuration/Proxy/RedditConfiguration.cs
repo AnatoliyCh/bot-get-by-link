@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Bot.GetByLink.Common.Interfaces.Configuration;
 using Bot.GetByLink.Common.Interfaces.Configuration.Proxy;
 
 namespace Bot.GetByLink.Common.Infrastructure.Configuration.Proxy;
@@ -25,4 +26,9 @@ public sealed class RedditConfiguration : IRedditConfiguration
     /// </summary>
     [JsonPropertyName("Secret")]
     public string Secret { get; init; } = string.Empty;
+
+    /// <summary>
+    ///     Gets sub services.
+    /// </summary>
+    public IRedditSubServicesConfiguration? SubServices { get; init; } = new RedditSubServicesConfiguration();
 }

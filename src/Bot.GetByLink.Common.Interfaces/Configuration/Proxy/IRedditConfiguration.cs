@@ -14,4 +14,9 @@ public interface IRedditConfiguration : IProxyConfiguration
     ///     Gets secret key.
     /// </summary>
     public string Secret { get; init; }
+
+    /// <summary>
+    ///     Gets sub services.
+    /// </summary>
+    public IRedditSubServicesConfiguration? SubServices { get; init; }
 }
