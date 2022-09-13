@@ -4,6 +4,7 @@ using Bot.GetByLink.Common.Infrastructure.Model;
 using Bot.GetByLink.Common.Interfaces.Configuration.Clients;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.InputFiles;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model;
 
@@ -50,7 +51,7 @@ public class ProxyResponseFormatter : IFormatterContent
             .Select<IMediaInfo, InputMediaBase>(media => new InputMediaPhoto(media.Url));
         var listVideoMedias = listMedia.Where(x => x.Type == MediaType.Video || x.Type == MediaType.Gif)
             .Select<IMediaInfo, InputMediaBase>(media => new InputMediaVideo(media.Url));
-
+        
         var groupListFormatedMedias = listPhotoMedias
             .Split(configuration.MaxColMediaInMessage)
             .Select(x => x.ToList())
@@ -63,7 +64,7 @@ public class ProxyResponseFormatter : IFormatterContent
         {
             var itemMedias = groupListFormatedMedias[i];
             var firstItemMedia = itemMedias[0];
-            if (firstItemMedia != null) firstItemMedia.Caption = textMessages.Skip(i).Take(1).FirstOrDefault();
+            if (firstItemMedia != null) firstItemMedia.Caption = textMessages.Skip(i).FirstOrDefault();
         }
 
         return groupListFormatedMedias.Select(x => x.Select(y => y as IAlbumInputMedia));
@@ -129,7 +130,7 @@ public class ProxyResponseFormatter : IFormatterContent
         if (mediaPicture?.Any() ?? false)
             foreach (var inputMediaPhoto in mediaPicture)
                 if (inputMediaPhoto.Size < 0
-                    || inputMediaPhoto.Size > configuration.MaxSizeMbPhoto
+                    || inputMediaPhoto.Size >= configuration.MaxSizeMbPhoto
                     || inputMediaPhoto.Width > configuration.MaxSizePxMedia
                     || inputMediaPhoto.Height > configuration.MaxSizePxMedia)
                     urlText = $"{inputMediaPhoto.Url}\n{urlText}";
@@ -138,7 +139,7 @@ public class ProxyResponseFormatter : IFormatterContent
         if (mediaVideo?.Any() ?? false)
             foreach (var inputMediaVideo in mediaVideo)
                 if (inputMediaVideo.Size < 0
-                    || inputMediaVideo.Size > configuration.MaxSizeMbVideo
+                    || inputMediaVideo.Size >= configuration.MaxSizeMbVideo
                     || inputMediaVideo.Width > configuration.MaxSizePxMedia
                     || inputMediaVideo.Height > configuration.MaxSizePxMedia)
                     urlText = $"{inputMediaVideo.Url}\n{urlText}";
