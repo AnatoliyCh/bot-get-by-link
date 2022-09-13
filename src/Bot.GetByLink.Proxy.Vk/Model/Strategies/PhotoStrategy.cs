@@ -51,7 +51,7 @@ public sealed class PhotoStrategy : ContentReturnStrategy
 
             var maxSize = photo.Sizes.Aggregate((a, b) => a.Height + a.Width > b.Height + b.Width ? a : b);
             var size = await ProxyHelper.GetSizeContentUrlAsync(maxSize.Url.AbsoluteUri);
-            var mediaInfo = new MediaInfo(maxSize.Url.AbsoluteUri, size, MediaType.Photo);
+            var mediaInfo = new MediaInfo(maxSize.Url.AbsoluteUri, size, MediaType.Photo, (int)maxSize.Width, (int)maxSize.Height);
 
             return new ProxyResponseContent(photo.Text, UrlPicture: new[] { mediaInfo });
         }
@@ -91,7 +91,7 @@ public sealed class PhotoStrategy : ContentReturnStrategy
                 {
                     var maxSize = photo.Sizes.Aggregate((a, b) => a.Height + a.Width > b.Height + b.Width ? a : b);
                     var size = await ProxyHelper.GetSizeContentUrlAsync(maxSize.Url.AbsoluteUri);
-                    photoUrls[position] = new MediaInfo(maxSize.Url.AbsoluteUri, size, MediaType.Photo);
+                    photoUrls[position] = new MediaInfo(maxSize.Url.AbsoluteUri, size, MediaType.Photo, (int)maxSize.Width, (int)maxSize.Height);
                 });
             }
 
