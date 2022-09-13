@@ -1,8 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Reflection.PortableExecutable;
+﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -30,16 +26,16 @@ public sealed class ProxyReddit : ProxyService
 {
     private readonly string appId;
     private readonly IRegexWrapper galleryRegex;
+    private readonly IRegexWrapper gfycatRegex;
     private readonly IRegexWrapper gifRegex;
     private readonly IRegexWrapper gifvRegex;
-    private readonly IRegexWrapper picturesRegex;
-    private readonly IRegexWrapper gfycatRegex;
-    private readonly IRegexWrapper redGifRegex;
-    private readonly IRegexWrapper imgurRegex;
-    private readonly string secretId;
     private readonly string ImgurAppId;
-    private readonly string urlBase = "www.reddit.com";
+    private readonly IRegexWrapper imgurRegex;
     private readonly ILogger logger;
+    private readonly IRegexWrapper picturesRegex;
+    private readonly IRegexWrapper redGifRegex;
+    private readonly string secretId;
+    private readonly string urlBase = "www.reddit.com";
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProxyReddit" /> class.
@@ -91,7 +87,8 @@ public sealed class ProxyReddit : ProxyService
             var postData = GetPostData(fullPostInfo);
             var crossPostId = GetParentPostIdAsync(postData);
             long size;
-            if (!string.IsNullOrWhiteSpace(crossPostId) && postData?.СrosspostParentList is not null && postData.СrosspostParentList.Count > 0)
+            if (!string.IsNullOrWhiteSpace(crossPostId) && postData?.СrosspostParentList is not null &&
+                postData.СrosspostParentList.Count > 0)
             {
                 fullPostInfo = await GetFullPostInfo($"{crossPostId}");
                 postData = GetPostData(fullPostInfo);
@@ -105,10 +102,13 @@ public sealed class ProxyReddit : ProxyService
             {
                 var (error, postContent) = postData.Url switch
                 {
-                    var gfycat when gfycatRegex.IsMatch(gfycat, RegexOptions.IgnoreCase) => await GetContentGfyCat(gfycat, header, postData.Over18),
-                    var redGif when redGifRegex.IsMatch(redGif, RegexOptions.IgnoreCase) => await GetContentRedGif(redGif, header),
-                    var imgur when imgurRegex.IsMatch(imgur, RegexOptions.IgnoreCase) => await GetContentImgur(postData, header),
-                    _ => ("not match", null),
+                    var gfycat when gfycatRegex.IsMatch(gfycat, RegexOptions.IgnoreCase) => await GetContentGfyCat(
+                        gfycat, header, postData.Over18),
+                    var redGif when redGifRegex.IsMatch(redGif, RegexOptions.IgnoreCase) => await GetContentRedGif(
+                        redGif, header),
+                    var imgur when imgurRegex.IsMatch(imgur, RegexOptions.IgnoreCase) => await GetContentImgur(postData,
+                        header),
+                    _ => ("not match", null)
                 };
                 if (postContent is not null) return postContent;
                 if (postData.Preview?.RedditVideoPreview is not null && error == "not found")
@@ -127,8 +127,8 @@ public sealed class ProxyReddit : ProxyService
                     galleryMedia);
             }
 
-            if (postData.Media == null && !postData.IsVideo &&
-                (string.IsNullOrWhiteSpace(postData.Url) && !string.IsNullOrWhiteSpace(postData.SelfText)))
+            if (postData.Media == null && !postData.IsVideo && string.IsNullOrWhiteSpace(postData.Url) &&
+                !string.IsNullOrWhiteSpace(postData.SelfText))
                 return new ProxyResponseContent(postData.SelfText, header);
 
             if (picturesRegex.IsMatch(postData.Url, RegexOptions.IgnoreCase))
@@ -154,12 +154,11 @@ public sealed class ProxyReddit : ProxyService
                     new[] { new MediaInfo(postData.Url, size, MediaType.Video, source.Width, source.Height) });
             }
 
-            if (postData.Media is not null)
-            {
-                return await HandlerMediaReddit(postData.Media, postData.Url, header);
-            }
+            if (postData.Media is not null) return await HandlerMediaReddit(postData.Media, postData.Url, header);
 
-            return new ProxyResponseContent($"{(string.IsNullOrWhiteSpace(postData.Url) ? string.Empty : $"{postData.Url}\n")}{postData.SelfText}", header);
+            return new ProxyResponseContent(
+                $"{(string.IsNullOrWhiteSpace(postData.Url) ? string.Empty : $"{postData.Url}\n")}{postData.SelfText}",
+                header);
         }
         catch (Exception ex)
         {
@@ -259,19 +258,24 @@ public sealed class ProxyReddit : ProxyService
             {
                 size = await ProxyHelper.GetSizeContentUrlAsync(video.ThumbnailUrl);
                 return new ProxyResponseContent(string.Empty, header, UrlVideo:
-                    new[] { new MediaInfo(video.ThumbnailUrl, size, MediaType.Video, video.ThumbnailWidth, video.ThumbnailHeight) });
+                    new[]
+                    {
+                        new MediaInfo(video.ThumbnailUrl, size, MediaType.Video, video.ThumbnailWidth,
+                            video.ThumbnailHeight)
+                    });
             }
-            else
-            {
-                return new ProxyResponseContent(url, header);
-            }
+
+            return new ProxyResponseContent(url, header);
         }
 
         var redditVideo = redditPostMedia.RedditVideo;
         if (string.IsNullOrWhiteSpace(redditVideo?.FallbackUrl)) return null;
         size = await ProxyHelper.GetSizeContentUrlAsync(redditVideo.FallbackUrl);
         return new ProxyResponseContent(string.Empty, header, UrlVideo:
-            new[] { new MediaInfo(redditVideo.FallbackUrl, size, MediaType.Video, redditVideo.Width, redditVideo.Height) });
+            new[]
+            {
+                new MediaInfo(redditVideo.FallbackUrl, size, MediaType.Video, redditVideo.Width, redditVideo.Height)
+            });
     }
 
     /// <summary>
@@ -338,7 +342,8 @@ public sealed class ProxyReddit : ProxyService
     /// <param name="header">Header reddit post.</param>
     /// <param name="nsfw">Flag nsfw post.</param>
     /// <returns>Content gfycat.</returns>
-    private async Task<(string Error, ProxyResponseContent? Content)> GetContentGfyCat(string? url, string header, bool nsfw)
+    private async Task<(string Error, ProxyResponseContent? Content)> GetContentGfyCat(string? url, string header,
+        bool nsfw)
     {
         if (url is null) return ("not valid url", null);
         var id = url[(url.LastIndexOf("/") + 1)..];
@@ -359,20 +364,28 @@ public sealed class ProxyReddit : ProxyService
         var text = await response.Content.ReadAsStringAsync();
 
         var gfycatData = JsonSerializer.Deserialize<GfycatData>(text);
-        if (gfycatData is null || gfycatData.GfyItem is null || gfycatData.GfyItem.ContentUrls is null) return ("not found", null);
+        if (gfycatData is null || gfycatData.GfyItem is null || gfycatData.GfyItem.ContentUrls is null)
+            return ("not found", null);
 
         if (gfycatData.GfyItem.HasAudio)
         {
             var video = gfycatData.GfyItem.ContentUrls["mobile"];
             if (video is null || string.IsNullOrWhiteSpace(video.Url)) return ("not found", null);
             return ("Ok", new ProxyResponseContent(string.Empty, header, UrlVideo:
-                new[] { new MediaInfo(video.Url, ProxyHelper.GetMbFromByte(video.Size ?? 0), MediaType.Video, video.Width, video.Height) }));
+                new[]
+                {
+                    new MediaInfo(video.Url, ProxyHelper.GetMbFromByte(video.Size ?? 0), MediaType.Video, video.Width,
+                        video.Height)
+                }));
         }
 
         var gif = gfycatData.GfyItem.ContentUrls["max5mbGif"];
         if (gif is null || string.IsNullOrWhiteSpace(gif.Url)) return ("not found", null);
         return ("Ok", new ProxyResponseContent(string.Empty, header, UrlVideo:
-            new[] { new MediaInfo(gif.Url, ProxyHelper.GetMbFromByte(gif.Size ?? 0), MediaType.Video, gif.Width, gif.Height) }));
+            new[]
+            {
+                new MediaInfo(gif.Url, ProxyHelper.GetMbFromByte(gif.Size ?? 0), MediaType.Video, gif.Width, gif.Height)
+            }));
     }
 
 
@@ -399,7 +412,7 @@ public sealed class ProxyReddit : ProxyService
     {
         var client = new HttpClient
         {
-            BaseAddress = new Uri($"https://api.redgifs.com/v2/gifs/{id?.ToLower()}"),
+            BaseAddress = new Uri($"https://api.redgifs.com/v2/gifs/{id?.ToLower()}")
         };
         client.DefaultRequestHeaders
             .Accept
@@ -424,7 +437,10 @@ public sealed class ProxyReddit : ProxyService
             if (videoUrl is null || string.IsNullOrWhiteSpace(videoUrl)) return ("not found", null);
             size = await ProxyHelper.GetSizeContentUrlAsync(videoUrl);
             return ("Ok", new ProxyResponseContent(string.Empty, header, UrlVideo:
-                new[] { new MediaInfo(videoUrl, size, MediaType.Video, redGiftData.Gif.Width, redGiftData.Gif.Height) }));
+                new[]
+                {
+                    new MediaInfo(videoUrl, size, MediaType.Video, redGiftData.Gif.Width, redGiftData.Gif.Height)
+                }));
         }
 
         var gifUrl = redGiftData.Gif.Urls?["hd"];
@@ -440,7 +456,8 @@ public sealed class ProxyReddit : ProxyService
     /// <param name="postData"></param>
     /// <param name="header"></param>
     /// <returns></returns>
-    private async Task<(string Error, ProxyResponseContent? Content)> GetContentImgur(RedditPostData postData, string header)
+    private async Task<(string Error, ProxyResponseContent? Content)> GetContentImgur(RedditPostData postData,
+        string header)
     {
         if (postData.Url is null) return ("not valid url", null);
         long size;
@@ -462,25 +479,23 @@ public sealed class ProxyReddit : ProxyService
         if (gifRegex.IsMatch(postData.Url?.ToLower()) || gifvRegex.IsMatch(postData.Url?.ToLower()))
         {
             var source = postData.Preview?.RedditVideoPreview; // trick
-            var urlMp4 = $"{postData.Url[..(postData.Url.LastIndexOf("."))]}.mp4";
+            var urlMp4 = $"{postData.Url[..postData.Url.LastIndexOf(".")]}.mp4";
             size = await ProxyHelper.GetSizeContentUrlAsync(urlMp4);
             if (source is null)
-            {
                 return ("Ok", new ProxyResponseContent(string.Empty, header, UrlVideo:
                     new[] { new MediaInfo(urlMp4, size, MediaType.Video) }));
-            }
 
             return ("Ok", new ProxyResponseContent(string.Empty, header, UrlVideo:
                 new[] { new MediaInfo(urlMp4, size, MediaType.Video, source.Width, source.Height) }));
         }
 
         var id = postData.Url[(postData.Url.LastIndexOf("/") + 1)..];
-        var modify = postData.Url[(postData.Url.LastIndexOf("/") - 1)];
+        var modify = postData.Url[postData.Url.LastIndexOf("/") - 1];
         if (modify == 'a')
         {
             var client = new HttpClient
             {
-                BaseAddress = new Uri($"https://api.imgur.com/3/album/{id}"),
+                BaseAddress = new Uri($"https://api.imgur.com/3/album/{id}")
             };
 
             client.DefaultRequestHeaders.Add("Authorization", $"Client-ID {ImgurAppId}");
@@ -491,11 +506,22 @@ public sealed class ProxyReddit : ProxyService
 
             var imgurAlbum = JsonSerializer.Deserialize<ImgurAlbum>(text);
 
-            var media = imgurAlbum?.Data?.Images?.Select(x => new MediaInfo(x.Link, ProxyHelper.GetMbFromByte(x.Size ?? 0), x.Type?.Contains("image") ?? false ? MediaType.Photo : MediaType.Video, x.Width, x.Height));
-            if (media is null || !media.Any()) 
-                return ("Ok", new ProxyResponseContent($"{(string.IsNullOrWhiteSpace(postData.Url) ? string.Empty : $"{postData.Url}\n")}{postData.SelfText}", header));
-            return ("Ok", new ProxyResponseContent(string.Empty, header, media.Where(x => x.Type == MediaType.Photo), media.Where(x => x.Type != MediaType.Photo)));
+            var media = imgurAlbum?.Data?.Images?.Select(x => new MediaInfo(x.Link,
+                ProxyHelper.GetMbFromByte(x.Size ?? 0),
+                x.Type?.Contains("image") ?? false ? MediaType.Photo : MediaType.Video, x.Width, x.Height));
+            if (media is null || !media.Any())
+                return ("Ok",
+                    new ProxyResponseContent(
+                        $"{(string.IsNullOrWhiteSpace(postData.Url) ? string.Empty : $"{postData.Url}\n")}{postData.SelfText}",
+                        header));
+            return ("Ok",
+                new ProxyResponseContent(string.Empty, header, media.Where(x => x.Type == MediaType.Photo),
+                    media.Where(x => x.Type != MediaType.Photo)));
         }
-        return ("Ok", new ProxyResponseContent($"{(string.IsNullOrWhiteSpace(postData.Url) ? string.Empty : $"{postData.Url}\n")}{postData.SelfText}", header));
+
+        return ("Ok",
+            new ProxyResponseContent(
+                $"{(string.IsNullOrWhiteSpace(postData.Url) ? string.Empty : $"{postData.Url}\n")}{postData.SelfText}",
+                header));
     }
 }

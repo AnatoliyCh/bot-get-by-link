@@ -15,7 +15,7 @@ public sealed class RedditPostMedia
     public RedditPostMediaVideo? RedditVideo { get; init; } = null;
 
     /// <summary>
-    ///     Gets reddit video.
+    ///     Gets other service video.
     /// </summary>
     [JsonPropertyName("oembed")]
     public RedditPostMediaVideo? Oembed { get; init; } = null;

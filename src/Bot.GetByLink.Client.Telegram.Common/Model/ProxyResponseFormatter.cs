@@ -4,7 +4,6 @@ using Bot.GetByLink.Common.Infrastructure.Model;
 using Bot.GetByLink.Common.Interfaces.Configuration.Clients;
 using Bot.GetByLink.Common.Interfaces.Proxy;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 
 namespace Bot.GetByLink.Client.Telegram.Common.Model;
 
@@ -51,7 +50,7 @@ public class ProxyResponseFormatter : IFormatterContent
             .Select<IMediaInfo, InputMediaBase>(media => new InputMediaPhoto(media.Url));
         var listVideoMedias = listMedia.Where(x => x.Type == MediaType.Video || x.Type == MediaType.Gif)
             .Select<IMediaInfo, InputMediaBase>(media => new InputMediaVideo(media.Url));
-        
+
         var groupListFormatedMedias = listPhotoMedias
             .Split(configuration.MaxColMediaInMessage)
             .Select(x => x.ToList())

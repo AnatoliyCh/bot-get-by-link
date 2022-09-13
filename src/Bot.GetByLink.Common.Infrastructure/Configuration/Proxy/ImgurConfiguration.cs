@@ -1,34 +1,28 @@
-﻿using Bot.GetByLink.Common.Interfaces.Configuration.Proxy;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
+using Bot.GetByLink.Common.Interfaces.Configuration.Proxy;
 
-namespace Bot.GetByLink.Common.Infrastructure.Configuration.Proxy
+namespace Bot.GetByLink.Common.Infrastructure.Configuration.Proxy;
+
+/// <summary>
+///     Imgur proxy configuration.
+/// </summary>
+public sealed class ImgurConfiguration : IImgurConfiguration
 {
     /// <summary>
-    ///     Imgur proxy configuration.
+    ///     Gets a value indicating whether whether to start a proxy.
     /// </summary>
-    public sealed class ImgurConfiguration : IImgurConfiguration
-    {
-        /// <summary>
-        ///     Gets a value indicating whether whether to start a proxy.
-        /// </summary>
-        [JsonPropertyName("Run")]
-        public bool Run { get; init; } = false;
+    [JsonPropertyName("Run")]
+    public bool Run { get; init; } = false;
 
-        /// <summary>
-        ///     Gets application Id.
-        /// </summary>
-        [JsonPropertyName("AppId")]
-        public string AppId { get; init; } = string.Empty;
+    /// <summary>
+    ///     Gets application Id.
+    /// </summary>
+    [JsonPropertyName("AppId")]
+    public string AppId { get; init; } = string.Empty;
 
-        /// <summary>
-        ///     Gets secret key.
-        /// </summary>
-        [JsonPropertyName("Secret")]
-        public string Secret { get; init; } = string.Empty;
-    }
+    /// <summary>
+    ///     Gets secret key.
+    /// </summary>
+    [JsonPropertyName("Secret")]
+    public string Secret { get; init; } = string.Empty;
 }

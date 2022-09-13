@@ -99,7 +99,7 @@ public sealed class RedditPostData
     public RedditPostPreview? Preview { get; init; } = null;
 
     /// <summary>
-    ///     Gets preview.
+    ///     Gets list parent post.
     /// </summary>
     [JsonPropertyName("crosspost_parent_list")]
     public IList<RedditPostData>? СrosspostParentList { get; init; } = null;

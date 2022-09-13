@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-
-namespace Bot.GetByLink.Proxy.Common;
+﻿namespace Bot.GetByLink.Proxy.Common;
 
 /// <summary>
 ///     Class general methods for proxy.
@@ -30,11 +28,14 @@ public static class ProxyHelper
     }
 
     /// <summary>
-    /// Function for cast byte to megabyte.
+    ///     Function for cast byte to megabyte.
     /// </summary>
     /// <param name="countByte">Count byte.</param>
     /// <returns>Count megabyte.</returns>
-    public static long GetMbFromByte(long countByte) => countByte / OneMb;
+    public static long GetMbFromByte(long countByte)
+    {
+        return countByte / OneMb;
+    }
 
     /// <summary>
     ///     Function for check has content from url.
@@ -45,8 +46,6 @@ public static class ProxyHelper
     {
         HttpClient client = new();
         client.BaseAddress = new Uri(url);
-        var productValue = new ProductInfoHeaderValue("BotGetByLink", "1.0");
-        client.DefaultRequestHeaders.UserAgent.Add(productValue);
         var request = new HttpRequestMessage(HttpMethod.Head, string.Empty);
         var response = await client.SendAsync(request);
         return response.IsSuccessStatusCode;
