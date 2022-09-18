@@ -42,7 +42,7 @@ public static class ProxyHelper
     /// </summary>
     /// <param name="url">Url.</param>
     /// <returns>Has url content.</returns>
-    public static async Task<bool> CheckContentUrl(string url)
+    public static async Task<bool> CheckContentUrlAsync(string url)
     {
         HttpClient client = new();
         client.BaseAddress = new Uri(url);
