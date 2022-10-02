@@ -63,7 +63,7 @@ public class ProxyResponseFormatter : IFormatterContent
         {
             var itemMedias = groupListFormatedMedias[i];
             var firstItemMedia = itemMedias[0];
-            if (firstItemMedia != null) firstItemMedia.Caption = textMessages.Skip(i).Take(1).FirstOrDefault();
+            if (firstItemMedia != null) firstItemMedia.Caption = textMessages.Skip(i).FirstOrDefault();
         }
 
         return groupListFormatedMedias.Select(x => x.Select(y => y as IAlbumInputMedia));
@@ -129,7 +129,7 @@ public class ProxyResponseFormatter : IFormatterContent
         if (mediaPicture?.Any() ?? false)
             foreach (var inputMediaPhoto in mediaPicture)
                 if (inputMediaPhoto.Size < 0
-                    || inputMediaPhoto.Size > configuration.MaxSizeMbPhoto
+                    || inputMediaPhoto.Size >= configuration.MaxSizeMbPhoto
                     || inputMediaPhoto.Width > configuration.MaxSizePxMedia
                     || inputMediaPhoto.Height > configuration.MaxSizePxMedia)
                     urlText = $"{inputMediaPhoto.Url}\n{urlText}";
@@ -138,7 +138,7 @@ public class ProxyResponseFormatter : IFormatterContent
         if (mediaVideo?.Any() ?? false)
             foreach (var inputMediaVideo in mediaVideo)
                 if (inputMediaVideo.Size < 0
-                    || inputMediaVideo.Size > configuration.MaxSizeMbVideo
+                    || inputMediaVideo.Size >= configuration.MaxSizeMbVideo
                     || inputMediaVideo.Width > configuration.MaxSizePxMedia
                     || inputMediaVideo.Height > configuration.MaxSizePxMedia)
                     urlText = $"{inputMediaVideo.Url}\n{urlText}";

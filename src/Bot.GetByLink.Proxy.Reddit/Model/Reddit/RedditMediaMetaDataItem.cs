@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Bot.GetByLink.Proxy.Reddit.Model;
+namespace Bot.GetByLink.Proxy.Reddit.Model.Reddit;
 
 /// <summary>
 ///     Class for media metadata item.

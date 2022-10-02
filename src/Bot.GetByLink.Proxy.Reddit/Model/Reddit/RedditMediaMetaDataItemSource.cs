@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using System.Web;
 
-namespace Bot.GetByLink.Proxy.Reddit.Model;
+namespace Bot.GetByLink.Proxy.Reddit.Model.Reddit;
 
 /// <summary>
 ///     Class for media metadata item source.
@@ -17,13 +17,13 @@ public sealed class RedditMediaMetaDataItemSource
     ///     Gets height element.
     /// </summary>
     [JsonPropertyName("y")]
-    public int? Height { get; init; } = 0;
+    public int Height { get; init; } = 0;
 
     /// <summary>
     ///     Gets width element.
     /// </summary>
     [JsonPropertyName("x")]
-    public int? Width { get; init; } = 0;
+    public int Width { get; init; } = 0;
 
     /// <summary>
     ///     Gets width element.

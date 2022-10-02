@@ -1,11 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Bot.GetByLink.Proxy.Reddit.Model;
+namespace Bot.GetByLink.Proxy.Reddit.Model.Reddit;
 
 /// <summary>
 ///     Reddit access token class.
 /// </summary>
-public sealed class AccessTokenReddit
+public sealed class RedditAccessToken
 {
     /// <summary>
     ///     Gets  access token.
