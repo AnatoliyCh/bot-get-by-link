@@ -1,9 +1,9 @@
 ﻿namespace Bot.GetByLink.Common.Interfaces.Configuration.Proxy;
 
 /// <summary>
-///     Reddit proxy setup interface.
+///     Imgur proxy setup interface.
 /// </summary>
-public interface IRedditConfiguration : IProxyConfiguration
+public interface IImgurConfiguration : IProxyConfiguration
 {
     /// <summary>
     ///     Gets application Id.
@@ -14,9 +14,4 @@ public interface IRedditConfiguration : IProxyConfiguration
     ///     Gets secret key.
     /// </summary>
     public string Secret { get; init; }
-
-    /// <summary>
-    ///     Gets sub services.
-    /// </summary>
-    public IRedditSubServicesConfiguration? SubServices { get; init; }
 }

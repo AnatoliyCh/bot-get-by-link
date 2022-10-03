@@ -62,8 +62,8 @@ public sealed class AlbumStrategy : ContentReturnStrategy
             var (ownerId, albumId) = GetAlbumIds(id);
             if (ownerId is null || albumId is null) return null;
 
-            var info = await GetInfobyAlbum((long)ownerId, (long)albumId);
-            var media = await GetAlbum((long)ownerId, (long)albumId);
+            var info = await GetInfobyAlbumAsync((long)ownerId, (long)albumId);
+            var media = await GetAlbumAsync((long)ownerId, (long)albumId);
 
             return new ProxyResponseContent(info, UrlPicture: media);
         }
@@ -91,7 +91,7 @@ public sealed class AlbumStrategy : ContentReturnStrategy
             {
                 if (album.OwnerId is null || album.Thumb.AlbumId is null) continue;
 
-                var photos = await GetAlbum((long)album.OwnerId, (long)album.Thumb.AlbumId);
+                var photos = await GetAlbumAsync((long)album.OwnerId, (long)album.Thumb.AlbumId);
                 if (photos is not null && photos.Any()) mediasAsList.AddRange(photos);
             }
 
@@ -114,7 +114,7 @@ public sealed class AlbumStrategy : ContentReturnStrategy
         return (null, null);
     }
 
-    private async Task<string> GetInfobyAlbum(long ownerId, long albumId)
+    private async Task<string> GetInfobyAlbumAsync(long ownerId, long albumId)
     {
         var photoGetAlbumsParams = new PhotoGetAlbumsParams
         {
@@ -127,7 +127,7 @@ public sealed class AlbumStrategy : ContentReturnStrategy
         return $"{album.Title}\n{album.Description}";
     }
 
-    private async Task<IEnumerable<IMediaInfo>?> GetAlbum(long ownerId, long albumId)
+    private async Task<IEnumerable<IMediaInfo>?> GetAlbumAsync(long ownerId, long albumId)
     {
         var photos = new List<Photo>((int)stepObjectsInAlbum);
         var offset = 0ul;

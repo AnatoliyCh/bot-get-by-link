@@ -49,4 +49,9 @@ public interface ITelegramConfiguration
     ///     Gets max text lenght for message.
     /// </summary>
     public int MaxColMediaInMessage { get; init; }
+
+    /// <summary>
+    ///     Gets max media size px for message.
+    /// </summary>
+    public int MaxSizePxMedia { get; init; }
 }

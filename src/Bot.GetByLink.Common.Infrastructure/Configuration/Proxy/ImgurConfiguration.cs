@@ -1,13 +1,12 @@
 ﻿using System.Text.Json.Serialization;
-using Bot.GetByLink.Common.Interfaces.Configuration;
 using Bot.GetByLink.Common.Interfaces.Configuration.Proxy;
 
 namespace Bot.GetByLink.Common.Infrastructure.Configuration.Proxy;
 
 /// <summary>
-///     Reddit proxy configuration.
+///     Imgur proxy configuration.
 /// </summary>
-public sealed class RedditConfiguration : IRedditConfiguration
+public sealed class ImgurConfiguration : IImgurConfiguration
 {
     /// <summary>
     ///     Gets a value indicating whether whether to start a proxy.
@@ -26,9 +25,4 @@ public sealed class RedditConfiguration : IRedditConfiguration
     /// </summary>
     [JsonPropertyName("Secret")]
     public string Secret { get; init; } = string.Empty;
-
-    /// <summary>
-    ///     Gets sub services.
-    /// </summary>
-    public IRedditSubServicesConfiguration? SubServices { get; init; } = new RedditSubServicesConfiguration();
 }

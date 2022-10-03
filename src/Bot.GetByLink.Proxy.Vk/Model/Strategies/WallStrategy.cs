@@ -74,14 +74,14 @@ public sealed class WallStrategy : ContentReturnStrategy
             {
                 Task.Run(async () =>
                 {
-                    var content = await GetContentByPost(post);
+                    var content = await GetContentByPostAsync(post);
                     if (content is not null) proxyResponseContent[0] = (ProxyResponseContent)content;
                 }),
                 Task.Run(async () =>
                 {
                     if (repost is null) return;
 
-                    var content = await GetContentByPost(repost);
+                    var content = await GetContentByPostAsync(repost);
                     if (content is not null) proxyResponseContent[1] = (ProxyResponseContent)content;
                 })
             };
@@ -123,7 +123,7 @@ public sealed class WallStrategy : ContentReturnStrategy
         throw new NotImplementedException();
     }
 
-    private async Task<IProxyContent?> GetContentByPost(Post post)
+    private async Task<IProxyContent?> GetContentByPostAsync(Post post)
     {
         var photos = new List<Photo>();
         var albums = new List<Album>();

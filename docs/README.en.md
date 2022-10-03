@@ -8,7 +8,9 @@ Service links supported:
   
 - [`Reddit`](https://www.reddit.com/)  
 
-Supports link: https://www.reddit.com/r/*/comments/*  
+Supports link:
+1. Regular posts https://www.reddit.com/r/*/comments/*  
+2. Albums/Galleries https://www.reddit.com/gallery/*  
   
 Supports forwarding from the Reddit mobile app.  
   
@@ -38,7 +40,7 @@ Some restrictions:
   
 Supported Clients
 
--   [`Telegram`][1] (**link to bot**);  
+-   [`Telegram`][1] [Link](https://t.me/BotGetByLink_bot);  
   
 General features:  
 1. If there is a lot of content in the post (example: a post with a large text), the bot will send it in parts and with an interval specified in the config;  

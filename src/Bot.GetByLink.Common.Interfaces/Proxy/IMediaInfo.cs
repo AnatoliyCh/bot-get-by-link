@@ -19,4 +19,14 @@ public interface IMediaInfo
     ///     Gets type media.
     /// </summary>
     public MediaType Type { get; init; }
+
+    /// <summary>
+    ///     Gets width media.
+    /// </summary>
+    public int? Width { get; init; }
+
+    /// <summary>
+    ///     Gets height media.
+    /// </summary>
+    public int? Height { get; init; }
 }
