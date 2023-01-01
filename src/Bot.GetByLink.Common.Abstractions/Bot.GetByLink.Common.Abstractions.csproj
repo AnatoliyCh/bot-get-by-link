@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Bot.GetByLink.Common.Interfaces\Bot.GetByLink.Common.Interfaces.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Bot.GetByLink.Common.Interfaces\Bot.GetByLink.Common.Interfaces.csproj" />
+    </ItemGroup>
 
 </Project>

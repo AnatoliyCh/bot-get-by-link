@@ -1,32 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <UserSecretsId>847f44c3-c440-4259-9880-1132b97b4024</UserSecretsId>
-    <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
-    <DockerfileContext>..\..</DockerfileContext>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <UserSecretsId>847f44c3-c440-4259-9880-1132b97b4024</UserSecretsId>
+        <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
+        <DockerfileContext>..\..</DockerfileContext>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="..\..\appsettings.json" Link="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\appsettings.Production.json" Link="appsettings.Production.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+    <ItemGroup>
+        <Content Include="..\..\appsettings.json" Link="appsettings.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\..\appsettings.Production.json" Link="appsettings.Production.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Bot.GetByLink.Client.Telegram.Common\Bot.GetByLink.Client.Telegram.Common.csproj" />
-    <ProjectReference Include="..\Bot.GetByLink.Proxy.Reddit\Bot.GetByLink.Proxy.Reddit.csproj" />
-    <ProjectReference Include="..\Bot.GetByLink.Proxy.Vk\Bot.GetByLink.Proxy.Vk.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Bot.GetByLink.Client.Telegram.Common\Bot.GetByLink.Client.Telegram.Common.csproj" />
+        <ProjectReference Include="..\Bot.GetByLink.Proxy.Reddit\Bot.GetByLink.Proxy.Reddit.csproj" />
+        <ProjectReference Include="..\Bot.GetByLink.Proxy.Vk\Bot.GetByLink.Proxy.Vk.csproj" />
+    </ItemGroup>
 
 </Project>

@@ -1,16 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Bot.GetByLink.Common.Abstractions\Bot.GetByLink.Common.Abstractions.csproj" />
-    <ProjectReference Include="..\Bot.GetByLink.Common.Interfaces\Bot.GetByLink.Common.Interfaces.csproj" />
-    <ProjectReference Include="..\Bot.GetByLink.Common.Resources\Bot.GetByLink.Common.Resources.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Bot.GetByLink.Common.Abstractions\Bot.GetByLink.Common.Abstractions.csproj" />
+        <ProjectReference Include="..\Bot.GetByLink.Common.Interfaces\Bot.GetByLink.Common.Interfaces.csproj" />
+        <ProjectReference Include="..\Bot.GetByLink.Common.Resources\Bot.GetByLink.Common.Resources.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="SonarAnalyzer.CSharp" Version="8.51.0.59060" />
+        <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.435" />
+    </ItemGroup>
 
 </Project>
