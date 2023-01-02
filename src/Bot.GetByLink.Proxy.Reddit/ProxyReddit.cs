@@ -30,7 +30,7 @@ public sealed class ProxyReddit : ProxyService
     private readonly IRegexWrapper gfycatRegex;
     private readonly IRegexWrapper gifRegex;
     private readonly IRegexWrapper gifvRegex;
-    private readonly string ImgurAppId;
+    private readonly string imgurAppId;
     private readonly IRegexWrapper imgurRegex;
     private readonly ILogger logger;
     private readonly IRegexWrapper picturesRegex;
@@ -51,7 +51,7 @@ public sealed class ProxyReddit : ProxyService
 
         appId = configuration.Proxy.Reddit.AppId ?? string.Empty;
         secretId = configuration.Proxy.Reddit.Secret ?? string.Empty;
-        ImgurAppId = configuration.Proxy.Reddit.SubServices?.Imgur?.AppId ?? string.Empty;
+        imgurAppId = configuration.Proxy.Reddit.SubServices?.Imgur?.AppId ?? string.Empty;
         picturesRegex = new PictureRegexWrapper();
         gifRegex = new GifRegexWrapper();
         galleryRegex = new RedditGalleryRegexWrapper();
@@ -212,7 +212,7 @@ public sealed class ProxyReddit : ProxyService
     ///     Function for get gallery media.
     /// </summary>
     /// <param name="post">Post in json.</param>
-    /// <returns>List media info </returns>
+    /// <returns>List media info.</returns>
     private static async Task<IEnumerable<IMediaInfo>> GetGalleryMediaAsync(RedditPostData? post)
     {
         var galleryData = post?.GalleryData;
@@ -301,7 +301,6 @@ public sealed class ProxyReddit : ProxyService
             }));
     }
 
-
     /// <summary>
     ///     Function for get content url for redgif.
     /// </summary>
@@ -369,6 +368,40 @@ public sealed class ProxyReddit : ProxyService
             new[] { new MediaInfo(gifUrl, size, MediaType.Video, redGiftData.Gif.Width, redGiftData.Gif.Height) }));
     }
 
+    /// <summary>
+    ///     Function for get contetn imgur.
+    /// </summary>
+    /// <param name="url">url post.</param>
+    /// <param name="header">Header post.</param>
+    /// <returns>Content streamble or error.</returns>
+    private static async Task<(ProxyTypeAnswer Error, ProxyResponseContent? Content)> GetContentStreambleAsync(
+        string? url,
+        string header)
+    {
+        if (url is null) return (ProxyTypeAnswer.NotValidUrl, null);
+        var id = url[(url.LastIndexOf("/") + 1)..];
+        var client = new HttpClient
+        {
+            BaseAddress = new Uri($"https://api.streamable.com/videos/{id}")
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Get, string.Empty);
+        var response = await client.SendAsync(request);
+        if (!response.IsSuccessStatusCode) return (ProxyTypeAnswer.NotFoundContent, null);
+        var text = await response.Content.ReadAsStringAsync();
+
+        var streamableData = JsonSerializer.Deserialize<StreamableData>(text);
+        var video = streamableData?.Files?["mp4-mobile"];
+        if (video is null || string.IsNullOrWhiteSpace(video.Url)) return (ProxyTypeAnswer.NotFoundContent, null);
+
+        return (ProxyTypeAnswer.Ok,
+            new ProxyResponseContent(string.Empty, header,
+                UrlVideo: new[]
+                {
+                    new MediaInfo(video.Url, ProxyHelper.GetMbFromByte(video.Size ?? 0), MediaType.Video, video.Width,
+                        video.Height)
+                }));
+    }
 
     /// <summary>
     ///     Fucntion for handle media reddit.
@@ -514,7 +547,7 @@ public sealed class ProxyReddit : ProxyService
             BaseAddress = new Uri($"https://api.imgur.com/3/album/{id}")
         };
 
-        client.DefaultRequestHeaders.Add("Authorization", $"Client-ID {ImgurAppId}");
+        client.DefaultRequestHeaders.Add("Authorization", $"Client-ID {imgurAppId}");
         var request = new HttpRequestMessage(HttpMethod.Get, string.Empty);
 
         var response = await client.SendAsync(request);
@@ -533,39 +566,5 @@ public sealed class ProxyReddit : ProxyService
         return (ProxyTypeAnswer.Ok,
             new ProxyResponseContent(string.Empty, header, media.Where(x => x.Type == MediaType.Photo),
                 media.Where(x => x.Type != MediaType.Photo)));
-    }
-
-    /// <summary>
-    ///     Function for get contetn imgur.
-    /// </summary>
-    /// <param name="url">url post.</param>
-    /// <param name="header">Header post.</param>
-    /// <returns>Content streamble or error.</returns>
-    private async Task<(ProxyTypeAnswer Error, ProxyResponseContent? Content)> GetContentStreambleAsync(string? url,
-        string header)
-    {
-        if (url is null) return (ProxyTypeAnswer.NotValidUrl, null);
-        var id = url[(url.LastIndexOf("/") + 1)..];
-        var client = new HttpClient
-        {
-            BaseAddress = new Uri($"https://api.streamable.com/videos/{id}")
-        };
-
-        var request = new HttpRequestMessage(HttpMethod.Get, string.Empty);
-        var response = await client.SendAsync(request);
-        if (!response.IsSuccessStatusCode) return (ProxyTypeAnswer.NotFoundContent, null);
-        var text = await response.Content.ReadAsStringAsync();
-
-        var streamableData = JsonSerializer.Deserialize<StreamableData>(text);
-        var video = streamableData?.Files?["mp4-mobile"];
-        if (video is null || string.IsNullOrWhiteSpace(video.Url)) return (ProxyTypeAnswer.NotFoundContent, null);
-
-        return (ProxyTypeAnswer.Ok,
-            new ProxyResponseContent(string.Empty, header,
-                UrlVideo: new[]
-                {
-                    new MediaInfo(video.Url, ProxyHelper.GetMbFromByte(video.Size ?? 0), MediaType.Video, video.Width,
-                        video.Height)
-                }));
     }
 }

@@ -91,9 +91,9 @@ public sealed class SendContentFromUrlCommand : AsyncCommand<CommandName>
     {
         if (regexWrappers is null || !regexWrappers.Any()) return null;
 
-        foreach (var regex in regexWrappers)
-            if (regex is UrlRegexWrapper urlRegex)
-                return urlRegex;
+        foreach (var regexWrapper in regexWrappers)
+            if (regexWrapper is UrlRegexWrapper regex)
+                return regex;
 
         return null;
     }
